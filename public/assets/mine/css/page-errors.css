@@ -1,0 +1,10 @@
+.error-number {
+    color: #FFFFFF !important;
+}
+.error-descripcion {
+    font-weight: normal;
+    text-align: justify;
+}
+.error-msg {
+    color: #FFFF00;
+}
