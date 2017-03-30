@@ -6,6 +6,7 @@
             <th class="text-left">CURP</th>
             <th class="text-left"> Nacimiento</th>
             <th class="text-left">Dirección</th>
+            <th class="text-left">Unidad de salud</th>
             <th class="text-left col-md-1"></th>
         </tr>
     </thead>
@@ -17,6 +18,7 @@
                 <td class="text-left"><strong>{{ $item->curp }}</strong></td>
                 <td class="text-left">{{$item->fecha_nacimiento}}</td>
                 <td class="text-left">{{ $item->calle }} {{ $item->numero }}, {{ $item->colonia }}, {{ $item->localidad->nombre }}, {{ $item->municipio->nombre }} </td>
+                <td class="text-left"><strong>{{$item->clue->clues}}</strong>, {{$item->clue->nombre}}</td>
                 <td class="text-center col-md-1">
                     <!--<a class="btn btn-success" href="{{ url(Route::getCurrentRoute()->getPath().'/'.$item->id) }}" class="button"> <i class="fa fa-info-circle"></i> </a>-->
                     <a class="btn btn-primary" href="{{ url(Route::getCurrentRoute()->getPath().'/'.$item->id.'/edit') }}" class="button"> <i class="fa fa-refresh"></i> </a>
@@ -33,6 +35,7 @@
             <th class="text-left">CURP</th>
             <th class="text-left"> Nacimiento</th>
             <th class="text-left">Dirección</th>
+            <th class="text-left">Unidad de salud</th>
             <th class="text-left col-md-1"></th>
         </tr>
     </tfoot>

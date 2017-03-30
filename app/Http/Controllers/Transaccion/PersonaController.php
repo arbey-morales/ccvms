@@ -40,15 +40,15 @@ class PersonaController extends Controller
 		if (Auth::user()->can('show.personas') && Auth::user()->activo==1) {
             if (Auth::user()->is('root|admin')) {
                 if($parametros['q']){
-                    $personas = Persona::where('deleted_at', NULL)->where('curp','LIKE',"%".$parametros['q']."%")->orWhere(DB::raw("CONCAT(nombre,' ',apellido_paterno,' ',apellido_materno)"),'LIKE',"%".$parametros['q']."%")->with('municipio','localidad')->orderBy('id', 'DESC')->take(500)->get();
+                    $personas = Persona::where('deleted_at', NULL)->where('curp','LIKE',"%".$parametros['q']."%")->orWhere(DB::raw("CONCAT(nombre,' ',apellido_paterno,' ',apellido_materno)"),'LIKE',"%".$parametros['q']."%")->with('municipio','localidad','clue')->orderBy('id', 'DESC')->take(500)->get();
                 } else {
-                    $personas = Persona::where('deleted_at', NULL)->with('municipio','localidad')->orderBy('id', 'DESC')->take(500)->get();
+                    $personas = Persona::where('deleted_at', NULL)->with('municipio','localidad','clue')->orderBy('id', 'DESC')->take(500)->get();
                 }
             } else { // Limitar por clues
                  if($parametros['q']){
-                    $personas = Persona::select('personas.*')->join('clues','clues.id','=','personas.clues_id')->where('clues.idJurisdiccion', Auth::user()->idJurisdiccion)->where('personas.deleted_at', NULL)->where('personas.curp','LIKE',"%".$parametros['q']."%")->orWhere(DB::raw("CONCAT(personas.nombre,' ',personas.apellido_paterno,' ',personas.apellido_materno)"),'LIKE',"%".$parametros['q']."%")->with('municipio','localidad')->orderBy('personas.id', 'DESC')->take(500)->get();
+                    $personas = Persona::select('personas.*')->join('clues','clues.id','=','personas.clues_id')->where('clues.idJurisdiccion', Auth::user()->idJurisdiccion)->where('personas.deleted_at', NULL)->where('personas.curp','LIKE',"%".$parametros['q']."%")->orWhere(DB::raw("CONCAT(personas.nombre,' ',personas.apellido_paterno,' ',personas.apellido_materno)"),'LIKE',"%".$parametros['q']."%")->with('municipio','localidad','clue')->orderBy('personas.id', 'DESC')->take(500)->get();
                  } else {
-                    $personas = Persona::select('personas.*')->join('clues','clues.id','=','personas.clues_id')->where('clues.idJurisdiccion', Auth::user()->idJurisdiccion)->where('personas.deleted_at', NULL)->with('municipio','localidad')->orderBy('personas.id', 'DESC')->take(500)->get();
+                    $personas = Persona::select('personas.*')->join('clues','clues.id','=','personas.clues_id')->where('clues.idJurisdiccion', Auth::user()->idJurisdiccion)->where('personas.deleted_at', NULL)->with('municipio','localidad','clue')->orderBy('personas.id', 'DESC')->take(500)->get();
                  }
             }
             return view('persona.index')->with('personas', $personas);
@@ -242,7 +242,7 @@ class PersonaController extends Controller
 				$clues = Clue::where('borradoAl',NULL)->get();
 				$municipios = Municipio::where('borradoAl',NULL)->get();
                 $localidades = Localidad::where('borradoAl',NULL)->get();
-                $agebs = Ageb::with('municipio','localidad')->all();
+                $agebs = Ageb::with('municipio','localidad')->get();
 			} else {
                 $localidades = collect();
                 $agebs = collect();
@@ -334,7 +334,7 @@ class PersonaController extends Controller
         $msgGeneral = '';
         $type       = 'flash_message_info';
 
-        if (Auth::user()->can('update.personas') && Auth::user()->activo==1) {
+        if (Auth::user()->can('create.personas') && Auth::user()->activo==1) {
             $messages = [
                 'required' => 'El campo :attribute es requirido',
                 'min'      => 'El campo :attribute debe tener :min caracteres como mínimo',
@@ -557,7 +557,7 @@ class PersonaController extends Controller
                     $clues = Clue::where('borradoAl',NULL)->get();
                     $municipios = Municipio::where('borradoAl',NULL)->get();
                     $localidades = Localidad::where('borradoAl',NULL)->get();
-                    $agebs = Ageb::with('municipio','localidad')->all();
+                    $agebs = Ageb::with('municipio','localidad')->get();
                     $persona = Persona::where('id', $id_persona)->where('deleted_at', NULL)->with('clue','pais','entidadNacimiento','entidadDomicilio','municipio','localidad','ageb','institucion','codigo','tipoParto','personasVacunasEsquemas')->first();
                 } else {
                     $localidades = collect();
@@ -656,7 +656,7 @@ class PersonaController extends Controller
         $persona = Persona::findOrFail($id);
         $personas_id = $id;
 
-        if (Auth::user()->can('create.personas') && Auth::user()->activo==1) {
+        if (Auth::user()->can('update.personas') && Auth::user()->activo==1) {
             $messages = [
                 'required' => 'El campo :attribute es requirido',
                 'min'      => 'El campo :attribute debe tener :min caracteres como mínimo',

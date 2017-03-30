@@ -13,10 +13,10 @@ class Ageb extends Model
     public $timestamps = false;
 
     public function municipio(){
-		  return $this->belongsTo('App\Catalogo\Municipio', 'idMunicipio', 'id');
+		  return $this->belongsTo('App\Catalogo\Municipio', 'idMunicipio', 'id')->select('id','clave','nombre');
 	}
 
     public function localidad(){
-		  return $this->belongsTo('App\Catalogo\Localidad', 'idLocalidad', 'id');
+		  return $this->belongsTo('App\Catalogo\Localidad', 'idLocalidad', 'id')->select('id','clave','nombre');
 	}
 }

@@ -44,14 +44,11 @@ class EsquemaController extends Controller
      */
     public function show($id)
     {
-        $data = Esquema::find($id);   
-        $esquema = $data;
+        $data = Esquema::with('vacunasEsquemas')->find($id);   
         if ($data) {
-             $data = VacunaEsquema::where('esquemas_id', $id)->with('vacuna','esquema')->orderBy('intervalo', 'ASC')->orderBy('orden_esquema', 'ASC')->get();
+            return response()->json([ 'data' => $data]);
         } else {
-            return response()->view('errors.allPagesError', ['icon' => 'search-minus', 'error' => '404', 'title' => 'Not found / No se encuentra', 'message' => 'El servidor no puede encontrar el recurso solicitado y no es posible determinar si esta ausencia es temporal o permanente.'], 404);
-        }
-        return view('catalogo.esquema.show')->with(['esquema' => $esquema, 'vacunas_esquemas' => $data]);
-        
+           return response()->json([ 'data' => NULL]);
+        }        
     }
 }

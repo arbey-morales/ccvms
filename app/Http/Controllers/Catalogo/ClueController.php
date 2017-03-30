@@ -48,8 +48,7 @@ class ClueController extends Controller
      */
     public function show($id)
     {
-        return redirect()->back();
-        /*$data = Clue::with('municipio','localidad','jurisdiccion')->find($id);        
+        $data = Clue::with('municipio','localidad','jurisdiccion')->find($id);        
         
         if(!$data ){            
             //return Response::json(['error' => "No se encuentra el recurso que esta buscando."], HttpResponse::HTTP_NOT_FOUND);
@@ -57,6 +56,6 @@ class ClueController extends Controller
         }
 
        // return Response::json([ 'data' => $data ], HttpResponse::HTTP_OK);
-        return response()->json([ 'data' => $data]);*/
+        return response()->json([ 'data' => $data]);
     }
 }
