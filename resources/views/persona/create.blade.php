@@ -373,7 +373,7 @@
             }).fail(function(){  // Calcula CURP                    
                 new PNotify({
                     title: 'Info!',
-                    text: 'No se consulto detalles de la unidad de salud',
+                    text: 'No se consultó detalles de la unidad de salud',
                     type: 'warning',
                     styling: 'bootstrap3'
                 });
@@ -387,113 +387,124 @@
         function get_esquema(esquema) {
             $('#title-esquema').empty().html('Buscando esquema '+esquema);
             $('#content-esquema').empty().html('<div class="col-md-12 text-center"> <i class="fa fa-circle-o-notch fa-spin" style="font-size:x-large;"></i> </div> ');
-            $.get('../catalogo/esquema/'+esquema, {}, function(response, status){ // Consulta CURP
-                $('#title-esquema').empty().html('<i class="fa fa-calendar text-success"></i> '+response.data.descripcion);
-                $('#content-esquema').empty();
-                var vacunas_esquemas = response.data.vacunas_esquemas;
-                var is_primer_md = false;
-                var is_last_md = false;
-                var total_md = 1;
-                var increment_md = 0;
-
-                $.each(vacunas_esquemas, function( key, ve ) {
-                    var key_plus = key; 
-                    key_plus = key_plus + 1; 
-                    var i_actual = ve.intervalo; 
-                    if((vacunas_esquemas.length - 1) == key) {
-                        var i_siguiente = 'none';
-                    } else {
-                        var i_siguiente = vacunas_esquemas[key_plus].intervalo;
-                    }
-
-                    col_md = 1; plu_col_md = 0;
-                    $.each(vacunas_esquemas, function(k, v) {
-                        if(ve.intervalo==v.intervalo){
-                            plu_col_md++;
-                        }
+            $.get('../catalogo/esquema/'+esquema, {}, function(response, status){ // Consulta esquema
+                if(response.data==null){
+                    new PNotify({
+                        title: 'Oye!',
+                        text: 'No se encontró el esquema que buscas',
+                        type: 'warning',
+                        styling: 'bootstrap3'
                     });
-                    col_md = 12 / plu_col_md;
+                    $('#title-esquema').empty().html('No se encuentra el esquema: '+esquema+'. ');
+                    $('#content-esquema').empty().html('<div class="col-md-12 text-center text-danger"> <h2 class="text-danger"> <i class="fa fa-info-circle text-info"></i> Imposible encontrar el esquema '+esquema+'. Seleccione otra fecha de nacimiento o asegurese que exista el esquema que busca. </h2></div> ');
+                } else {
+                    $('#title-esquema').empty().html('<i class="fa fa-calendar text-success"></i> '+response.data.descripcion);
+                    $('#content-esquema').empty();
+                    var vacunas_esquemas = response.data.vacunas_esquemas;
+                    var is_primer_md = false;
+                    var is_last_md = false;
+                    var total_md = 1;
+                    var increment_md = 0;
 
-                    if(increment_md==0) {
-                        is_primer_md = true;
-                    } else {
-                        is_primer_md = false;
-                    }
-
-                    if(col_md==6){
-                        if(is_primer_md){
-                            col_md = 3; 
-                        }else{
-                            col_md = 9;
+                    $.each(vacunas_esquemas, function( key, ve ) {
+                        var key_plus = key; 
+                        key_plus = key_plus + 1; 
+                        var i_actual = ve.intervalo; 
+                        if((vacunas_esquemas.length - 1) == key) {
+                            var i_siguiente = 'none';
+                        } else {
+                            var i_siguiente = vacunas_esquemas[key_plus].intervalo;
                         }
-                    }
-                    
-                    if(col_md==4){
-                        if(is_primer_md){
-                            col_md = 6; 
-                        }else{
-                            col_md = 3;
+
+                        col_md = 1; plu_col_md = 0;
+                        $.each(vacunas_esquemas, function(k, v) {
+                            if(ve.intervalo==v.intervalo){
+                                plu_col_md++;
+                            }
+                        });
+                        col_md = 12 / plu_col_md;
+
+                        if(increment_md==0) {
+                            is_primer_md = true;
+                        } else {
+                            is_primer_md = false;
                         }
-                    }                
 
-                    total_md = plu_col_md;
-                    increment_md++;
-
-                    var tipo_aplicacion = '';
-                    var intervalo = '';
-                    if(ve.tipo_aplicacion==1) {
-                        tipo_aplicacion = 'Única';
-                    } 
-                    if(ve.tipo_aplicacion==2) {
-                        tipo_aplicacion = '1a Dosis';
-                    } 
-                    if(ve.tipo_aplicacion==3) {
-                        tipo_aplicacion = '2a Dosis';
-                    }
-                    if(ve.tipo_aplicacion==4){ 
-                        tipo_aplicacion = '3a Dosis'; 
-                    }
-                    if(ve.tipo_aplicacion==5){ 
-                        tipo_aplicacion = '4a Dosis'; 
-                    }
-                    if(ve.tipo_aplicacion==6) {
-                        tipo_aplicacion = 'Refuerzo';
-                    }
-
-                    if(ve.intervalo<=29) {
-                        intervalo = 'Nacimiento'; 
-                    } else {
-                        if((ve.intervalo/30)<=23) { 
-                            intervalo = (ve.intervalo/30)+' Meses';
-                        } else { 
-                            intervalo = ((ve.intervalo/30)/12)+' Años';
-                        }
-                    }
-
-                    if(key==0){
-                        $('#content-esquema').append('<div class="col-md-12">');
-                    }
-
-                    $('#content-esquema').append('<div class="animated flipInY col-lg-'+col_md+' col-md-'+col_md+' col-sm-'+col_md+' col-xs-12"><br> <div class="tile-stats" style="color:white; margin:0px; padding:3px; border:solid 2px #'+ve.vacuna.color_rgb+'; background-color:#'+ve.vacuna.color_rgb+' !important;"> <div class="row"> <div class="col-md-12"> <span style="font-size:x-large;font-weight:bold;"> '+ve.vacuna.clave+' <small> '+tipo_aplicacion+' </small> </span> <span style="font-size:large;" class="pull-right"> '+intervalo+' </span> </div> </div> <div class="row"> <div class="bt-flabels__wrapper"> <input id="fecha_aplicacion'+ve.id+'" name="fecha_aplicacion'+ve.id+'" type="text" value="" class="form-control has-feedback-left" aria-describedby="inputSuccess2Status" autocomplete="off" placeholder="Fecha de aplicación"> </div> </div> </div> </div>');
-
-                    if((vacunas_esquemas.length - 1) == key) {
-                        $('#content-esquema').append('</div>');
-                    } else {
-                        if(key!=0) {
-                            if(i_actual!=i_siguiente) { 
-                                is_primer_md = false;
-                                is_last_md = false;
-                                total_md = 1;
-                                increment_md = 0;                              
-                                $('#content-esquema').append('</div> <div class="col-md-12">');
+                        if(col_md==6){
+                            if(is_primer_md){
+                                col_md = 3; 
+                            }else{
+                                col_md = 9;
                             }
                         }
-                    }
-                });
+                        
+                        if(col_md==4){
+                            if(is_primer_md){
+                                col_md = 6; 
+                            }else{
+                                col_md = 3;
+                            }
+                        }                
 
-                setTimeout(function() {
-                    init_fecha_aplicacion();
-                }, 500);
+                        total_md = plu_col_md;
+                        increment_md++;
+
+                        var tipo_aplicacion = '';
+                        var intervalo = '';
+                        if(ve.tipo_aplicacion==1) {
+                            tipo_aplicacion = 'Única';
+                        } 
+                        if(ve.tipo_aplicacion==2) {
+                            tipo_aplicacion = '1a Dosis';
+                        } 
+                        if(ve.tipo_aplicacion==3) {
+                            tipo_aplicacion = '2a Dosis';
+                        }
+                        if(ve.tipo_aplicacion==4){ 
+                            tipo_aplicacion = '3a Dosis'; 
+                        }
+                        if(ve.tipo_aplicacion==5){ 
+                            tipo_aplicacion = '4a Dosis'; 
+                        }
+                        if(ve.tipo_aplicacion==6) {
+                            tipo_aplicacion = 'Refuerzo';
+                        }
+
+                        if(ve.intervalo<=29) {
+                            intervalo = 'Nacimiento'; 
+                        } else {
+                            if((ve.intervalo/30)<=23) { 
+                                intervalo = (ve.intervalo/30)+' Meses';
+                            } else { 
+                                intervalo = ((ve.intervalo/30)/12)+' Años';
+                            }
+                        }
+
+                        if(key==0){
+                            $('#content-esquema').append('<div class="col-md-12">');
+                        }
+
+                        $('#content-esquema').append('<div class="animated flipInY col-lg-'+col_md+' col-md-'+col_md+' col-sm-'+col_md+' col-xs-12"><br> <div class="tile-stats" style="color:white; margin:0px; padding:3px; border:solid 2px #'+ve.vacuna.color_rgb+'; background-color:#'+ve.vacuna.color_rgb+' !important;"> <div class="row"> <div class="col-md-12"> <span style="font-size:x-large;font-weight:bold;"> '+ve.vacuna.clave+' <small> '+tipo_aplicacion+' </small> </span> <span style="font-size:large;" class="pull-right"> '+intervalo+' </span> </div> </div> <div class="row"> <div class="bt-flabels__wrapper"> <input id="fecha_aplicacion'+ve.id+'" name="fecha_aplicacion'+ve.id+'" type="text" value="" class="form-control has-feedback-left" aria-describedby="inputSuccess2Status" autocomplete="off" placeholder="Fecha de aplicación"> </div> </div> </div> </div>');
+
+                        if((vacunas_esquemas.length - 1) == key) {
+                            $('#content-esquema').append('</div>');
+                        } else {
+                            if(key!=0) {
+                                if(i_actual!=i_siguiente) { 
+                                    is_primer_md = false;
+                                    is_last_md = false;
+                                    total_md = 1;
+                                    increment_md = 0;                              
+                                    $('#content-esquema').append('</div> <div class="col-md-12">');
+                                }
+                            }
+                        }
+                    });
+
+                    setTimeout(function() {
+                        init_fecha_aplicacion();
+                    }, 500);
+                }
             }).fail(function(){                   
                 $('#title-esquema').empty().html('No se encuentra el esquema: '+esquema+'. ');
                 $('#content-esquema').empty().html('<div class="col-md-12 text-center text-danger"> <h2 class="text-danger"> <i class="fa fa-info-circle text-info"></i> Imposible encontrar el esquema '+esquema+'. Seleccione otra fecha de nacimiento o asegurese que exista el esquema que busca. </h2></div> ');

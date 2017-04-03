@@ -344,7 +344,8 @@ class PersonaController extends Controller
                 'numeric'  => 'El campo :attribute debe ser un número.',
                 'same'     => 'El campo :attribute debe ser igual al password',
                 'confirmed'=> 'El campo :attribute debe ser confirmado',
-                'date'     => 'El campo :attribute debe ser formato fecha'
+                'date'     => 'El campo :attribute debe ser formato fecha',
+                'before'   => 'El campo :attribute no debe ser mayor a la fecha actual'
             ];
 
             $rules = [
@@ -352,7 +353,7 @@ class PersonaController extends Controller
                 'paterno'              => 'required|min:3|max:20|string',
                 'materno'              => 'required|min:3|max:20|string',
                 'clues_id'             => 'required|min:1|numeric',
-                'fecha_nacimiento'     => 'required|date',
+                'fecha_nacimiento'     => 'required|date|before:tomorrow',
                 'curp'                 => 'required|min:17|max:18',
                 'genero'               => 'required|in:F,M',
                 'tipos_parto_id'       => 'required|min:1|numeric',
@@ -429,7 +430,24 @@ class PersonaController extends Controller
                     $fecha_apli = explode('-',$request['fecha_aplicacion'.$ve->id]);
                     if(array_key_exists(0, $fecha_apli) && array_key_exists(1, $fecha_apli) && array_key_exists(2, $fecha_apli)){
                         $temp_fecha_aplicacion = $fecha_apli[2].'-'.$fecha_apli[1].'-'.$fecha_apli[0];
-                        if (preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/",$temp_fecha_aplicacion)) { } else { $save_vac_esq = false; break; }
+                        if (preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/",$temp_fecha_aplicacion)) { 
+
+                            $today  = explode('-', date('Y-m-d'));
+                            $mktime_today = mktime(0,0,0,$today[1],$today[2],$today[0]);
+                            $born  = explode('-',$request->fecha_nacimiento);
+                            $mktime_born = mktime(0,0,0,$born[1],$born[2],$born[0]);
+                            $apli  = explode('-', $temp_fecha_aplicacion);
+                            $mktime_apli = mktime(0,0,0,$apli[1],$apli[2],$apli[0]);
+
+                            if($mktime_apli>=$mktime_born && $mktime_apli<=$mktime_today) { } else {
+                                $save_vac_esq = false; 
+                                break;
+                            }
+
+                        } else { 
+                            $save_vac_esq = false; 
+                            break; 
+                        }
                     } else{
                         $save_vac_esq = false; 
                         break;
@@ -499,7 +517,7 @@ class PersonaController extends Controller
                     $type       = 'flash_message_error';
                 }  
             } else {
-                $msgGeneral = 'Verifique fecha de aplicación de las vacunas que está registrando.';
+                $msgGeneral = 'Verifique fecha de aplicación de las vacunas que está registrando. Deben tener fomato valido, No deben mayores al día de hoy y no menores a la fecha de nacimiento';
                 $type       = 'flash_message_error';
             }        
             
