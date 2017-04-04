@@ -119,7 +119,7 @@
                                                 <h4 data-id="{{$value->role->id}}" class="text-info"> {{$value->role->description}}</h4>
                                                 @if(count($value->role->permissions)>0)
                                                     @foreach ($value->role->permissions as $k => $prms)
-                                                        <strong>{{++$k}}</strong>.- {{ $prms->permission->name }}
+                                                        <strong>{{++$k}}</strong> - {{ $prms->permission['name'] }}
                                                     @endforeach
                                                 @else
                                                     <h5>Sin permisos...</h5>
