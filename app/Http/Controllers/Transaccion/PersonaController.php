@@ -37,6 +37,9 @@ class PersonaController extends Controller
     public function index()
     {
         $parametros = Input::only('q');
+        $q = "";
+        if($parametros['q'])
+            $q = $parametros['q'];
 		if (Auth::user()->can('show.personas') && Auth::user()->activo==1) {
             if (Auth::user()->is('root|admin')) {
                 if($parametros['q']){
@@ -51,7 +54,7 @@ class PersonaController extends Controller
                     $personas = Persona::select('personas.*')->join('clues','clues.id','=','personas.clues_id')->where('clues.idJurisdiccion', Auth::user()->idJurisdiccion)->where('personas.deleted_at', NULL)->with('municipio','localidad','clue')->orderBy('personas.id', 'DESC')->take(500)->get();
                  }
             }
-            return view('persona.index')->with('personas', $personas);
+            return view('persona.index')->with('personas', $personas)->with('q', $q);
         } else {
             return response()->view('errors.allPagesError', ['icon' => 'user-secret', 'error' => '403', 'title' => 'Forbidden / Prohibido', 'message' => 'No tiene autorización para acceder al recurso. Se ha negado el acceso.'], 403);
         }
@@ -360,7 +363,6 @@ class PersonaController extends Controller
                 'entidad_federativa_nacimiento_id'       => 'required|min:1|numeric',
                 'municipios_id'        => 'required|min:1|numeric',
                 'localidades_id'       => 'required|min:1|numeric',
-                'descripcion_domicilio'=> 'required|min:3|max:100',
                 'calle'                => 'required|min:1|max:100',
                 'colonia'              => 'required|min:1|max:100',
                 'numero'               => 'required|min:1|max:5',
@@ -434,7 +436,7 @@ class PersonaController extends Controller
 
                             $today  = explode('-', date('Y-m-d'));
                             $mktime_today = mktime(0,0,0,$today[1],$today[2],$today[0]);
-                            $born  = explode('-',$request->fecha_nacimiento);
+                            $born  = explode('-', $request->fecha_nacimiento);
                             $mktime_born = mktime(0,0,0,$born[1],$born[2],$born[0]);
                             $apli  = explode('-', $temp_fecha_aplicacion);
                             $mktime_apli = mktime(0,0,0,$apli[1],$apli[2],$apli[0]);
@@ -541,9 +543,9 @@ class PersonaController extends Controller
             $person = Persona::findOrFail($id);
             if ($person) {
                 if (Auth::user()->is('root|admin')) {
-                    $persona = Persona::where('id', $id)->where('deleted_at', NULL)->with('clue','pais','entidadNacimiento','entidadDomicilio','municipio','localidad','ageb','institucion','codigo','tipoParto','personasVacunasEsquemas')->first();
+                    $persona = Persona::where('id', $id)->where('deleted_at', NULL)->with('clue','pais','entidadNacimiento','entidadDomicilio','municipio','localidad','ageb','afiliacion','codigo','tipoParto','personasVacunasEsquemas')->first();
                 } else { // Limitar por clues
-                    $persona = Persona::select('personas.*')->join('clues','clues.id','=','personas.clues_id')->where('personas.id', $id)->where('clues.idJurisdiccion', Auth::user()->idJurisdiccion)->where('personas.deleted_at', NULL)->with('clue','pais','entidadNacimiento','entidadDomicilio','municipio','localidad','ageb','institucion','codigo','tipoParto','personasVacunasEsquemas')->first();
+                    $persona = Persona::select('personas.*')->join('clues','clues.id','=','personas.clues_id')->where('personas.id', $id)->where('clues.idJurisdiccion', Auth::user()->idJurisdiccion)->where('personas.deleted_at', NULL)->with('clue','pais','entidadNacimiento','entidadDomicilio','municipio','localidad','ageb','afiliacion','codigo','tipoParto','personasVacunasEsquemas')->first();
                 }
 
                 $esquema_date = explode('-', $persona->fecha_nacimiento);
@@ -576,7 +578,7 @@ class PersonaController extends Controller
                     $municipios = Municipio::where('borradoAl',NULL)->get();
                     $localidades = Localidad::where('borradoAl',NULL)->get();
                     $agebs = Ageb::with('municipio','localidad')->get();
-                    $persona = Persona::where('id', $id_persona)->where('deleted_at', NULL)->with('clue','pais','entidadNacimiento','entidadDomicilio','municipio','localidad','ageb','institucion','codigo','tipoParto','personasVacunasEsquemas')->first();
+                    $persona = Persona::where('id', $id_persona)->where('deleted_at', NULL)->with('clue','pais','entidadNacimiento','entidadDomicilio','municipio','localidad','ageb','afiliacion','codigo','tipoParto','personasVacunasEsquemas')->first();
                 } else {
                     $localidades = collect();
                     $agebs = collect();
@@ -593,7 +595,7 @@ class PersonaController extends Controller
                             $agebs->push($i);
                         }
                     }
-                    $persona = Persona::select('personas.*')->join('clues','clues.id','=','personas.clues_id')->where('personas.id', $id_persona)->where('clues.idJurisdiccion', Auth::user()->idJurisdiccion)->where('personas.deleted_at', NULL)->with('clue','pais','entidadNacimiento','entidadDomicilio','municipio','localidad','ageb','institucion','codigo','tipoParto','personasVacunasEsquemas')->first();
+                    $persona = Persona::select('personas.*')->join('clues','clues.id','=','personas.clues_id')->where('personas.id', $id_persona)->where('clues.idJurisdiccion', Auth::user()->idJurisdiccion)->where('personas.deleted_at', NULL)->with('clue','pais','entidadNacimiento','entidadDomicilio','municipio','localidad','ageb','afiliacion','codigo','tipoParto','personasVacunasEsquemas')->first();
                 }
                 
                 //$vacunas_esquemas = VacunaEsquema::select('vacunas_esquemas.*')->join('vacunas','vacunas.id','=','vacunas_esquemas.vacunas_id')->orderBy('vacunas_esquemas.intervalo', 'ASC')->get();
@@ -692,7 +694,6 @@ class PersonaController extends Controller
                 'tipos_parto_id'       => 'required|min:1|numeric',
                 'municipios_id'        => 'required|min:1|numeric',
                 'localidades_id'       => 'required|min:1|numeric',
-                'descripcion_domicilio'=> 'required|min:3|max:100',
                 'calle'                => 'required|min:1|max:100',
                 'colonia'              => 'required|min:1|max:100',
                 'numero'               => 'required|min:1|max:5',
@@ -763,7 +764,23 @@ class PersonaController extends Controller
                     $fecha_apli = explode('-',$request['fecha_aplicacion'.$ve->id]);
                     if(array_key_exists(0, $fecha_apli) && array_key_exists(1, $fecha_apli) && array_key_exists(2, $fecha_apli)){
                         $temp_fecha_aplicacion = $fecha_apli[2].'-'.$fecha_apli[1].'-'.$fecha_apli[0];
-                        if (preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/",$temp_fecha_aplicacion)) { } else { $save_vac_esq = false; break; }
+                        if (preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/",$temp_fecha_aplicacion)) { 
+
+                            $today  = explode('-', date('Y-m-d'));
+                            $mktime_today = mktime(0,0,0,$today[1],$today[2],$today[0]);
+                            $born  = explode('-', $persona->fecha_nacimiento);
+                            $mktime_born = mktime(0,0,0,$born[1],$born[2],$born[0]);
+                            $apli  = explode('-', $temp_fecha_aplicacion);
+                            $mktime_apli = mktime(0,0,0,$apli[1],$apli[2],$apli[0]);
+
+                            if($mktime_apli>=$mktime_born && $mktime_apli<=$mktime_today) { } else {
+                                $save_vac_esq = false; 
+                                break;
+                            }
+
+                        } else { 
+                            $save_vac_esq = false; break; 
+                        }
                     } else { 
                         $save_vac_esq = false; 
                         break;
@@ -835,7 +852,7 @@ class PersonaController extends Controller
                     $type       = 'flash_message_error';
                 }  
             } else {
-                $msgGeneral = 'Verifique fecha de aplicación de las vacunas que está registrando.';
+                $msgGeneral = 'Verifique fecha de aplicación de las vacunas que está registrando. Deben tener fomato valido, No deben mayores al día de hoy y no menores a la fecha de nacimiento';
                 $type       = 'flash_message_error';
             }        
             

@@ -13,10 +13,12 @@
         <div class="x_title">
             <h2><i class="fa fa-group"></i> Censo nominal <i class="fa fa-angle-right text-danger"></i><small> Lista</small></h2>
 
-             {!! Form::open([ 'route' => 'persona.index', 'class' => 'col-md-5 col-md-offset-2', 'method' => 'GET']) !!}
-                    {!! Form::text('q', null , ['class' => 'form-control', 'id' => 'q', 'autocomplete' => 'off', 'placeholder' => 'Buscar por Nombre y CURP ' ]) !!}
+             {!! Form::open([ 'route' => 'persona.index', 'class' => 'col-md-4 col-md-offset-1', 'method' => 'GET']) !!}
+                    {!! Form::text('q', $q, ['class' => 'form-control', 'id' => 'q', 'autocomplete' => 'off', 'placeholder' => 'Buscar por Nombre y CURP ' ]) !!}
              {!! Form::close() !!}
-
+             @if(count($personas)>0)
+                <a target="_blank" class="btn btn-info col-md-1 col-md-offset-3" href="{{ url('persona-pdf') }}" class="button"> <i class="fa fa-file-pdf-o"></i> Ver .pdf </a>
+             @endif
              @permission('create.personas')<a class="btn btn-default pull-right" href="{{ route('persona.create') }}" role="button">Agregar Persona</a>@endpermission
             <div class="clearfix"></div>
         </div>

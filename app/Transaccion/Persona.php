@@ -41,7 +41,7 @@ class Persona extends Model
 		  return $this->belongsTo('App\Catalogo\Ageb', 'agebs_id', 'id');
 	}
 
-    public function institucion(){
+    public function afiliacion(){
 		  return $this->belongsTo('App\Catalogo\Institucion', 'instituciones_id', 'id');
 	}
 

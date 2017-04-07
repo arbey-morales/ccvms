@@ -53,6 +53,9 @@ Route::group(['prefix' => 'catalogo', 'namespace' => 'Catalogo', 'middleware' =>
     //Route::resource('localidad', 'LocalidadController', ['only' => ['index']] );
 });
 
+// PDF persona
+Route::get('persona-pdf', 'Pdf\PdfController@persona');
+
 // Error abort
 Route::get('error', function(){
     abort(500);             
