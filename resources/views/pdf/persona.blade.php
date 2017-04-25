@@ -88,6 +88,7 @@
           <th>AGEB</th>
           <th>Sector</th>
           <th>Mz</th>
+          <th>Esquema de vacunación</th>
         </tr>
         @if(count($data)>0)
           @foreach($data as $item)
@@ -104,11 +105,20 @@
                   <td>{{ $item->ageb['id'] }}</td>
                   <td>{{ $item->sector }}</td>
                   <td>{{ $item->manzana }}</td>
+                  <td>
+                    @if(count($item->personasVacunasEsquemas)>0)
+                      @foreach($item->personasVacunasEsquemas as $key=>$value)
+                        {{$value->fecha_aplicacion}}
+                      @endforeach
+                    @else 
+                      S/A
+                    @endif  
+                  </td>
               </tr>
           @endforeach
         @else
           <tr>
-              <td colspan="12"> Sin Resultados</td>
+              <td colspan="13"> Sin Resultados</td>
           </tr>
         @endif
     </table>

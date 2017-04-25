@@ -55,7 +55,7 @@ class Persona extends Model
 
 	public function personasVacunasEsquemas()
     {
-        return $this->hasMany('App\Catalogo\PersonaVacunaEsquema', 'personas_id','id')->where('deleted_at', NULL);
+        return $this->hasMany('App\Catalogo\PersonaVacunaEsquema', 'personas_id')->where('deleted_at', NULL);
     }
 
 }

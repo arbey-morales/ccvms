@@ -166,15 +166,15 @@
                     <div class="uk-grid uk-grid-collapse">
                         <div class="uk-width-1-2">
                             <div class="bt-flabels__wrapper">
-                                {!! Form::label('calle', 'Calle', ['for' => 'calle'] ) !!}
-                                {!! Form::text('calle', null , ['class' => 'form-control', 'data-parsley-length' => '[1, 100]', 'data-parsley-required' => 'true', 'id' => 'calle', 'autocomplete' => 'off', 'placeholder' => 'Calle' ]  ) !!}
+                                {!! Form::label('calle', '* Calle', ['for' => 'calle'] ) !!}
+                                {!! Form::text('calle', null , ['class' => 'form-control', 'data-parsley-length' => '[1, 100]', 'data-parsley-required' => 'true', 'id' => 'calle', 'autocomplete' => 'off', 'placeholder' => '* Calle' ]  ) !!}
                                 <span class="bt-flabels__error-desc">Requerido / Mín: 1 - Máx: 100 caracteres</span>
                             </div>
                         </div>
                         <div class="uk-width-1-2">
                             <div class="bt-flabels__wrapper bt-flabels--right">
-                                {!! Form::label('numero', 'No.', ['for' => 'numero'] ) !!}
-                                {!! Form::text('numero', null , ['class' => 'form-control', 'data-parsley-length' => '[1, 5]', 'data-parsley-required' => 'true', 'id' => 'numero', 'autocomplete' => 'off', 'placeholder' => 'No.' ]  ) !!}
+                                {!! Form::label('numero', '* No.', ['for' => 'numero'] ) !!}
+                                {!! Form::text('numero', null , ['class' => 'form-control', 'data-parsley-length' => '[1, 5]', 'data-parsley-required' => 'true', 'id' => 'numero', 'autocomplete' => 'off', 'placeholder' => '* No.' ]  ) !!}
                                 <span class="bt-flabels__error-desc">Requerido /    Mín: 1 - Máx: 5 caracteres</span>
                             </div>
                         </div>
@@ -183,8 +183,8 @@
                         <div class="uk-width-1-2">
                             <div class="bt-flabels__wrapper">
                                 {!! Form::label('colonia', 'Colonia', ['for' => 'colonia'] ) !!}
-                                {!! Form::text('colonia', null , ['class' => 'form-control', 'data-parsley-length' => '[3, 100]', 'data-parsley-required' => 'true', 'id' => 'colonia', 'autocomplete' => 'off', 'placeholder' => 'Colonia' ]  ) !!}
-                                <span class="bt-flabels__error-desc">Requerido / Mín: 3 - Máx: 100 caracteres</span>
+                                {!! Form::text('colonia', null , ['class' => 'form-control', 'id' => 'colonia', 'autocomplete' => 'off', 'placeholder' => 'Colonia' ]  ) !!}
+                                <!--<span class="bt-flabels__error-desc">Requerido / Mín: 3 - Máx: 100 caracteres</span>-->
                             </div>
                         </div>
                         <div class="uk-width-1-2">
@@ -474,9 +474,9 @@
                             intervalo = 'Nacimiento'; 
                         } else {
                             if((ve.intervalo/30)<=23) { 
-                                intervalo = (ve.intervalo/30)+' Meses';
+                                intervalo = Math.round((ve.intervalo/30))+' Meses';
                             } else { 
-                                intervalo = ((ve.intervalo/30)/12)+' Años';
+                                intervalo = Math.round(((ve.intervalo/30)/12))+' Años';
                             }
                         }
 

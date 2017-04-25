@@ -170,16 +170,16 @@
                     <div class="uk-grid uk-grid-collapse">
                         <div class="uk-width-1-2">
                             <div class="bt-flabels__wrapper">
-                                {!! Form::label('calle', 'Calle', ['for' => 'calle'] ) !!}
-                                {!! Form::text('calle', null , ['class' => 'form-control', 'data-parsley-length' => '[1, 100]', 'data-parsley-required' => 'true', 'id' => 'calle', 'autocomplete' => 'off', 'placeholder' => 'Calle' ]  ) !!}
+                                {!! Form::label('calle', '* Calle', ['for' => 'calle'] ) !!}
+                                {!! Form::text('calle', null , ['class' => 'form-control', 'data-parsley-length' => '[1, 100]', 'data-parsley-required' => 'true', 'id' => 'calle', 'autocomplete' => 'off', 'placeholder' => '* Calle' ]  ) !!}
                                 <span class="bt-flabels__error-desc">Requerido / Mín: 1 - Máx: 100 caracteres</span>
                             </div>
                         </div>
                         <div class="uk-width-1-2">
                             <div class="bt-flabels__wrapper bt-flabels--right">
-                                {!! Form::label('numero', 'No.', ['for' => 'numero'] ) !!}
-                                {!! Form::text('numero', null , ['class' => 'form-control', 'data-parsley-length' => '[1, 5]', 'data-parsley-required' => 'true', 'id' => 'numero', 'autocomplete' => 'off', 'placeholder' => 'No.' ]  ) !!}
-                                <span class="bt-flabels__error-desc">Requerido /    Mín: 1 - Máx: 5 caracteres</span>
+                                {!! Form::label('numero', '* No.', ['for' => 'numero'] ) !!}
+                                {!! Form::text('numero', null , ['class' => 'form-control', 'data-parsley-length' => '[1, 5]', 'data-parsley-required' => 'true', 'id' => 'numero', 'autocomplete' => 'off', 'placeholder' => '* No.' ]  ) !!}
+                                <span class="bt-flabels__error-desc">Requerido / Mín: 1 - Máx: 5 caracteres</span>
                             </div>
                         </div>
                     </div>
@@ -187,8 +187,8 @@
                         <div class="uk-width-1-2">
                             <div class="bt-flabels__wrapper">
                                 {!! Form::label('colonia', 'Colonia', ['for' => 'colonia'] ) !!}
-                                {!! Form::text('colonia', null , ['class' => 'form-control', 'data-parsley-length' => '[3, 100]', 'data-parsley-required' => 'true', 'id' => 'colonia', 'autocomplete' => 'off', 'placeholder' => 'Colonia' ]  ) !!}
-                                <span class="bt-flabels__error-desc">Requerido / Mín: 3 - Máx: 100 caracteres</span>
+                                {!! Form::text('colonia', null , ['class' => 'form-control', 'id' => 'colonia', 'autocomplete' => 'off', 'placeholder' => 'Colonia' ]  ) !!}
+                                <!--<span class="bt-flabels__error-desc">Requerido / Mín: 3 - Máx: 100 caracteres</span>-->
                             </div>
                         </div>
                         <div class="uk-width-1-2">
@@ -218,7 +218,7 @@
                 </div>                
                 
                 <div class="uk-text-center uk-margin-top pull-right">
-                    <button type="reset" class="btn btn-primary btn-lg"> <i class="fa fa-eraser"></i> Limpiar</button>
+                    <button type="reset" class="btn btn-primary btn-lg"> <i class="fa fa-history"></i> Restaurar</button>
                     @permission('update.personas')<button type="submit" class="btn btn-success btn-lg js-submit"> <i class="fa fa-save"></i> Guardar Cambios</button>@endpermission
                 </div>
 
