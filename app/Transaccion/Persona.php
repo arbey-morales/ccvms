@@ -14,48 +14,53 @@ class Persona extends Model
 	public $timestamps = false;
 
     public function clue(){
-		  return $this->belongsTo('App\Catalogo\Clue', 'clues_id', 'id');
+		return $this->belongsTo('App\Catalogo\Clue', 'clues_id', 'id')->select('id','clues','nombre','domicilio');
 	}
 
     public function pais(){
-		  return $this->belongsTo('App\Catalogo\Pais', 'paises_id', 'id');
+		return $this->belongsTo('App\Catalogo\Pais', 'paises_id', 'id');
 	}
 
     public function entidadNacimiento(){
-		  return $this->belongsTo('App\Catalogo\Entidad', 'entidad_federativa_nacimiento_id', 'id');
+		return $this->belongsTo('App\Catalogo\Entidad', 'entidad_federativa_nacimiento_id', 'id');
 	}
 
     public function entidadDomicilio(){
-		  return $this->belongsTo('App\Catalogo\Entidad', 'entidad_federativa_dimicilio_id', 'id');
+		return $this->belongsTo('App\Catalogo\Entidad', 'entidad_federativa_dimicilio_id', 'id');
 	}
 
     public function municipio(){
-		  return $this->belongsTo('App\Catalogo\Municipio', 'municipios_id', 'id');
+		  return $this->belongsTo('App\Catalogo\Municipio', 'municipios_id', 'id')->select('id','clave','nombre');
 	}
 
     public function localidad(){
-		  return $this->belongsTo('App\Catalogo\Localidad', 'localidades_id', 'id');
+		return $this->belongsTo('App\Catalogo\Localidad', 'localidades_id', 'id')->select('id','clave','nombre');
 	}
 
     public function ageb(){
-		  return $this->belongsTo('App\Catalogo\Ageb', 'agebs_id', 'id');
+		return $this->belongsTo('App\Catalogo\Ageb', 'agebs_id', 'id')->select('id','idMunicipio','idLocalidad');
 	}
 
     public function afiliacion(){
-		  return $this->belongsTo('App\Catalogo\Institucion', 'instituciones_id', 'id');
+		return $this->belongsTo('App\Catalogo\Institucion', 'instituciones_id', 'id')->select('id','clave','nombre','nombreCorto');
 	}
 
     public function codigo(){
-		  return $this->belongsTo('App\Catalogo\Codigo', 'codigos_id', 'id');
+		return $this->belongsTo('App\Catalogo\Codigo', 'codigos_id', 'id')->select('id','clave','nombre');
 	}
 
     public function tipoParto(){
-		  return $this->belongsTo('App\Catalogo\TipoParto', 'tipos_parto_id', 'id');
+		return $this->belongsTo('App\Catalogo\TipoParto', 'tipos_parto_id', 'id')->select('id','clave','descripcion');
 	}
 
 	public function personasVacunasEsquemas()
     {
-        return $this->hasMany('App\Catalogo\PersonaVacunaEsquema', 'personas_id')->where('deleted_at', NULL);
+        return $this->hasMany('App\Catalogo\PersonaVacunaEsquema', 'personas_id')->where('deleted_at', NULL)->select('id','personas_id','vacunas_esquemas_id','fecha_aplicacion','dosis');
+    }
+
+	public function aplicaciones()
+    {
+        return $this->hasMany('App\Catalogo\PersonaVacunaEsquema', 'personas_id')->where('deleted_at', NULL)->select('id','personas_id','vacunas_esquemas_id','fecha_aplicacion','dosis')->with('esquema');
     }
 
 }

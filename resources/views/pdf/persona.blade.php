@@ -77,48 +77,41 @@
     <table cellspacing="0">
         <tr>
           <th>Nombre</th>
+          <th>Tutor</th>
           <th>Nacimiento</th>
           <th> </th>
           <th>CURP</th>
-          <th>DH</th>
-          <th>TP</th>
-          <th>CD</th>
+          <!--<th>DH</th>-->
+          <th>T. Parto</th>
           <th>Dirección</th>
           <th>CLUES</th>
           <th>AGEB</th>
           <th>Sector</th>
           <th>Mz</th>
-          <th>Esquema de vacunación</th>
+          <th>Código</th>
+          <th>DH</th>
         </tr>
         @if(count($data)>0)
           @foreach($data as $item)
               <tr>
                   <td>{{ $item->nombre }}  {{ $item->apellido_paterno }} {{ $item->apellido_materno }}</td>
+                  <td>{{ $item->tutor }}</td>
                   <td>{{ $item->fecha_nacimiento }}</td>
                   <td>{{ $item->genero }}</td>
                   <td>{{ $item->curp }}</td>
-                  <td>{{ $item->afiliacion['nombreCorto'] }}</td>
-                  <td>{{ $item->tipoParto->descripcion }}</td>
-                  <td>{{ $item->codigo['nombre'] }}</td>
+                  <td> @if($item->tipoParto){{ $item->tipoParto->descripcion }} @endif </td>
                   <td>{{ $item->calle }} {{ $item->numero }}, {{ $item->colonia }}, {{ $item->localidad->nombre }}, {{ $item->municipio->nombre }} </td>
                   <td><strong>{{$item->clue->clues}}</strong>, {{$item->clue->nombre}}</td>
                   <td>{{ $item->ageb['id'] }}</td>
                   <td>{{ $item->sector }}</td>
                   <td>{{ $item->manzana }}</td>
-                  <td>
-                    @if(count($item->personasVacunasEsquemas)>0)
-                      @foreach($item->personasVacunasEsquemas as $key=>$value)
-                        {{$value->fecha_aplicacion}}
-                      @endforeach
-                    @else 
-                      S/A
-                    @endif  
-                  </td>
+                  <td> @if($item->codigo) {{ $item->codigo->nombre }} @endif </td>
+                  <td> @if($item->afiliacion) {{ $item->afiliacion->nombreCorto }} @endif </td>
               </tr>
           @endforeach
         @else
           <tr>
-              <td colspan="13"> Sin Resultados</td>
+              <td colspan="14"> Sin Resultados</td>
           </tr>
         @endif
     </table>

@@ -11,19 +11,22 @@
                 <a href="{{ route('persona.index') }}"><i class="fa fa-group"></i> Censo Nominal</a>
             </li>
             @endpermission
+            @permission('show.personas')
+            <li><a><i class="fa fa-book"></i> Reportes <span class="fa fa-chevron-down"></span></a>
+                <ul class="nav child_menu">
+                    <li><a href="{{ url('persona/reporte') }}">Censo Nominal</a></li>
+                    <!--<li><a href="{{ url('cobertura/reporte') }}">Coberturas</a></li>-->
+                </ul>
+            </li>
+            @endpermission
             @permission('show.catalogos')
             <li><a><i class="fa fa-archive"></i> Catálogos <span class="fa fa-chevron-down"></span></a>
                 <ul class="nav child_menu">
                     <li><a href="{{ route('catalogo.ageb.index') }}">Ageb</a></li>
                     <li><a href="{{ route('catalogo.clue.index') }}">Clues</a></li>
-                   <!-- <li><a href="{{ route('usuario.index') }}">Nacionalidads</a></li>
-                    <li><a href="{{ route('usuario.index') }}">Vacunas</a></li>
-                    <li><a href="{{ route('usuario.index') }}">Enfermedades</a></li>-->
                     <li><a href="{{ route('catalogo.esquema.index') }}">Esquemas</a></li>
                     <li><a href="{{ route('catalogo.municipio.index') }}">Municipios</a></li>
                     <li><a href="{{ route('catalogo.localidad.index') }}">Localidades</a></li>
-                   <!-- <li><a href="{{ route('usuario.index') }}">Ciudades</a></li>
-                    <li><a href="{{ route('usuario.index') }}">Colonias</a></li>-->
                 </ul>
             </li>
             @endpermission

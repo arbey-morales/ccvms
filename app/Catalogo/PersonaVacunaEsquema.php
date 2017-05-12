@@ -11,4 +11,9 @@ class PersonaVacunaEsquema extends Model
     protected $fillable = ["id","personas_id","vacunas_esquemas_id","fecha_programada","fecha_aplicacion","fecha_caducidad","lote","dosis"];
 
     public $timestamps = false;
+
+    public function esquema(){
+		  return $this->belongsTo('App\Catalogo\VacunaEsquema', 'vacunas_esquemas_id', 'id')->where('deleted_at', NULL)->with('vacuna')->orderBy('intervalo', 'ASC')->orderBy('orden_esquema', 'ASC');
+	}
+
 }

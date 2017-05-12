@@ -13,10 +13,10 @@ class VacunaEsquema extends Model
     public $timestamps = false;
 
     public function vacuna(){
-		  return $this->belongsTo('App\Catalogo\Vacuna', 'vacunas_id', 'id');
+		  return $this->belongsTo('App\Catalogo\Vacuna', 'vacunas_id', 'id')->select('id','vias_administracion_id','clave','nombre','orden_esquema','color_rgb')->where('deleted_at', NULL);
 	}
 
     public function esquema(){
-		  return $this->belongsTo('App\Catalogo\Esquema', 'esquemas_id', 'id');
+		  return $this->belongsTo('App\Catalogo\Esquema', 'esquemas_id', 'id')->select('id','descripcion')->where('deleted_at', NULL);
 	}
 }

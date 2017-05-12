@@ -29,7 +29,9 @@ use App\Catalogo\PersonaVacunaEsquema;
 class PersonaController extends Controller
 {
     public $tipos_aplicacion = array("X","Única","1a Dosis","2a Dosis","3a Dosis","4a Dosis","Refuerzo");
+    
     public $estados = array("X","AS","BC","BS","CC","CL","CM","CS","CH","DF","DG","GT","GR","HG","JC","MC","MN","MS","NT","NL","OC","PL","QT","QR","SP","SL","SR","TC","TS","TL","VZ","YN","ZS");
+    
     /**
      * Display a listing of the resource.
      *
@@ -56,6 +58,65 @@ class PersonaController extends Controller
                  }
             }
             return view('persona.index')->with('personas', $personas)->with('q', $q);
+        } else {
+            return response()->view('errors.allPagesError', ['icon' => 'user-secret', 'error' => '403', 'title' => 'Forbidden / Prohibido', 'message' => 'No tiene autorización para acceder al recurso. Se ha negado el acceso.'], 403);
+        }
+    }
+
+    /**
+     * Display a index of reports.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function report()
+    {
+        if (Auth::user()->can('show.personas') && Auth::user()->activo==1) {     
+			if (Auth::user()->is('root|admin')) {
+				$clues = Clue::where('borradoAl',NULL)->get();
+				$municipios = Municipio::where('borradoAl',NULL)->get();
+                $localidades = Localidad::where('borradoAl',NULL)->get();
+                $agebs = Ageb::with('municipio','localidad')->get();
+			} else {
+                $localidades = collect();
+                $agebs = collect();
+				$clues = Clue::where('idJurisdiccion', Auth::user()->idJurisdiccion)->where('borradoAl',NULL)->get();
+				$municipios = Municipio::where('idJurisdiccion', Auth::user()->idJurisdiccion)->where('borradoAl',NULL)->get();
+                foreach($municipios as $key=> $mpio){
+                    $localidades_temp = Localidad::where('idMunicipio', $mpio->id)->where('borradoAl',NULL)->get(); 
+                    foreach($localidades_temp as $id=> $item){
+                        $localidades->push($item);
+                    }
+
+                    $agebs_temp = Ageb::where('idMunicipio', $mpio->id)->where('deleted_at',NULL)->with('municipio','localidad')->get(); 
+                    foreach($agebs_temp as $k=> $i){
+                        $agebs->push($i);
+                    }
+                }
+			}
+
+            $esquema = Esquema::all();
+         
+			$arrayclue[0] = 'Seleccionar Unidad de salud';
+            foreach ($clues as $cont=>$clue) {
+                $arrayclue[$clue->id] = $clue->clues .' - '.$clue->nombre;
+            }
+			
+            $arraymunicipio[0] = 'Seleccionar Municipio';
+			foreach ($municipios as $municipio) {
+                $arraymunicipio[$municipio->id] = $municipio->clave .' - '.$municipio->nombre;
+            }
+
+            $arrayageb[0] = 'Seleccionar AGEB';
+            foreach ($agebs as $ageb) {
+                $arrayageb[$ageb->id] = $ageb->id.' - '.$ageb->localidad->nombre.', '.$ageb->municipio->nombre;
+            }
+            
+            $arraylocalidad[0] = 'Seleccionar Localidad';
+            foreach ($localidades as $localidad) {
+                $arraylocalidad[$localidad->id] = $localidad->clave .' - '.$localidad->nombre;
+            }	
+
+            return view('persona.reporte')->with(['esquema' => $esquema, 'agebs' => $arrayageb, 'localidades' => $arraylocalidad, 'clues' => $arrayclue, 'municipios' => $arraymunicipio ]);
         } else {
             return response()->view('errors.allPagesError', ['icon' => 'user-secret', 'error' => '403', 'title' => 'Forbidden / Prohibido', 'message' => 'No tiene autorización para acceder al recurso. Se ha negado el acceso.'], 403);
         }
