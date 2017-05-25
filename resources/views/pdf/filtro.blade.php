@@ -176,7 +176,7 @@
           @endforeach
         @else
           <tr>
-              <td colspan="7" align="center"> Sin Resultados</td>
+              <td colspan="7" align="center  "> Sin Resultados</td>
           </tr>
         @endif
     </table>

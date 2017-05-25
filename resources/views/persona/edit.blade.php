@@ -101,8 +101,8 @@
                     <div class="uk-grid uk-grid-collapse">
                         <div class="uk-width-1-2">
                             <div class="bt-flabels__wrapper">
-                                {!! Form::label('curp', 'CURP', ['for' => 'curp'] ) !!}
-                                {!! Form::text('curp', $persona->curp, ['class' => 'form-control', 'style' => 'font-size:x-large; color:tomato;', 'data-parsley-required' => 'true', 'readonly' => 'on', 'id' => 'curp', 'autocomplete' => 'off', 'placeholder' => 'CURP' ]  ) !!}
+                                {!! Form::label('curp', '* CURP', ['for' => 'curp'] ) !!}
+                                {!! Form::text('curp', $persona->curp, ['class' => 'form-control', 'style' => 'font-size:x-large; color:tomato;', 'data-parsley-required' => 'true', 'readonly' => 'on', 'id' => 'curp', 'autocomplete' => 'off', 'placeholder' => '* CURP' ]  ) !!}
                                 <span class="bt-flabels__error-desc">Requerido / Mín: 17 - Máx: 18 Caracteres</span>
                             </div>
                         </div>

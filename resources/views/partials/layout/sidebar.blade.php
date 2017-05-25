@@ -4,7 +4,7 @@
         <h3> {{Auth::user()->jurisdiccion->nombre}}</h3>
         <ul class="nav side-menu">
             <li>
-                <a href="{{ url('/') }}"><i class="fa fa-home"></i> Inicio </a>
+                <a href="{{ url('/') }}"><i class="fa fa-dashboard"></i> Tablero </a>
             </li>
             @permission('show.personas')
             <li>
@@ -32,11 +32,20 @@
             @endpermission
         </ul>
     </div>
-    @role('admin|root')    
+    @role('admin|root')
+        <!-- SECCIÓN SÓLO OPERADOR ESTATAL -->
         <div class="menu_section">
-            <h3>SISTEMA</h3>
+            <h3>OTROS AJUSTES</h3>
             <ul class="nav side-menu">
-                <li><a><i class="fa fa-universal-access"></i> Configuración <span class="fa fa-chevron-down"></span></a>
+                <li><a><i class="fa fa-tasks"></i> Info. CCVMS  <span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                        @permission('show.catalogos')
+                            <li><a href="{{ route('usuario.index') }}">Coberturas RENAPO</a></li>
+                            <li><a href="{{ route('usuario.index') }}">Esquema de vacunación</a></li>
+                        @endpermission
+                    </ul>
+                </li>
+                <li><a><i class="fa fa-universal-access"></i> Seguridad <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                         @permission('show.usuarios')<li><a href="{{ route('usuario.index') }}">Usuarios</a></li>@endpermission
                         @role('root') 
@@ -46,7 +55,7 @@
                     </ul>
                 </li>
             </ul>
-        </div>
+        </div>  
     @endrole
 </div>
 @endif

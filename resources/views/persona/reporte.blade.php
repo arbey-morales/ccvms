@@ -36,6 +36,10 @@
             {!! Form::open([ 'url' => 'persona-filtro-pdf', 'id' => 'personas-form', 'method' => 'GET', 'class' => 'uk-form bt-flabels js-flabels', 'data-parsley-validate' => 'on', 'data-parsley-errors-messages-disabled' => 'on']) !!}
                
                <div class="bt-form__wrapper">
+                    <div class="bt-flabels__wrapper">
+                        {!! Form::label('clues_id', 'Unidad de salud', ['for' => 'clues_id'] ) !!}
+                        {!! Form::select('clues_id', $clues,  0, ['class' => 'form-control js-data-clue select2', 'id' => 'clues_id', 'data-placeholder' => 'Unidad de salud', 'style' => 'width:100%'] ) !!}                        
+                    </div>
                     <div class="uk-grid uk-grid-collapse">
                         <div class="uk-width-1-2">
                             <div class="bt-flabels__wrapper">
@@ -50,11 +54,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="bt-flabels__wrapper">
-                        {!! Form::label('clues_id', 'Unidad de salud', ['for' => 'clues_id'] ) !!}
-                        {!! Form::select('clues_id', $clues,  0, ['class' => 'form-control js-data-clue select2', 'id' => 'clues_id', 'data-placeholder' => 'Unidad de salud', 'style' => 'width:100%'] ) !!}                        
-                    </div>
-                    <div class="uk-grid uk-grid-collapse">
+                    <!--<div class="uk-grid uk-grid-collapse">
                         <div class="uk-width-1-2">
                             <div class="bt-flabels__wrapper">
                                 {!! Form::label('municipios_id', 'Municipio', ['for' => 'municipios_id'] ) !!}
@@ -67,7 +67,7 @@
                                 {!! Form::select('localidades_id', $localidades, 0, ['class' => 'form-control js-data-localidad select2', 'id' => 'localidades_id',  'data-placeholder' => 'Localidad', 'style' => 'width:100%'] ) !!}                                
                             </div>
                         </div>
-                    </div>
+                    </div>-->
                 </div>                
                 
                 <div class="uk-text-center uk-margin-top pull-right">
