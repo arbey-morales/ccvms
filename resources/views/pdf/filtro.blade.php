@@ -94,14 +94,8 @@
           <th width="5%">Nacimiento</th>
           <th width="2%"> </th>
           <th width="10%">CURP</th>
-          <!--<th>DH</th>-->
-          <!--<th>TP</th>
-          <th>CD</th>-->
           <th>Dirección</th>
           <th>CLUES</th>
-          <!--<th>AGEB</th>
-          <th>Sector</th>
-          <th>Mz</th>-->
           <th align="center" width="40%" style="padding:0px; margin:0px;">Esquema de vacunación</th>
         </tr>
         @if(count($data)>0)
@@ -111,14 +105,8 @@
                   <td>{{ $item->fecha_nacimiento }}</td>
                   <td>{{ $item->genero }}</td>
                   <td>{{ $item->curp }}</td>
-                  <!--<td>{{ $item->afiliacion['nombreCorto'] }}</td>-->
-                  <!--<td>{{ $item->tipoParto->descripcion }}</td>
-                  <td>{{ $item->codigo['nombre'] }}</td>-->
                   <td>{{ $item->calle }} {{ $item->numero }}, {{ $item->colonia }}, {{ $item->localidad->nombre }}, {{ $item->municipio->nombre }} </td>
                   <td><strong>{{$item->clue->clues}}</strong>, {{$item->clue->nombre}}</td>
-                  <!--<td>{{ $item->ageb['id'] }}</td>
-                  <td>{{ $item->sector }}</td>
-                  <td>{{ $item->manzana }}</td>-->
                   <td>
                     @if(count($item->aplicaciones)>0)
                       <?php $vac = array(); ?>

@@ -14,7 +14,27 @@
     {!! Html::style('assets/mine/css/form.css') !!}
 
     <style>
-        #paterno,#materno,#nombre,#curp,#tutor {text-transform:uppercase};
+        #paterno,#materno,#nombre,#curp,#tutor {
+            text-transform:uppercase
+        }
+        .select-label{
+            pointer-events: none;
+            position: absolute;
+            opacity: 1;
+            top: 0;
+            -webkit-transform: translateY(15%);
+                    transform: translateY(15%);
+            z-index: 2;
+            font-weight: bold;
+            font-size: 10px;
+            text-transform: uppercase;
+            padding-left: 6px;
+            color: #52a6e1;
+            -webkit-transition: opacity 0.3s cubic-bezier(0.215, 0.61, 0.355, 1), -webkit-transform 0.3s cubic-bezier(0.215, 0.61, 0.355, 1);
+            transition: opacity 0.3s cubic-bezier(0.215, 0.61, 0.355, 1), -webkit-transform 0.3s cubic-bezier(0.215, 0.61, 0.355, 1);
+            transition: transform 0.3s cubic-bezier(0.215, 0.61, 0.355, 1), opacity 0.3s cubic-bezier(0.215, 0.61, 0.355, 1);
+            transition: transform 0.3s cubic-bezier(0.215, 0.61, 0.355, 1), opacity 0.3s cubic-bezier(0.215, 0.61, 0.355, 1), -webkit-transform 0.3s cubic-bezier(0.215, 0.61, 0.355, 1);
+        }
     </style>
 @endsection
 @section('content')
@@ -41,8 +61,9 @@
                
                <div class="bt-form__wrapper">
                     <div class="bt-flabels__wrapper">
-                        {!! Form::label('clues_id', '* Unidad de salud', ['for' => 'clues_id'] ) !!}
-                        {!! Form::select('clues_id', $clues,  1, ['class' => 'form-control js-data-clue select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'clues_id', 'data-placeholder' => '* Unidad de salud', 'style' => 'width:100%'] ) !!}
+                        <span class="select-label">* Unidad de salud</span>
+                        {!! Form::label('clue_id', '* Unidad de salud', ['for' => 'clue_id'] ) !!}
+                        {!! Form::select('clue_id', $clues,  1, ['class' => 'form-control js-data-clue select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'clue_id', 'data-placeholder' => '* Unidad de salud', 'style' => 'width:100%'] ) !!}
                         <span class="bt-flabels__error-desc">Requerido</span>
                     </div>
                     <div class="uk-grid uk-grid-collapse">
@@ -81,15 +102,17 @@
                     <div class="uk-grid uk-grid-collapse">
                         <div class="uk-width-1-2">
                             <div class="bt-flabels__wrapper">
+                                <span class="select-label">* Género</span>
                                 {!! Form::label('genero', '* Género', ['for' => 'genero'] ) !!}
                                 {!! Form::select('genero', ['F' => 'F - Femenino', 'M' => 'M - Masculino'],  'F', ['class' => 'form-control js-data-genero select2', 'data-parsley-required' => 'true', 'id' => 'genero',  'data-placeholder' => '* Género', 'style' => 'width:100%'] ) !!}
                                 <span class="bt-flabels__error-desc">Requerido</span>
                             </div>
                         </div>
                         <div class="uk-width-1-2">
-                            <div class="bt-flabels__wrapper bt-flabels--right">                                
+                            <div class="bt-flabels__wrapper bt-flabels--right">  
+                                <span class="select-label">* Entidad federativa de nacimiento</span>                              
                                 {!! Form::label('entidad_federativa_nacimiento_id', '* Entidad federativa de nacimiento', ['for' => 'entidad_federativa_nacimiento_id'] ) !!}
-                                {!! Form::select('entidad_federativa_nacimiento_id', $estados,  $clue_selected->idEntidad, ['class' => 'form-control js-data-estado select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'entidad_federativa_nacimiento_id',  'data-placeholder' => '* Entidad federativa de nacimiento', 'style' => 'width:100%'] ) !!}
+                                {!! Form::select('entidad_federativa_nacimiento_id', $estados,  $clue_selected->entidades_id, ['class' => 'form-control js-data-estado select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'entidad_federativa_nacimiento_id',  'data-placeholder' => '* Entidad federativa de nacimiento', 'style' => 'width:100%'] ) !!}
                                 <span class="bt-flabels__error-desc">Requerido</span>
                             </div>
                         </div>
@@ -104,29 +127,44 @@
                         </div>
                         <div class="uk-width-1-2">
                             <div class="bt-flabels__wrapper bt-flabels--right">
-                                {!! Form::label('tipos_parto_id', 'Tipo de parto', ['for' => 'tipos_parto_id'] ) !!}
-                                {!! Form::select('tipos_parto_id', $partos,  1, ['class' => 'form-control js-data-parto select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'tipos_parto_id',  'data-placeholder' => 'Tipo de parto', 'style' => 'width:100%'] ) !!}
+                                <span class="select-label">* Tipo de parto</span>
+                                {!! Form::label('tipo_parto_id', '* Tipo de parto', ['for' => 'tipo_parto_id'] ) !!}
+                                {!! Form::select('tipo_parto_id', $partos,  1, ['class' => 'form-control js-data-parto select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'tipo_parto_id',  'data-placeholder' => '* Tipo de parto', 'style' => 'width:100%'] ) !!}
                                 <span class="bt-flabels__error-desc">Requerido</span>
                             </div>
                         </div>
                     </div>
-                    <div class="bt-flabels__wrapper">
-                        {!! Form::label('tutor', '* Nombre del tutor', ['for' => 'tutor'] ) !!}
-                        {!! Form::text('tutor', null , ['class' => 'form-control', 'data-parsley-required' => 'true', 'data-parsley-length' => '[10, 100]', 'id' => 'tutor', 'autocomplete' => 'off', 'placeholder' => '* Nombre del tutor' ]  ) !!}
-                        <span class="bt-flabels__error-desc">Requerido / Mín: 10 - Máx: 100 caracteres</span>
+                    <div class="uk-grid uk-grid-collapse">
+                        <div class="uk-width-1-2">
+                            <div class="bt-flabels__wrapper">
+                                {!! Form::label('tutor', '* Nombre del tutor', ['for' => 'tutor'] ) !!}
+                                {!! Form::text('tutor', null , ['class' => 'form-control', 'data-parsley-required' => 'true', 'data-parsley-length' => '[10, 100]', 'id' => 'tutor', 'autocomplete' => 'off', 'placeholder' => '* Nombre del tutor' ]  ) !!}
+                                <span class="bt-flabels__error-desc">Requerido / Mín: 10 - Máx: 100 caracteres</span>
+                            </div>
+                        </div>
+                        <div class="uk-width-1-2">
+                            <div class="bt-flabels__wrapper bt-flabels--right">
+                                {!! Form::label('fecha_nacimiento_tutor', '* Fecha de nacimiento tutor', ['for' => 'fecha_nacimiento_tutor'] ) !!}
+                                {!! Form::text('fecha_nacimiento_tutor', null , ['class' => 'form-control has-feedback-left', 'aria-describedby' => 'inputSuccess2Status', 'data-parsley-required' => 'true', 'id' => 'fecha_nacimiento_tutor', 'autocomplete' => 'off', 'placeholder' => '* Fecha de nacimiento tutor' ]  ) !!}
+                                <span id="inputSuccess2Status" class="sr-only">(success)</span>
+                                <span class="bt-flabels__error-desc">Requerido</span>
+                            </div>
+                        </div>
                     </div>
                     <div class="uk-grid uk-grid-collapse">
                         <div class="uk-width-1-2">
                             <div class="bt-flabels__wrapper">
-                                {!! Form::label('municipios_id', '* Municipio', ['for' => 'municipios_id'] ) !!}
-                                {!! Form::select('municipios_id', $municipios,  $clue_selected->idMunicipio, ['class' => 'form-control js-data-municipio select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'municipios_id',  'data-placeholder' => '* Municipio', 'style' => 'width:100%'] ) !!}
+                                <span class="select-label">* Municipio</span>
+                                {!! Form::label('municipio_id', '* Municipio', ['for' => 'municipio_id'] ) !!}
+                                {!! Form::select('municipio_id', $municipios,  $clue_selected->municipios_id, ['class' => 'form-control js-data-municipio select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'municipio_id',  'data-placeholder' => '* Municipio', 'style' => 'width:100%'] ) !!}
                                 <span class="bt-flabels__error-desc">Requerido</span>
                             </div>
                         </div>
                         <div class="uk-width-1-2">
                             <div class="bt-flabels__wrapper bt-flabels--right">   
-                                {!! Form::label('localidades_id', '* Localidad', ['for' => 'localidades_id'] ) !!}
-                                {!! Form::select('localidades_id', $localidades, $clue_selected->idLocalidad, ['class' => 'form-control js-data-localidad select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'localidades_id',  'data-placeholder' => '* Localidad', 'style' => 'width:100%'] ) !!}
+                                <span class="select-label">* Localidad</span>
+                                {!! Form::label('localidad_id', '* Localidad', ['for' => 'localidad_id'] ) !!}
+                                {!! Form::select('localidad_id', $localidades, $clue_selected->localidades_id, ['class' => 'form-control js-data-localidad select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'localidad_id',  'data-placeholder' => '* Localidad', 'style' => 'width:100%'] ) !!}
                                 <span class="bt-flabels__error-desc">Requerido</span>
                             </div>
                         </div>
@@ -134,8 +172,9 @@
                     <div class="uk-grid uk-grid-collapse">
                         <div class="uk-width-1-2">
                             <div class="bt-flabels__wrapper">
-                                {!! Form::label('agebs_id', 'AGEB', ['for' => 'agebs_id'] ) !!}
-                                {!! Form::select('agebs_id', $agebs, 0, ['class' => 'form-control js-data-ageb select2', 'data-parsley-type' => 'number', 'id' => 'agebs_id', 'data-placeholder' => 'Ageb', 'style' => 'width:100%'] ) !!}
+                                <span class="select-label">AGEB</span>
+                                {!! Form::label('ageb_id', 'AGEB', ['for' => 'ageb_id'] ) !!}
+                                {!! Form::select('ageb_id', $agebs, 0, ['class' => 'form-control js-data-ageb select2', 'data-parsley-type' => 'number', 'id' => 'ageb_id', 'data-placeholder' => 'Ageb', 'style' => 'width:100%'] ) !!}
                                 
                             </div>
                         </div>
@@ -198,133 +237,73 @@
                     <div class="uk-grid uk-grid-collapse">
                         <div class="uk-width-1-2">
                             <div class="bt-flabels__wrapper">   
-                                {!! Form::label('instituciones_id', 'Afiliación', ['for' => 'instituciones_id'] ) !!}
-                                {!! Form::select('instituciones_id', $instituciones,  0, ['class' => 'form-control js-data-institucion select2', 'data-parsley-type' => 'number', 'data-parsley-min' => '0', 'id' => 'instituciones_id',  'data-placeholder' => '* Afilación', 'style' => 'width:100%'] ) !!}
+                                <span class="select-label">Afiliación</span>
+                                {!! Form::label('institucion_id', 'Afiliación', ['for' => 'institucion_id'] ) !!}
+                                {!! Form::select('institucion_id', $instituciones,  0, ['class' => 'form-control js-data-institucion select2', 'data-parsley-type' => 'number', 'data-parsley-min' => '0', 'id' => 'institucion_id',  'data-placeholder' => '* Afilación', 'style' => 'width:100%'] ) !!}
                                 <span class="bt-flabels__error-desc">Requerido</span>
                             </div>
                         </div>
                         <div class="uk-width-1-2">
-                            <div class="bt-flabels__wrapper bt-flabels--right">                                                           
-                                {!! Form::label('codigos_id', 'Código', ['for' => 'codigos_id'] ) !!}
-                                {!! Form::select('codigos_id', $codigos, 0, ['class' => 'form-control js-data-codigo select2', 'data-parsley-type' => 'number', 'data-parsley-min' => '0', 'id' => 'codigos_id',  'data-placeholder' => '* Código', 'style' => 'width:100%'] ) !!}
+                            <div class="bt-flabels__wrapper bt-flabels--right">  
+                                <span class="select-label">Código</span>                                                         
+                                {!! Form::label('codigo_id', 'Código', ['for' => 'codigo_id'] ) !!}
+                                {!! Form::select('codigo_id', $codigos, 0, ['class' => 'form-control js-data-codigo select2', 'data-parsley-type' => 'number', 'data-parsley-min' => '0', 'id' => 'codigo_id',  'data-placeholder' => '* Código', 'style' => 'width:100%'] ) !!}
                                 <span class="bt-flabels__error-desc">Requerido</span>
                             </div>
                         </div>
                     </div>
                 </div>                
                 
+                @if(count($vacunas_esquemas)>0)
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h2 id="title-esquema"><i class="fa fa-calendar text-success"></i> @if(count($esquema)>0) {{ $esquema->descripcion }} @endif </h2>
+                            <ul class="nav navbar-right panel_toolbox">
+                            </ul>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content" id="content-esquema">
+                            @if(count($vacunas_esquemas)>0)
+                                @foreach($vacunas_esquemas as $key=>$ve)
+                                    <?php $key_plus = $key; $key_plus = $key_plus + 1; $col_md = 12; $plu_col_md = 0; ?>
+                                    @if(count($vacunas_esquemas) - 1 > $key)
+                                        @foreach ($vacunas_esquemas as $k => $v)
+                                            @if($ve->fila==$v->fila)
+                                                <?php $plu_col_md++; ?>
+                                            @endif 
+                                        @endforeach 
+                                        <?php $col_md = round(12 / $plu_col_md); ?>                                 
+                                        <div class="animated flipInY col-md-{{$col_md}} col-xs-12"><br>
+                                            <div class="tile-stats" style="color:white; margin:0px; padding:3px; border:solid 2px #{{$ve->color_rgb}}; background-color:#{{$ve->color_rgb}} !important;">
+                                                <div class="row">
+                                                    <div class="col-md-12"> <span style="font-size:large;font-weight:bold;"> {{$ve->clave}} <small> @if($ve->tipo_aplicacion==1) Única @endif @if($ve->tipo_aplicacion==2) 1a Dosis @endif @if($ve->tipo_aplicacion==3) 2a Dosis @endif @if($ve->tipo_aplicacion==4) 3a Dosis @endif @if($ve->tipo_aplicacion==5) 4a Dosis @endif @if($ve->tipo_aplicacion==6) Refuerzo @endif  </small> </span> <span style="font-size:large;" class="pull-right"> @if($ve->intervalo_inicio<=29) Nacimiento @else  @if(($ve->intervalo_inicio/30)<=23){{($ve->intervalo_inicio/30)}} Meses @else {{round((($ve->intervalo_inicio/30)/12))}} Años @endif @endif  </span></div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="bt-flabels__wrapper">
+                                                        {!! Form::label('fecha_aplicacion'.$ve->id, 'Fecha de aplicación', ['for' => 'fecha_aplicacion'.$ve->id] ) !!}
+                                                        {!! Form::text('fecha_aplicacion'.$ve->id, null , ['class' => 'form-control has-feedback-left', 'aria-describedby' => 'inputSuccess2Status', 'id' => 'fecha_aplicacion'.$ve->id, 'autocomplete' => 'off', 'placeholder' => 'Fecha de aplicación' ]  ) !!}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @if($vacunas_esquemas[$key_plus]->fila != $ve->fila)
+                                            <div class="clearfix"></div>
+                                        @endif
+                                    @endif
+                                @endforeach
+                            @else
+                                <div class="col-md-12 text-center text-info"> <i class="fa fa-info-circle text-danger" style="font-size:x-large;"></i> <h3>Sin esquema</h3></div>
+                            @endif
+                        </div>
+                    </div>
+                @else
+                    <div class="col-md-12 text-center text-info"> <i class="fa fa-info-circle text-danger" style="font-size:x-large;"></i> <h3>Sin esquema</h3></div>
+                @endif
+
                 <div class="uk-text-center uk-margin-top pull-right">
                     <button type="reset" class="btn btn-primary btn-lg"> <i class="fa fa-eraser"></i> Limpiar</button>
                     @permission('create.personas')<button type="submit" class="btn btn-success btn-lg js-submit"> <i class="fa fa-save"></i> Guardar</button>@endpermission
                 </div>
-
-                @if(count($vacunas_esquemas)>0)
-                  <div class="x_panel">
-                    <div class="x_title">
-                        <h2 id="title-esquema"><i class="fa fa-calendar text-success"></i> {{ $esquema->descripcion }} </h2>
-                        <ul class="nav navbar-right panel_toolbox">
-                        <!--<li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                        </li>
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                            <ul class="dropdown-menu" role="menu">
-                            <li><a href="#">Settings 1</a>
-                            </li>
-                            <li><a href="#">Settings 2</a>
-                            </li>
-                            </ul>
-                        </li>
-                            <li><a class="close-link"><i class="fa fa-close"></i></a>
-                        </li>-->
-                        </ul>
-                        <div class="clearfix"></div>
-                    </div>
-                    <div class="x_content" id="content-esquema">
-                    <?php
-                        $is_primer_md = false;
-                        $is_last_md = false;
-                        $total_md = 1;
-                        $increment_md = 0;
-                    ?>
-                    @foreach($vacunas_esquemas as $key=>$ve)   
-                        <?php 
-                            $key_plus = $key; 
-                            $key_plus = $key_plus + 1; 
-                            $i_actual = $ve->intervalo; 
-                            if((count($vacunas_esquemas) - 1) == $key) {
-                                $i_siguiente = 'none';
-                            } else {
-                                $i_siguiente = $vacunas_esquemas[$key_plus]->intervalo;
-                            }
-                            $col_md = 1; $plu_col_md = 0;
-                            foreach ($vacunas_esquemas as $k => $v) {
-                                if($ve->intervalo==$v->intervalo)
-                                    $plu_col_md++;
-                            }
-                            $col_md = 12 / $plu_col_md;
-
-                            if($increment_md==0) {
-                                $is_primer_md = true;
-                            } else {
-                                $is_primer_md = false;
-                            }
-
-                            if($col_md==6)
-                                if($is_primer_md)
-                                    $col_md = 3; 
-                                else
-                                    $col_md = 9;
-                            
-                            if($col_md==4)
-                                if($is_primer_md)
-                                    $col_md = 6; 
-                                else
-                                    $col_md = 3;
-                        
-
-                            $total_md = $plu_col_md;
-                            $increment_md++;
-                        ?>
-
-                        @if($key==0)
-                            <div class="col-md-12">
-                        @endif
-                            <div class="animated flipInY col-lg-{{$col_md}} col-md-{{$col_md}} col-sm-{{$col_md}} col-xs-12"><br>
-                                <div class="tile-stats" style="color:white; margin:0px; padding:3px; border:solid 2px #{{$ve->vacuna->color_rgb}}; background-color:#{{$ve->vacuna->color_rgb}} !important;">
-                                    <div class="row">
-                                        <div class="col-md-12"> <span style="font-size:x-large;font-weight:bold;"> {{$ve->vacuna->clave}} <small> @if($ve->tipo_aplicacion==1) Única @endif @if($ve->tipo_aplicacion==2) 1a Dosis @endif @if($ve->tipo_aplicacion==3) 2a Dosis @endif @if($ve->tipo_aplicacion==4) 3a Dosis @endif @if($ve->tipo_aplicacion==5) 4a Dosis @endif @if($ve->tipo_aplicacion==6) Refuerzo @endif  </small> </span> <span style="font-size:large;" class="pull-right"> @if($ve->intervalo<=29) Nacimiento @else  @if(($ve->intervalo/30)<=23){{($ve->intervalo/30)}} Meses @else {{round((($ve->intervalo/30)/12))}} Años @endif @endif  </span></div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="bt-flabels__wrapper">
-                                            {!! Form::label('fecha_aplicacion'.$ve->id, 'Fecha de aplicación', ['for' => 'fecha_aplicacion'.$ve->id] ) !!}
-                                            {!! Form::text('fecha_aplicacion'.$ve->id, null , ['class' => 'form-control has-feedback-left', 'aria-describedby' => 'inputSuccess2Status', 'id' => 'fecha_aplicacion'.$ve->id, 'autocomplete' => 'off', 'placeholder' => 'Fecha de aplicación' ]  ) !!}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        
-                        @if((count($vacunas_esquemas)-1) == $key)
-                            </div>
-                        @else
-                            @if($key!=0)
-                                @if($i_actual!=$i_siguiente)
-                                    <?php 
-                                        $is_primer_md = false;
-                                        $is_last_md = false;
-                                        $total_md = 1;
-                                        $increment_md = 0;
-                                    ?>
-                                    </div> <div class="col-md-12">
-                                @endif
-                            @endif
-                        @endif
-                    @endforeach
-                    </div>
-                    </div>
-                </div>
-                @else
-                    <div class="col-md-12 text-center text-info"> <i class="fa fa-info-circle text-danger" style="font-size:x-large;"></i> <h3>Sin esquema</h3></div>
-                @endif
             {!! Form::close() !!}
         </div>
     </div>
@@ -363,13 +342,21 @@
         $(".js-data-estado,.js-data-genero").change(function(){
             setTimeout(function(){ validate_inputs_curp(); }, 1000);
         });
+        
+        $("input[name*='fecha_aplicacion']").on("blur", function(){
+            valoraFecha($(this).val(), replaceAll($(this).attr('name'),"_", " "));
+        });
+        $("#fecha_nacimiento,#fecha_nacimiento_tutor,input[name*='fecha_aplicacion']").blur(function(){
+            valoraFecha($(this).val(), replaceAll($(this).attr('name'),"_", " "));             
+        });
+        
 
         $(".js-data-clue").change(function(){
             var clue_id = $(this).val();
             $.get('../catalogo/clue/'+clue_id, function(response, status){ // Consulta CURP
-                $(".js-data-estado").val(response.data.idEntidad).trigger("change");
-                $(".js-data-municipio").val(response.data.idMunicipio).trigger("change");
-                $(".js-data-localidad").val(response.data.idLocalidad).trigger("change");
+                $(".js-data-estado").val(response.data.entidades_id).trigger("change");
+                $(".js-data-municipio").val(response.data.municipios_id).trigger("change");
+                $(".js-data-localidad").val(response.data.localidades_id).trigger("change");
             }).fail(function(){  // Calcula CURP                    
                 new PNotify({
                     title: 'Info!',
@@ -383,6 +370,30 @@
         $("#fecha_nacimiento,#paterno,#materno,#nombre").blur(function(){            
             setTimeout(function(){ validate_inputs_curp(); }, 1000);
         });
+
+        function valoraFecha(date,name){
+            if(date!=null && date!="") {
+                var fn_validar = replaceAll(date,"-", "/");                
+                var errors = 0;
+                var warning = '';
+
+                if(validarFormatoFecha(fn_validar)){ 
+                    if(!existeFecha(fn_validar)){
+                        errors++; warning+= "La fecha que acaba agregar no existe. \n";
+                    }
+                }else{
+                    errors++; warning+= "El formato de la fecha que acaba agregar es incorrecto. \n";
+                }
+                if(errors>0){
+                    new PNotify({
+                        title: 'Info!',
+                        text: name+': '+warning,
+                        type: 'info',
+                        styling: 'bootstrap3'
+                    });
+                } 
+            }
+        }
 
         function get_esquema(esquema) {
             $('#title-esquema').empty().html('Buscando esquema '+esquema);
@@ -398,61 +409,24 @@
                     $('#title-esquema').empty().html('No se encuentra el esquema: '+esquema+'. ');
                     $('#content-esquema').empty().html('<div class="col-md-12 text-center text-danger"> <h2 class="text-danger"> <i class="fa fa-info-circle text-info"></i> Imposible encontrar el esquema '+esquema+'. Seleccione otra fecha de nacimiento o asegurese que exista el esquema que busca. </h2></div> ');
                 } else {
-                    $('#title-esquema').empty().html('<i class="fa fa-calendar text-success"></i> '+response.data.descripcion);
+                    $('#title-esquema').empty().html('<i class="fa fa-calendar text-success"></i> '+response.esquema.descripcion);
                     $('#content-esquema').empty();
-                    var vacunas_esquemas = response.data.vacunas_esquemas;
-                    var is_primer_md = false;
-                    var is_last_md = false;
-                    var total_md = 1;
-                    var increment_md = 0;
-
+                    var vacunas_esquemas = response.data;
+                    var key_plus = 0;
                     $.each(vacunas_esquemas, function( key, ve ) {
-                        var key_plus = key; 
-                        key_plus = key_plus + 1; 
-                        var i_actual = ve.intervalo; 
-                        if((vacunas_esquemas.length - 1) == key) {
-                            var i_siguiente = 'none';
-                        } else {
-                            var i_siguiente = vacunas_esquemas[key_plus].intervalo;
-                        }
-
-                        col_md = 1; plu_col_md = 0;
-                        $.each(vacunas_esquemas, function(k, v) {
-                            if(ve.intervalo==v.intervalo){
+                        key_plus++;
+                        var col_md = 12;
+                        var plu_col_md = 0;
+                        $.each(vacunas_esquemas,  function( k, v ){
+                            if(ve.fila==v.fila){
                                 plu_col_md++;
-                            }
+                            } 
                         });
-                        col_md = 12 / plu_col_md;
-
-                        if(increment_md==0) {
-                            is_primer_md = true;
-                        } else {
-                            is_primer_md = false;
-                        }
-
-                        if(col_md==6){
-                            if(is_primer_md){
-                                col_md = 3; 
-                            }else{
-                                col_md = 9;
-                            }
-                        }
-                        
-                        if(col_md==4){
-                            if(is_primer_md){
-                                col_md = 6; 
-                            }else{
-                                col_md = 3;
-                            }
-                        }                
-
-                        total_md = plu_col_md;
-                        increment_md++;
-
+                        col_md = 12 / plu_col_md; // numero de columnas por fila
                         var tipo_aplicacion = '';
-                        var intervalo = '';
+                        var intervalo_inicio = '';
                         if(ve.tipo_aplicacion==1) {
-                            tipo_aplicacion = 'Única';
+                            tipo_aplicacion = 'Dosis única';
                         } 
                         if(ve.tipo_aplicacion==2) {
                             tipo_aplicacion = '1a Dosis';
@@ -470,33 +444,19 @@
                             tipo_aplicacion = 'Refuerzo';
                         }
 
-                        if(ve.intervalo<=29) {
-                            intervalo = 'Nacimiento'; 
+                        if(ve.intervalo_inicio<=29) {
+                            intervalo_inicio = 'Nacimiento'; 
                         } else {
-                            if((ve.intervalo/30)<=23) { 
-                                intervalo = Math.round((ve.intervalo/30))+' Meses';
+                            if((ve.intervalo_inicio/30)<=23) { 
+                                intervalo_inicio = Math.round((ve.intervalo_inicio/30))+' Meses';
                             } else { 
-                                intervalo = Math.round(((ve.intervalo/30)/12))+' Años';
+                                intervalo_inicio = Math.round(((ve.intervalo_inicio/30)/12))+' Años';
                             }
                         }
-
-                        if(key==0){
-                            $('#content-esquema').append('<div class="col-md-12">');
-                        }
-
-                        $('#content-esquema').append('<div class="animated flipInY col-lg-'+col_md+' col-md-'+col_md+' col-sm-'+col_md+' col-xs-12"><br> <div class="tile-stats" style="color:white; margin:0px; padding:3px; border:solid 2px #'+ve.vacuna.color_rgb+'; background-color:#'+ve.vacuna.color_rgb+' !important;"> <div class="row"> <div class="col-md-12"> <span style="font-size:x-large;font-weight:bold;"> '+ve.vacuna.clave+' <small> '+tipo_aplicacion+' </small> </span> <span style="font-size:large;" class="pull-right"> '+intervalo+' </span> </div> </div> <div class="row"> <div class="bt-flabels__wrapper"> <input id="fecha_aplicacion'+ve.id+'" name="fecha_aplicacion'+ve.id+'" type="text" value="" class="form-control has-feedback-left" aria-describedby="inputSuccess2Status" autocomplete="off" placeholder="Fecha de aplicación"> </div> </div> </div> </div>');
-
-                        if((vacunas_esquemas.length - 1) == key) {
-                            $('#content-esquema').append('</div>');
-                        } else {
-                            if(key!=0) {
-                                if(i_actual!=i_siguiente) { 
-                                    is_primer_md = false;
-                                    is_last_md = false;
-                                    total_md = 1;
-                                    increment_md = 0;                              
-                                    $('#content-esquema').append('</div> <div class="col-md-12">');
-                                }
+                        if(vacunas_esquemas.length - 1 > key){
+                            $('#content-esquema').append('<div class="animated flipInY col-md-'+Math.round(col_md)+' col-xs-12"><br> <div class="tile-stats" style="color:white; margin:0px; padding:3px; border:solid 2px #'+ve.color_rgb+'; background-color:#'+ve.color_rgb+' !important;"> <div class="row"> <div class="col-md-12"> <span style="font-size:large;font-weight:bold;"> '+ve.clave+' <small> '+tipo_aplicacion+' </small> </span> <span style="font-size:large;" class="pull-right"> '+intervalo_inicio+' </span> </div> </div> <div class="row"> <div class="bt-flabels__wrapper"> <input id="fecha_aplicacion'+ve.id+'" name="fecha_aplicacion'+ve.id+'" type="text" value="" class="form-control has-feedback-left" aria-describedby="inputSuccess2Status" autocomplete="off" placeholder="Fecha de aplicación"> </div> </div> </div> </div>');
+                            if(vacunas_esquemas[key_plus].fila != ve.fila){
+                                $('#content-esquema').append('<div class="clearfix"></div>');
                             }
                         }
                     });
@@ -530,7 +490,7 @@
             
             if(validarFormatoFecha(fn_validar)){ 
                 if(!existeFecha(fn_validar)){
-                        errors++; warning+= "La fecha introducida no existe. \n";
+                        errors++; warning+= "La fecha que introdujo no existe. \n";
                 }
             }else{
                 errors++; warning+= "El formato de la fecha es incorrecto. \n";
@@ -606,15 +566,11 @@
         }
 
         function existeFecha(fecha){
-            var fechaf = fecha.split("-");
-            var day = fechaf[0];
-            var month = fechaf[1];
-            var year = fechaf[2];
-            var date = new Date(year,month,'0');
-            if((day-0)>(date.getDate()-0)){
-                    return false;
-            }
-            return true;
+            var fechaf = fecha.split("/");
+            var d = fechaf[0];
+            var m = fechaf[1];
+            var y = fechaf[2];
+            return m > 0 && m < 13 && y > 0 && y < 32768 && d > 0 && d <= (new Date(y, m, 0)).getDate();
         }
 
         function replaceAll(str, find, replace) {

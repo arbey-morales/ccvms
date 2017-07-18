@@ -10,7 +10,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach($usuarios as $key=>$item)
+        @foreach($data as $key=>$item)
             <tr data-id="{{ $item->id }}" class="@if($item->activo === 0) ? warning @endif" data-toggle="tooltip" data-placement="top" title="@if($item->activo===0) Propietario Inactivo @endif">
                 <td class="text-center"><strong> {{ ++$key }} </strong></td>
                 <td class="text-left">{{ $item->nombre }} {{ $item->paterno }} {{ $item->materno }}</td>

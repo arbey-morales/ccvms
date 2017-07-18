@@ -40,7 +40,7 @@
                             <div class="col-md-12 col-sm-12 col-xs-12">
                                 <div class="x_panel">
                                     <div class="x_title">
-                                        <h2>{{ $usuario->nombre }} {{ $usuario->paterno }} {{ $usuario->materno }}</h2>
+                                        <h2>{{ $data->nombre }} {{ $data->paterno }} {{ $data->materno }}</h2>
                                         <!--<ul class="nav navbar-right panel_toolbox">
                                         <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                                         </li>
@@ -62,7 +62,7 @@
 
                                         <div class="col-md-7 col-sm-7 col-xs-12">
                                             <div class="product-image">
-                                                <img src="@if($usuario->foto) {{ url('storage/user/profile/'.$usuario->foto) }}  @else {{ url('storage/user/profile/user-default.png') }} @endif" alt="..." />
+                                                <img src="@if($data->foto) {{ url('storage/user/profile/'.$data->foto) }}  @else {{ url('storage/user/profile/user-default.png') }} @endif" alt="..." />
                                             </div>
                                         </div>
 
@@ -71,22 +71,22 @@
                                             <h3 class="prod_title">Más detalles</h3>
                                             <div class="">
                                                 <ul class="list-unstyled user_data">
-                                                    <li><i class="fa fa-map-marker user-profile-icon"></i> <strong>{{ $usuario->direccion }}</strong>
+                                                    <li><i class="fa fa-map-marker user-profile-icon"></i> <strong>{{ $data->direccion }}</strong>
                                                     </li>
                                                     <li>
-                                                        <i class="fa fa-envelope user-profile-icon"></i> Email: {{ $usuario->email }}
+                                                        <i class="fa fa-envelope user-profile-icon"></i> Email: {{ $data->email }}
                                                     </li>
                                                     <li>
-                                                        <i class="fa fa-calendar user-profile-icon"></i> Registro: {{ $usuario->creadoAl }}
+                                                        <i class="fa fa-calendar user-profile-icon"></i> Registro: {{ $data->creadoAl }}
                                                     </li>
                                                     <li>
-                                                        @if($usuario->activo==1) <i class="fa fa-heart text-danger user-profile-icon"></i> En actividad! @else
+                                                        @if($data->activo==1) <i class="fa fa-heart text-danger user-profile-icon"></i> En actividad! @else
                                                         <i class="fa fa-heartbeat text-dafault user-profile-icon"></i> Usuario Inactivo
                                                         @endif
                                                     </li>
                                                 </ul>
                                                 <br>
-                                                    @permission('update.usuarios')<a href="{{ route('usuario.edit', $usuario->id) }}" class="btn btn-success"><i class="fa fa-edit m-right-xs"></i> Hacer Cambios</a>@endpermission
+                                                    @permission('update.usuarios')<a href="{{ route('usuario.edit', $data->id) }}" class="btn btn-success"><i class="fa fa-edit m-right-xs"></i> Hacer Cambios</a>@endpermission
                                                 <br />
                                                 <hr>
                                             </div>
@@ -98,10 +98,10 @@
                     </div>
                     <div role="tabpanel" class="tab-pane fade" id="tab_content2" aria-labelledby="roles-tab">
                         <br>
-                        @if(count($usuario->rolesuser)>0)
+                        @if(count($data->rolesuser)>0)
                             <div class="col-md-12">
                                 <ul class="list-unstyled timeline">
-                                @foreach ($usuario->rolesuser as $key => $value)
+                                @foreach ($data->rolesuser as $key => $value)
                                     <li>
                                         <div class="block">
                                             <div class="tags">

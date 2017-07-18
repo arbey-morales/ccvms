@@ -102,7 +102,7 @@
                   <td> @if($item->tipoParto){{ $item->tipoParto->descripcion }} @endif </td>
                   <td>{{ $item->calle }} {{ $item->numero }}, {{ $item->colonia }}, {{ $item->localidad->nombre }}, {{ $item->municipio->nombre }} </td>
                   <td><strong>{{$item->clue->clues}}</strong>, {{$item->clue->nombre}}</td>
-                  <td>{{ $item->ageb['id'] }}</td>
+                  <td>@if($item->ageb) {{ $item->ageb->id }} @endif</td>
                   <td>{{ $item->sector }}</td>
                   <td>{{ $item->manzana }}</td>
                   <td> @if($item->codigo) {{ $item->codigo->nombre }} @endif </td>

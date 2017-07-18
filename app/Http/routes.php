@@ -24,19 +24,19 @@ Route::group(['namespace' => 'Auth','prefix' => 'auth'], function () {
 
 Route::group(['namespace' => 'Transaccion', 'middleware' => 'auth'], function () {
     // Trancacciones
-    Route::resource('usuario',          'UserController');
-    Route::post('persona/curp',         'PersonaController@curp');
-    Route::get('persona/reporte',       'PersonaController@report');
-    Route::resource('persona',          'PersonaController');
-    
-    
+    Route::resource('usuario',                             'UserController');
+    Route::post('persona/curp',                            'PersonaController@curp');
+    Route::get('persona/reporte',                          'PersonaController@report');
+    Route::resource('persona',                             'PersonaController');
+    Route::resource('cuadro-dist-juris',                   'CuadroDistribucionJurisdiccionalController');
+    Route::resource('cuadro_distribucion_clue',            'CuadroDistribucionClueController');    
 });  
 
 Route::group(['prefix' => 'catalogo', 'namespace' => 'Catalogo', 'middleware' => 'auth'], function () {
     // Catalogos
     Route::resource('ageb',             'AgebController',            ['only' => ['index', 'show']]);
     Route::resource('clue',             'ClueController',            ['only' => ['index', 'show']]);
-    Route::resource('codigo',           'CodigoController',          ['only' => ['index', 'show']]);
+    Route::resource('codigo',           'CodigoCensoController',     ['only' => ['index', 'show']]);
     Route::resource('entidad',          'EntidadController',         ['only' => ['index', 'show']]);
     Route::resource('esquema',          'EsquemaController',         ['only' => ['index', 'show']]);
     Route::resource('institucion',      'InstitucionController',     ['only' => ['index', 'show']]);
@@ -57,4 +57,3 @@ Route::get('error', function(){
     abort(500);             
 });
 
-//Route::get('crashs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');

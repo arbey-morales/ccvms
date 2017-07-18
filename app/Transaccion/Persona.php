@@ -9,7 +9,7 @@ class Persona extends Model
 {
     protected $table = 'personas';
 	
-    protected $fillable = ["id", "clues_id", "paises_id", "entidad_fererativa_nacimiento_id", "entidad_federativa_domicilio_id", "municipios_id", "localidades_id", "agebs_id", "instituciones_id", "codigos_id", "tipos_parto_id", "folio_certificado_nacimiento", "nombre", "apellido_paterno", "apellido_materno", "curp", "genero", "fecha_nacimiento", "descripcion_domicilio", "calle", "numero", "colonia", "codigo_postal", "telefono_casa", "telefono_celular", "tutor"];
+    protected $fillable = ["clue_id", "pais_id", "entidad_fererativa_nacimiento_id", "entidad_federativa_domicilio_id", "municipio_id", "localidad_id", "ageb_id", "institucion_id", "codigo_id", "tipo_parto_id", "folio_certificado_nacimiento", "nombre", "apellido_paterno", "apellido_materno", "curp", "genero", "fecha_nacimiento", "descripcion_domicilio", "calle", "numero", "colonia", "codigo_postal", "telefono_casa", "telefono_celular", "tutor", "usuario_id"];
 
 	public $timestamps = false;
 
@@ -22,11 +22,11 @@ class Persona extends Model
 	}
 
     public function entidadNacimiento(){
-		return $this->belongsTo('App\Catalogo\Entidad', 'entidad_federativa_nacimiento_id', 'id');
+		return $this->belongsTo('App\Catalogo\Entidad', 'entidades_federativas_nacimiento_id', 'id');
 	}
 
     public function entidadDomicilio(){
-		return $this->belongsTo('App\Catalogo\Entidad', 'entidad_federativa_dimicilio_id', 'id');
+		return $this->belongsTo('App\Catalogo\Entidad', 'entidades_federativas_dimicilio_id', 'id');
 	}
 
     public function municipio(){
@@ -38,7 +38,7 @@ class Persona extends Model
 	}
 
     public function ageb(){
-		return $this->belongsTo('App\Catalogo\Ageb', 'agebs_id', 'id')->select('id','idMunicipio','idLocalidad');
+		return $this->belongsTo('App\Catalogo\Ageb', 'agebs_id', 'id')->select('id','municipios_id','localidades_id');
 	}
 
     public function afiliacion(){
@@ -46,11 +46,11 @@ class Persona extends Model
 	}
 
     public function codigo(){
-		return $this->belongsTo('App\Catalogo\Codigo', 'codigos_id', 'id')->select('id','clave','nombre');
+		return $this->belongsTo('App\Catalogo\CodigoCenso', 'codigos_censos_id', 'id')->select('id','clave','nombre');
 	}
 
     public function tipoParto(){
-		return $this->belongsTo('App\Catalogo\TipoParto', 'tipos_parto_id', 'id')->select('id','clave','descripcion');
+		return $this->belongsTo('App\Catalogo\TipoParto', 'tipos_partos_id', 'id')->select('id','clave','descripcion');
 	}
 
 	public function personasVacunasEsquemas()

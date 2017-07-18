@@ -26,15 +26,15 @@ class ClueController extends Controller
         
         if (Auth::user()->is('root|admin')) {
             if ($parametros['q']) {
-                $data =  Clue::where('clues','LIKE',"%".$parametros['q']."%")->orWhere('nombre','LIKE',"%".$parametros['q']."%")->with('municipio','localidad','jurisdiccion')->get();
+                $data =  Clue::where('clues','LIKE',"%".$parametros['q']."%")->orWhere('nombre','LIKE',"%".$parametros['q']."%")->with('municipio','localidad','jurisdiccion')->where('deleted_at',NULL)->get();
             } else {
-                $data =  Clue::with('municipio','localidad','jurisdiccion')->get();
+                $data =  Clue::with('municipio','localidad','jurisdiccion')->where('deleted_at',NULL)->get();
             }
         } else {
             if ($parametros['q']) {
-                $data = Clue::where('clues','LIKE',"%".$parametros['q']."%")->orWhere('nombre','LIKE',"%".$parametros['q']."%")->where('idJurisdiccion', Auth::user()->idJurisdiccion)->where('borradoAl',NULL)->with('municipio','localidad','jurisdiccion')->get();
+                $data = Clue::where('clues','LIKE',"%".$parametros['q']."%")->orWhere('nombre','LIKE',"%".$parametros['q']."%")->where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->with('municipio','localidad','jurisdiccion')->get();
             } else {
-                $data = Clue::where('idJurisdiccion', Auth::user()->idJurisdiccion)->where('borradoAl',NULL)->with('municipio','localidad','jurisdiccion')->get();
+                $data = Clue::where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->with('municipio','localidad','jurisdiccion')->get();
             }
         }       
         return view('catalogo.clue.index')->with('clues', $data);

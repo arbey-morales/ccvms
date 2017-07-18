@@ -11,6 +11,11 @@
                 <a href="{{ route('persona.index') }}"><i class="fa fa-group"></i> Censo Nominal</a>
             </li>
             @endpermission
+            <!--@permission('show.cuadro_distribucion_jurisdiccional')
+            <li>
+                <a href="{{ route('cuadro-dist-juris.index') }}"><i class="fa fa-share-alt-square"></i> Cuadro distribución</a>
+            </li>
+            @endpermission-->
             @permission('show.personas')
             <li><a><i class="fa fa-book"></i> Reportes <span class="fa fa-chevron-down"></span></a>
                 <ul class="nav child_menu">

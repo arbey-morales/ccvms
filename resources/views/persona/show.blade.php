@@ -30,20 +30,20 @@
         <div class="x_content">
             <div class="col-md-3 col-sm-3 col-xs-12 profile_left">
                 <div class="btn btn-default col-md-12" style="font-size:x-large;">
-                    <h2>@if($persona->genero=='M') <i class="fa fa-male" style="color:#4d81bf; font-size:xx-large;"></i> @endif @if($persona->genero=='F') <i class="fa fa-female" style="color:#ed1586; font-size:xx-large;"></i>  @endif  <i class="fa fa-qrcode "></i> {{$persona->curp}}</h2>
+                    <h2>@if($data->genero=='M') <i class="fa fa-male" style="color:#4d81bf; font-size:xx-large;"></i> @endif @if($data->genero=='F') <i class="fa fa-female" style="color:#ed1586; font-size:xx-large;"></i>  @endif  <i class="fa fa-qrcode "></i> {{$data->curp}}</h2>
                 </div>
-                <h4>{{$persona->nombre}} {{$persona->apellido_paterno}} {{$persona->apellido_materno}}</h4>
-                <h5> <i class="fa fa-calendar text-warning"></i> Nacimiento:  {{$persona->fecha_nacimiento}} / <strong class="text-primary">{{$persona->tipoParto->clave}}: {{$persona->tipoParto->descripcion}}</strong> </h5>
-                <h5> <i class="fa fa-map-marker text-danger"></i> {{ $persona->calle }} {{ $persona->numero }}, {{ $persona->colonia }}, {{ $persona->localidad->nombre }}, {{ $persona->municipio->nombre }} </h5>
-                <h5 class="text-danger"> <i class="fa fa-legal text-primary"></i> Tutor:  {{$persona->tutor}} </h5>
-                <h5> <i class="fa fa-hospital-o text-success"></i> {{$persona->clue->clues}} - {{$persona->clue->nombre}}</h5>
+                <h4>{{$data->nombre}} {{$data->apellido_paterno}} {{$data->apellido_materno}}</h4>
+                <h5> <i class="fa fa-calendar text-warning"></i> Nacimiento:  <strong>{{$data->fecha_nacimiento}}</strong> / <strong class="text-primary">{{$data->tipoParto->clave}}: {{$data->tipoParto->descripcion}}</strong> </h5>
+                <h5> <i class="fa fa-map-marker text-danger"></i> {{ $data->calle }} {{ $data->numero }}, {{ $data->colonia }}, {{ $data->localidad->nombre }}, {{ $data->municipio->nombre }} </h5>
+                <h5 class="text-danger"> <i class="fa fa-legal text-primary"></i> Tutor:  {{$data->tutor}} / <strong> {{$data->fecha_nacimiento_tutor}} </strong> </h5>
+                <h5> <i class="fa fa-hospital-o text-success"></i> {{$data->clue->clues}} - {{$data->clue->nombre}}</h5>
 
                 <br>
-                @permission('update.personas')<a href="{{ route('persona.edit', $persona->id) }}" class="btn btn-primary pull-right"><i class="fa fa-edit m-right-xs"></i> Hacer Cambios</a>@endpermission
+                @permission('update.personas')<a href="{{ route('persona.edit', $data->id) }}" class="btn btn-primary pull-right"><i class="fa fa-edit m-right-xs"></i> Hacer Cambios</a>@endpermission
                 <br>
 
                 <!-- start skills -->
-                <h4>Contenidos...</h4>
+                <h4>...</h4>
                 <ul class="list-unstyled user_data">
                 <li>
                     <p>....</p>
@@ -75,114 +75,58 @@
             </div>
             <div class="col-md-9 col-sm-9 col-xs-12">
                 @if(count($vacunas_esquemas)>0)
-                  <div class="x_panel">
-                    <div class="x_title">
-                        <h2 id="title-esquema"><i class="fa fa-calendar text-success"></i> {{ $esquema->descripcion }} </h2>
-                        <ul class="nav navbar-right panel_toolbox">
-                        <!--<li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                        </li>
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                            <ul class="dropdown-menu" role="menu">
-                            <li><a href="#">Settings 1</a>
-                            </li>
-                            <li><a href="#">Settings 2</a>
-                            </li>
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h2 id="title-esquema"><i class="fa fa-calendar text-success"></i> @if(count($esquema)>0){{ $esquema->descripcion }} @endif</h2>
+                            <ul class="nav navbar-right panel_toolbox">
                             </ul>
-                        </li>
-                            <li><a class="close-link"><i class="fa fa-close"></i></a>
-                        </li>-->
-                        </ul>
-                        <div class="clearfix"></div>
-                    </div>
-                    <div class="x_content" id="content-esquema">
-                    <?php
-                        $is_primer_md = false;
-                        $is_last_md = false;
-                        $total_md = 1;
-                        $increment_md = 0;
-                    ?>
-                    @foreach($vacunas_esquemas as $key=>$ve)   
-                        <?php 
-                            $key_plus = $key; 
-                            $key_plus = $key_plus + 1; 
-                            $i_actual = $ve->intervalo; 
-                            if((count($vacunas_esquemas) - 1) == $key) {
-                                $i_siguiente = 'none';
-                            } else {
-                                $i_siguiente = $vacunas_esquemas[$key_plus]->intervalo;
-                            }
-                            $col_md = 1; $plu_col_md = 0;
-                            foreach ($vacunas_esquemas as $k => $v) {
-                                if($ve->intervalo==$v->intervalo)
-                                    $plu_col_md++;
-                            }
-                            $col_md = 12 / $plu_col_md;
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content" id="content-esquema">
+                        @foreach($vacunas_esquemas as $key=>$ve)   
+                            <?php $key_plus = $key; $key_plus = $key_plus + 1; $col_md = 12; $plu_col_md = 0; ?>
+                            @if(count($vacunas_esquemas) - 1 > $key)
+                                @foreach ($vacunas_esquemas as $k => $v)
+                                    @if($ve->fila==$v->fila)
+                                        <?php $plu_col_md++; ?>
+                                    @endif 
+                                @endforeach 
+                                <?php $col_md = round(12 / $plu_col_md); $fecha_ap = ''; ?> 
 
-                            if($increment_md==0) {
-                                $is_primer_md = true;
-                            } else {
-                                $is_primer_md = false;
-                            }
-
-                            if($col_md==6)
-                                if($is_primer_md)
-                                    $col_md = 3; 
-                                else
-                                    $col_md = 9;
-                            
-                            if($col_md==4)
-                                if($is_primer_md)
-                                    $col_md = 6; 
-                                else
-                                    $col_md = 3;
-                        
-
-                            $total_md = $plu_col_md;
-                            $increment_md++;
-                        ?>
-
-                        @if($key==0)
-                            <div class="col-md-12">
-                        @endif
-                            <div class="animated flipInY col-lg-{{$col_md}} col-md-{{$col_md}} col-sm-{{$col_md}} col-xs-12"><br>
-                                <div class="tile-stats" style="color:white; margin:0px; padding:3px; border:solid 2px #{{$ve->vacuna->color_rgb}}; background-color:#{{$ve->vacuna->color_rgb}} !important;">
-                                    <div class="row">
-                                        <div class="col-md-12"> <span style="font-size:large;font-weight:bold;"> {{$ve->vacuna->clave}} <small> @if($ve->tipo_aplicacion==1) Única @endif @if($ve->tipo_aplicacion==2) 1a Dosis @endif @if($ve->tipo_aplicacion==3) 2a Dosis @endif @if($ve->tipo_aplicacion==4) 3a Dosis @endif @if($ve->tipo_aplicacion==5) 4a Dosis @endif @if($ve->tipo_aplicacion==6) Refuerzo @endif  </small> </span> <span style="font-size:medium;" class="pull-right"> @if($ve->intervalo<=29) Nacimiento @else  @if(($ve->intervalo/30)<=23){{($ve->intervalo/30)}} Meses @else {{round((($ve->intervalo/30)/12))}} Años @endif @endif  </span></div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-12 text-center" style="background-color:#fff; font-size:x-large; color:#000;">
-                                         <i class="fa fa-calendar" style="color:#{{$ve->vacuna->color_rgb}};"></i>                                          
-                                            @foreach($persona->personasVacunasEsquemas as $index=>$valor)
-                                                @if($valor->vacunas_esquemas_id==$ve->id)
-                                                    {{ substr($valor->fecha_aplicacion, 0, -8) }}
-                                                    <?php break; ?>
-                                                @endif
-                                            @endforeach
-                                         </div>
+                                @foreach($data->personasVacunasEsquemas as $index=>$valor)
+                                    @if($valor->vacunas_esquemas_id==$ve->id)
+                                        <?php
+                                            $fecha_ap = explode("-", trim(substr($valor->fecha_aplicacion, 0, -8))); 
+                                            $fecha_ap = $fecha_ap[2].'-'.$fecha_ap[1].'-'.$fecha_ap[0];
+                                            break;
+                                        ?>
+                                    @endif
+                                @endforeach
+                                <div class="animated flipInY col-md-{{$col_md}} col-xs-12"><br>
+                                    <div class="tile-stats" style="color:white; margin:0px; padding:3px; border:solid 2px #{{$ve->color_rgb}}; background-color:#{{$ve->color_rgb}} !important;">
+                                        <div class="row">
+                                            <div class="col-md-12"> <span style="font-size:large;font-weight:bold;"> {{$ve->clave}} <small> @if($ve->tipo_aplicacion==1) Única @endif @if($ve->tipo_aplicacion==2) 1a Dosis @endif @if($ve->tipo_aplicacion==3) 2a Dosis @endif @if($ve->tipo_aplicacion==4) 3a Dosis @endif @if($ve->tipo_aplicacion==5) 4a Dosis @endif @if($ve->tipo_aplicacion==6) Refuerzo @endif  </small> </span> <span style="font-size:medium;" class="pull-right"> @if($ve->intervalo_inicio<=29) Nacimiento @else  @if(($ve->intervalo_inicio/30)<=23){{($ve->intervalo_inicio/30)}} Meses @else {{round((($ve->intervalo_inicio/30)/12))}} Años @endif @endif  </span></div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12 text-center" style="background-color:#fff; font-size:x-large; color:#000;">
+                                            <i class="fa fa-calendar" style="color:#{{$ve->color_rgb}};"></i>                                          
+                                                @foreach($data->personasVacunasEsquemas as $index=>$valor)
+                                                    @if($valor->vacunas_esquemas_id==$ve->id)
+                                                        {{ $fecha_ap }}
+                                                        <?php break; ?>
+                                                    @endif
+                                                @endforeach
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        
-                        @if((count($vacunas_esquemas)-1) == $key)
-                            </div>
-                        @else
-                            @if($key!=0)
-                                @if($i_actual!=$i_siguiente)
-                                    <?php 
-                                        $is_primer_md = false;
-                                        $is_last_md = false;
-                                        $total_md = 1;
-                                        $increment_md = 0;
-                                    ?>
-                                    </div> <div class="col-md-12">
+                                @if($vacunas_esquemas[$key_plus]->fila != $ve->fila)
+                                    <div class="clearfix"></div>
                                 @endif
                             @endif
-                        @endif
-                    @endforeach
+                        @endforeach
+                        </div>
                     </div>
-                    </div>
-                </div>
                 @else
                     <div class="col-md-12 text-center text-info"> <i class="fa fa-info-circle text-danger" style="font-size:x-large;"></i> <h3>Sin esquema</h3></div>
                 @endif

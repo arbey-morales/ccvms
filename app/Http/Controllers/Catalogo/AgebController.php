@@ -34,17 +34,17 @@ class AgebController extends Controller
         } else {
             $data = collect();
             if ($parametros['q']) {
-                $municipios = Municipio::where('idJurisdiccion', Auth::user()->idJurisdiccion)->where('borradoAl',NULL)->get();
+                $municipios = Municipio::where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->get();
                 foreach($municipios as $key=> $mpio){
-                    $agebs_temp = Ageb::where('id','LIKE',"%".$parametros['q']."%")->where('idMunicipio', $mpio->id)->where('deleted_at',NULL)->with('municipio','localidad')->get(); 
+                    $agebs_temp = Ageb::where('id','LIKE',"%".$parametros['q']."%")->where('municipios_id', $mpio->id)->where('deleted_at',NULL)->with('municipio','localidad')->get(); 
                     foreach($agebs_temp as $k=> $i){
                         $data->push($i);
                     }
                 }
             } else {
-                $municipios = Municipio::where('idJurisdiccion', Auth::user()->idJurisdiccion)->where('borradoAl',NULL)->get();
+                $municipios = Municipio::where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->get();
                 foreach($municipios as $key=> $mpio){
-                    $agebs_temp = Ageb::where('idMunicipio', $mpio->id)->where('deleted_at',NULL)->with('municipio','localidad')->get(); 
+                    $agebs_temp = Ageb::where('municipios_id', $mpio->id)->where('deleted_at',NULL)->with('municipio','localidad')->get(); 
                     foreach($agebs_temp as $k=> $i){
                         $data->push($i);
                     }

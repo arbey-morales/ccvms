@@ -8,12 +8,12 @@ class Vacuna extends Model
 {
     protected $table = 'vacunas';
     
-    protected $fillable = ["id","clave","nombre","orden_esquema"];
+    protected $fillable = ["via_administracion_id","clave","nombre","orden_esquema","color_rgb","usuario_id"];
 
     public $timestamps = false;
 
     public function vacunasEsquemas()
     {
-        return $this->hasMany('App\Catalogo\VacunaEsquema', 'vacunas_id', 'id');
+        return $this->hasMany('App\Catalogo\VacunaEsquema', 'vacuna_id', 'id');
     }
 }

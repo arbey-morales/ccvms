@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Entidad extends Model
 {
-    protected $table = 'entidadesFederativas';
+    protected $table = 'entidades_federativas';
 
-    protected $fillable = ["id","clave","nombre","creadoPor","actualizadoPor","creadoAl","modificadoAl","borradoAl"];
+    protected $fillable = ["clave","nombre"];
 
     public $timestamps = false;
 }

@@ -4,15 +4,15 @@
             <th class="text-left">#</th>
             <th class="text-left">Nombre</th>
             <th class="text-left">CURP</th>
-            <th class="text-left"> Nacimiento</th>
+            <th class="text-left">Nacimiento</th>
             <th class="text-left">Dirección</th>
             <th class="text-left">Unidad de salud</th>
             <th class="text-left col-md-1"></th>
         </tr>
     </thead>
     <tbody>
-        @foreach($personas as $key=>$item)
-            <tr data-id="{{ $item->id }}" class="@if($item->activo === 0) ? warning @endif" data-toggle="tooltip" data-placement="top" title="@if($item->activo===0) Operador Inactivo @endif">
+        @foreach($data as $key=>$item)
+            <tr data-id="{{ $item->id }}" data-toggle="tooltip" data-placement="top">
                 <td class="text-center"><strong> {{ ++$key }} </strong></td>
                 <td class="text-left"><a class="btn btn-default" href="{{ url(Route::getCurrentRoute()->getPath().'/'.$item->id) }}" class="button">@if($item->genero=='M') <i class="fa fa-male" style="color:#4d81bf; font-size:large;"></i> @endif @if($item->genero=='F') <i class="fa fa-female" style="color:#ed1586; font-size:large;"></i> @endif </a> {{ $item->nombre }} {{ $item->apellido_paterno }} {{ $item->apellido_materno }}</td>
                 <td class="text-left"><strong>{{ $item->curp }}</strong></td>
@@ -33,7 +33,7 @@
             <th class="text-left">#</th>
             <th class="text-left">Nombre</th>
             <th class="text-left">CURP</th>
-            <th class="text-left"> Nacimiento</th>
+            <th class="text-left">Nacimiento</th>
             <th class="text-left">Dirección</th>
             <th class="text-left">Unidad de salud</th>
             <th class="text-left col-md-1"></th>

@@ -18,7 +18,7 @@ use App\Catalogo\Pais;
 use App\Catalogo\Ageb;
 use App\Catalogo\Municipio;
 use App\Catalogo\TipoParto;
-use App\Catalogo\Codigo;
+use App\Catalogo\CodigoCenso;
 use App\Catalogo\Institucion;
 use App\Catalogo\Localidad;
 use App\Catalogo\Vacuna;
@@ -28,7 +28,7 @@ use App\Catalogo\PersonaVacunaEsquema;
 
 class PersonaController extends Controller
 {
-    public $tipos_aplicacion = array("X","Única","1a Dosis","2a Dosis","3a Dosis","4a Dosis","Refuerzo");
+    public $tipo_aplicacion = array("X","Dosis única","1a Dosis","2a Dosis","3a Dosis","4a Dosis","Refuerzo");
     
     public $estados = array("X","AS","BC","BS","CC","CL","CM","CS","CH","DF","DG","GT","GR","HG","JC","MC","MN","MS","NT","NL","OC","PL","QT","QR","SP","SL","SR","TC","TS","TL","VZ","YN","ZS");
     
@@ -52,12 +52,12 @@ class PersonaController extends Controller
                 }
             } else { // Limitar por clues
                  if($parametros['q']){
-                    $personas = Persona::select('personas.*')->join('clues','clues.id','=','personas.clues_id')->where('clues.idJurisdiccion', Auth::user()->idJurisdiccion)->where('personas.deleted_at', NULL)->where('personas.curp','LIKE',"%".$parametros['q']."%")->orWhere(DB::raw("CONCAT(personas.nombre,' ',personas.apellido_paterno,' ',personas.apellido_materno)"),'LIKE',"%".$parametros['q']."%")->with('municipio','localidad','clue')->orderBy('personas.id', 'DESC')->take(500)->get();
+                    $personas = Persona::select('personas.*')->join('clues','clues.id','=','personas.clues_id')->where('clues.jurisdicciones_id', Auth::user()->idJurisdiccion)->where('personas.deleted_at', NULL)->where('personas.curp','LIKE',"%".$parametros['q']."%")->orWhere(DB::raw("CONCAT(personas.nombre,' ',personas.apellido_paterno,' ',personas.apellido_materno)"),'LIKE',"%".$parametros['q']."%")->with('municipio','localidad','clue')->orderBy('personas.id', 'DESC')->take(500)->get();
                  } else {
-                    $personas = Persona::select('personas.*')->join('clues','clues.id','=','personas.clues_id')->where('clues.idJurisdiccion', Auth::user()->idJurisdiccion)->where('personas.deleted_at', NULL)->with('municipio','localidad','clue')->orderBy('personas.id', 'DESC')->take(500)->get();
+                    $personas = Persona::select('personas.*')->join('clues','clues.id','=','personas.clues_id')->where('clues.jurisdicciones_id', Auth::user()->idJurisdiccion)->where('personas.deleted_at', NULL)->with('municipio','localidad','clue')->orderBy('personas.id', 'DESC')->take(500)->get();
                  }
             }
-            return view('persona.index')->with('personas', $personas)->with('q', $q);
+            return view('persona.index')->with('data', $personas)->with('q', $q);
         } else {
             return response()->view('errors.allPagesError', ['icon' => 'user-secret', 'error' => '403', 'title' => 'Forbidden / Prohibido', 'message' => 'No tiene autorización para acceder al recurso. Se ha negado el acceso.'], 403);
         }
@@ -72,51 +72,17 @@ class PersonaController extends Controller
     {
         if (Auth::user()->can('show.personas') && Auth::user()->activo==1) {     
 			if (Auth::user()->is('root|admin')) {
-				$clues = Clue::where('borradoAl',NULL)->get();
-				$municipios = Municipio::where('borradoAl',NULL)->get();
-                $localidades = Localidad::where('borradoAl',NULL)->get();
-                $agebs = Ageb::with('municipio','localidad')->get();
+				$clues = Clue::where('deleted_at',NULL)->where('estatus_id', 1)->get();
 			} else {
-                $localidades = collect();
-                $agebs = collect();
-				$clues = Clue::where('idJurisdiccion', Auth::user()->idJurisdiccion)->where('borradoAl',NULL)->get();
-				$municipios = Municipio::where('idJurisdiccion', Auth::user()->idJurisdiccion)->where('borradoAl',NULL)->get();
-                foreach($municipios as $key=> $mpio){
-                    $localidades_temp = Localidad::where('idMunicipio', $mpio->id)->where('borradoAl',NULL)->get(); 
-                    foreach($localidades_temp as $id=> $item){
-                        $localidades->push($item);
-                    }
-
-                    $agebs_temp = Ageb::where('idMunicipio', $mpio->id)->where('deleted_at',NULL)->with('municipio','localidad')->get(); 
-                    foreach($agebs_temp as $k=> $i){
-                        $agebs->push($i);
-                    }
-                }
+				$clues = Clue::where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->where('estatus_id', 1)->get();
 			}
 
-            $esquema = Esquema::all();
-         
 			$arrayclue[0] = 'Seleccionar Unidad de salud';
             foreach ($clues as $cont=>$clue) {
                 $arrayclue[$clue->id] = $clue->clues .' - '.$clue->nombre;
             }
-			
-            $arraymunicipio[0] = 'Seleccionar Municipio';
-			foreach ($municipios as $municipio) {
-                $arraymunicipio[$municipio->id] = $municipio->clave .' - '.$municipio->nombre;
-            }
 
-            $arrayageb[0] = 'Seleccionar AGEB';
-            foreach ($agebs as $ageb) {
-                $arrayageb[$ageb->id] = $ageb->id.' - '.$ageb->localidad->nombre.', '.$ageb->municipio->nombre;
-            }
-            
-            $arraylocalidad[0] = 'Seleccionar Localidad';
-            foreach ($localidades as $localidad) {
-                $arraylocalidad[$localidad->id] = $localidad->clave .' - '.$localidad->nombre;
-            }	
-
-            return view('persona.reporte')->with(['esquema' => $esquema, 'agebs' => $arrayageb, 'localidades' => $arraylocalidad, 'clues' => $arrayclue, 'municipios' => $arraymunicipio ]);
+            return view('persona.reporte')->with(['clues' => $arrayclue]);
         } else {
             return response()->view('errors.allPagesError', ['icon' => 'user-secret', 'error' => '403', 'title' => 'Forbidden / Prohibido', 'message' => 'No tiene autorización para acceder al recurso. Se ha negado el acceso.'], 403);
         }
@@ -304,38 +270,46 @@ class PersonaController extends Controller
     {
         if (Auth::user()->can('create.personas') && Auth::user()->activo==1) {     
 			if (Auth::user()->is('root|admin')) {
-				$clues = Clue::where('borradoAl',NULL)->get();
-				$municipios = Municipio::where('borradoAl',NULL)->get();
-                $localidades = Localidad::where('borradoAl',NULL)->get();
+				$clues = Clue::where('deleted_at',NULL)->where('estatus_id', 1)->get();
+				$municipios = Municipio::where('deleted_at',NULL)->get();
+                $localidades = Localidad::where('deleted_at',NULL)->get();
                 $agebs = Ageb::with('municipio','localidad')->get();
 			} else {
                 $localidades = collect();
                 $agebs = collect();
-				$clues = Clue::where('idJurisdiccion', Auth::user()->idJurisdiccion)->where('borradoAl',NULL)->get();
-				$municipios = Municipio::where('idJurisdiccion', Auth::user()->idJurisdiccion)->where('borradoAl',NULL)->get();
+				$clues = Clue::where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->where('estatus_id', 1)->get();
+				$municipios = Municipio::where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->get();
                 foreach($municipios as $key=> $mpio){
-                    $localidades_temp = Localidad::where('idMunicipio', $mpio->id)->where('borradoAl',NULL)->get(); 
+                    $localidades_temp = Localidad::where('municipios_id', $mpio->id)->where('deleted_at',NULL)->get(); 
                     foreach($localidades_temp as $id=> $item){
                         $localidades->push($item);
                     }
 
-                    $agebs_temp = Ageb::where('idMunicipio', $mpio->id)->where('deleted_at',NULL)->with('municipio','localidad')->get(); 
+                    $agebs_temp = Ageb::where('municipios_id', $mpio->id)->where('deleted_at',NULL)->with('municipio','localidad')->get(); 
                     foreach($agebs_temp as $k=> $i){
                         $agebs->push($i);
                     }
                 }
 			}
 
-            //$vacunas_esquemas = VacunaEsquema::select('vacunas_esquemas.*')->join('vacunas','vacunas.id','=','vacunas_esquemas.vacunas_id')->orderBy('vacunas_esquemas.intervalo', 'ASC')->get();
+            //$vacunas_esquemas = VacunaEsquema::select('vacunas_esquemas.*')->join('vacunas','vacunas.id','=','vacunas_esquemas.vacuna_id')->orderBy('vacunas_esquemas.intervalo_inicio', 'ASC')->get();
             $fecha_actual = explode('-', date('Y-m-d'));
-            $esquema = Esquema::find($fecha_actual[0]);
-            $vacunas_esquemas = VacunaEsquema::where('esquemas_id', $fecha_actual[0])->with('vacuna','esquema')->orderBy('intervalo', 'ASC')->orderBy('orden_esquema', 'ASC')->get();
+            $esquema = Esquema::find($fecha_actual[0]);            
+            //$vacunas_esquemas = VacunaEsquema::where('esquemas_id', $fecha_actual[0])->with('vacuna','esquema')->orderBy('intervalo_inicio', 'ASC')->orderBy('orden_esquema', 'ASC')->get();
+            $vacunas_esquemas = DB::table('vacunas_esquemas AS ve')
+                        ->select('ve.id','ve.vacunas_id','ve.esquemas_id','ve.tipo_aplicacion','ve.orden_esquema AS ve_orden_esquema','ve.intervalo_inicio','ve.intervalo_fin','ve.dosis_requerida','ve.fila','ve.columna','v.clave','v.nombre','v.orden_esquema AS v_orden_esquema','v.color_rgb')
+                        ->join('vacunas AS v','v.id','=','ve.vacunas_id')
+                        ->where('ve.esquemas_id', $fecha_actual[0])
+                        ->orderBy('v_orden_esquema')
+                        ->orderBy('intervalo_inicio')
+                        ->orderBy('fila')
+                        ->orderBy('columna')
+                        ->get();
             
-            
-            $estados = Entidad::where('borradoAl',NULL)->get();
+            $estados = Entidad::where('deleted_at',NULL)->get();
 			$paises = Pais::all();
-			$instituciones = Institucion::where('borradoAl',NULL)->get();
-			$codigos = Codigo::where('deleted_at',NULL)->get();
+			$instituciones = Institucion::where('deleted_at',NULL)->get();
+			$codigos = CodigoCenso::where('deleted_at',NULL)->get();
 			$tiposparto = TipoParto::where('deleted_at',NULL)->get();
 
 			$clue_selected = [];
@@ -351,7 +325,7 @@ class PersonaController extends Controller
 
             $arrayageb[0] = 'Seleccionar AGEB';
             foreach ($agebs as $ageb) {
-                $arrayageb[$ageb->id] = $ageb->id.' - '.$ageb->localidad->nombre.', '.$ageb->municipio->nombre;
+                $arrayageb[$ageb->id] = substr($ageb->id, -4).' - '.$ageb->localidad->nombre.', '.$ageb->municipio->nombre;
             }
             
 			foreach ($estados as $estado) {
@@ -398,7 +372,7 @@ class PersonaController extends Controller
     {
         $msgGeneral = '';
         $type       = 'flash_message_info';
-        $tipos_aplicacion=$this->tipos_aplicacion;
+        $tipo_aplicacion=$this->tipo_aplicacion;
 
         if (Auth::user()->can('create.personas') && Auth::user()->activo==1) {
             $messages = [
@@ -411,31 +385,32 @@ class PersonaController extends Controller
                 'same'     => 'El campo :attribute debe ser igual al password',
                 'confirmed'=> 'El campo :attribute debe ser confirmado',
                 'date'     => 'El campo :attribute debe ser formato fecha',
-                'before'   => 'El campo :attribute no debe ser mayor a la fecha actual'
+                'before'   => 'La :attribute debe ser menor o igual a la fecha limite(fecha actual o fecha de nacimiento del niño)'
             ];
 
             $rules = [
-                'nombre'               => 'required|min:3|max:30|string',
-                'paterno'              => 'required|min:3|max:20|string',
-                'materno'              => 'required|min:3|max:20|string',
-                'clues_id'             => 'required|min:1|numeric',
-                'fecha_nacimiento'     => 'required|date|before:tomorrow',
-                'curp'                 => 'required|min:17|max:18',
-                'genero'               => 'required|in:F,M',
-                'tipos_parto_id'       => 'required|min:1|numeric',
+                'nombre'                                 => 'required|min:3|max:30|string',
+                'paterno'                                => 'required|min:3|max:20|string',
+                'materno'                                => 'required|min:3|max:20|string',
+                'clue_id'                                => 'required|min:1|numeric',
+                'fecha_nacimiento'                       => 'required|date|before:tomorrow',
+                'fecha_nacimiento_tutor'                 => 'required|date|before:fecha_nacimiento',
+                'curp'                                   => 'required|min:17|max:18',
+                'genero'                                 => 'required|in:F,M',
+                'tipo_parto_id'                          => 'required|min:1|numeric',
                 'entidad_federativa_nacimiento_id'       => 'required|min:1|numeric',
-                'municipios_id'        => 'required|min:1|numeric',
-                'localidades_id'       => 'required|min:1|numeric',
-                'calle'                => 'required|min:1|max:100',
-                'numero'               => 'required|min:1|max:5',
-                'tutor'                => 'required|min:10|max:100',
+                'municipio_id'                           => 'required|min:1|numeric',
+                'localidad_id'                           => 'required|min:1|numeric',
+                'calle'                                  => 'required|min:1|max:100',
+                'numero'                                 => 'required|min:1|max:5',
+                'tutor'                                  => 'required|min:10|max:100',
             ];
             
             $this->validate($request, $rules, $messages);
 
-            $personas_id = '';
+            $persona_id = '';
             $incremento = 0;
-            $clue = Clue::find($request->clues_id);
+            $clue = Clue::find($request->clue_id);
             $persona_increment = Persona::where('servidor_id', $clue->servidor)->orderBy('incremento','DESC')->take(1)->get();
 
             if(count($persona_increment)>0){
@@ -443,35 +418,38 @@ class PersonaController extends Controller
             } else {                 
                 $incremento = 1;                             
             }
-            $personas_id = $clue->servidor.''.$incremento; 
+            $persona_id = $clue->servidor.''.$incremento; 
             
-            if($request->instituciones_id==0)
-                $request->instituciones_id = NULL;
-            if($request->codigos_id==0)
-                $request->codigos_id = NULL;
-            if($request->agebs_id==0)
-                $request->agebs_id = NULL;
+            if($request->institucion_id==0)
+                $request->institucion_id = NULL;
+            if($request->codigo_id==0)
+                $request->codigo_id = NULL;
+            if($request->ageb_id==0)
+                $request->ageb_id = NULL;
 
             $fecha_nacimiento = explode('-',$request->fecha_nacimiento);
-            $request->fecha_nacimiento = $fecha_nacimiento[2].'-'.$fecha_nacimiento[1].'-'.$fecha_nacimiento[0]; // formato valido para guardar fecha
+            $request->fecha_nacimiento = $fecha_nacimiento[2].'-'.$fecha_nacimiento[1].'-'.$fecha_nacimiento[0]; // formato valido para guardar fecha n
+
+            $fecha_nacimiento_tutor = explode('-',$request->fecha_nacimiento_tutor);
+            $request->fecha_nacimiento_tutor = $fecha_nacimiento_tutor[2].'-'.$fecha_nacimiento_tutor[1].'-'.$fecha_nacimiento_tutor[0]; // formato valido para guardar fecha n t
                    
             $persona = new Persona;
-            $persona->id                    = $personas_id;
+            $persona->id                    = $persona_id;
             $persona->servidor_id           = $clue->servidor;
             $persona->incremento            = $incremento;
             $persona->nombre                = strtoupper($request->nombre);
             $persona->apellido_paterno      = strtoupper($request->paterno);
             $persona->apellido_materno      = strtoupper($request->materno);
-            $persona->clues_id              = $request->clues_id;
+            $persona->clues_id              = $request->clue_id;
             $persona->fecha_nacimiento      = $request->fecha_nacimiento;
             $persona->curp                  = strtoupper($request->curp);
             $persona->genero                = $request->genero;
-            $persona->tipos_parto_id        = $request->tipos_parto_id;
-            $persona->entidad_federativa_nacimiento_id = $request->entidad_federativa_nacimiento_id;
-            $persona->entidad_federativa_domicilio_id = $request->entidad_federativa_nacimiento_id;
-            $persona->municipios_id         = $request->municipios_id;
-            $persona->localidades_id        = $request->localidades_id;
-            $persona->agebs_id              = $request->agebs_id;
+            $persona->tipos_partos_id       = $request->tipo_parto_id;
+            $persona->entidades_federativas_nacimiento_id = $request->entidad_federativa_nacimiento_id;
+            $persona->entidades_federativas_domicilio_id = $request->entidad_federativa_nacimiento_id;
+            $persona->municipios_id         = $request->municipio_id;
+            $persona->localidades_id        = $request->localidad_id;
+            $persona->agebs_id              = $request->ageb_id;
             $persona->colonia               = $request->colonia;
             $persona->paises_id             = 155;
             $persona->descripcion_domicilio = $request->descripcion_domicilio;
@@ -480,49 +458,63 @@ class PersonaController extends Controller
             $persona->manzana               = $request->manzana;
             $persona->codigo_postal         = $request->codigo_postal;
             $persona->sector                = $request->sector;
-            $persona->codigos_id            = $request->codigos_id;
-            $persona->instituciones_id      = $request->instituciones_id;
+            $persona->codigos_censos_id     = $request->codigo_id;
+            $persona->instituciones_id      = $request->institucion_id;
             $persona->tutor                 = strtoupper($request->tutor);
+            $persona->fecha_nacimiento_tutor = $request->fecha_nacimiento_tutor;
+            $persona->usuario_id            = Auth::user()->email;
+            $persona->created_at            = date('Y-m-d H:m:s');
 
-            $vacunas_esquemas = VacunaEsquema::where('esquemas_id', $fecha_nacimiento[2])->with('vacuna')->get();
+            //$vacunas_esquemas = VacunaEsquema::where('esquemas_id', $fecha_nacimiento[2])->with('vacuna')->get();
+            $vacunas_esquemas = DB::table('vacunas_esquemas AS ve')
+                        ->select('ve.id','ve.vacunas_id','ve.esquemas_id','ve.tipo_aplicacion','ve.orden_esquema AS ve_orden_esquema','ve.intervalo_inicio','ve.intervalo_fin','ve.dosis_requerida','ve.fila','ve.columna','v.clave','v.nombre','v.orden_esquema AS v_orden_esquema','v.color_rgb')
+                        ->join('vacunas AS v','v.id','=','ve.vacunas_id')
+                        ->where('ve.esquemas_id', $fecha_nacimiento[2])
+                        ->orderBy('v_orden_esquema')
+                        ->orderBy('intervalo_inicio')
+                        ->orderBy('fila')
+                        ->orderBy('columna')
+                        ->get();
             $save_vac_esq = true;            
             $msg_dosis = '';
             $esquema_dosis_validada = array(); // dosis ya validada por una dosis al menos
-
             foreach($vacunas_esquemas as $key=>$ve){
+                     
                 if($request['fecha_aplicacion'.$ve->id]!=NULL && $request['fecha_aplicacion'.$ve->id]!=""){ // Si trae algún valor la variable
                     $fecha_apli = explode('-',$request['fecha_aplicacion'.$ve->id]);
                     if(array_key_exists(0, $fecha_apli) && array_key_exists(1, $fecha_apli) && array_key_exists(2, $fecha_apli)){ // Si cumple con día, mes y año
                         $temp_fecha_aplicacion = $fecha_apli[2].'-'.$fecha_apli[1].'-'.$fecha_apli[0];
                         if (preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/",$temp_fecha_aplicacion)) { // valida formato de fecha
-
+                            $dosis_anteriores = VacunaEsquema::where('vacunas_id', $ve->vacunas_id)->where('esquemas_id', $fecha_nacimiento[2])->where('intervalo_inicio','<',$ve->intervalo_inicio)->where('deleted_at', NULL)->orderBy('intervalo_inicio', 'DESC')->take(1)->get();
+                            //var_dump(json_encode($dosis_anteriores).' - '.$ve->clave.','.$ve->tipo_aplicacion);                                                   
                             $today  = explode('-', date('Y-m-d'));
                             $mktime_today = mktime(0,0,0,$today[1],$today[2],$today[0]);
+
                             $born  = explode('-', $request->fecha_nacimiento);
                             $mktime_born = mktime(0,0,0,$born[1],$born[2],$born[0]);
+                            
                             $apli  = explode('-', $temp_fecha_aplicacion);
                             $mktime_apli = mktime(0,0,0,$apli[1],$apli[2],$apli[0]);
                             if($mktime_apli>=$mktime_born && $mktime_apli<=$mktime_today) { // Si la fecha de aplicación >= fecha de nacimento y <= la fecha de hoy
                                 // validar que la aplicación actual no salte aplicaciones anteriores de cada vacuna...
-                                $dosis_anteriores = VacunaEsquema::where('vacunas_id', $ve->vacunas_id)->where('esquemas_id', $fecha_nacimiento[2])->where('intervalo','<',$ve->intervalo)->where('deleted_at', NULL)->get();
                                 $msg_dosis_faltantes = '';
                                 $falta_dosis = false;
                                 foreach($dosis_anteriores as $index_menores=>$value_menores){
-                                    $intervalo = '';
-                                    if($value_menores->intervalo<=29) { 
-                                        $intervalo = 'Nacimiento'; 
+                                    $intervalo_inicio = '';
+                                    if($value_menores->intervalo_inicio<=29) { 
+                                        $intervalo_inicio = 'Nacimiento'; 
                                     } else {
-                                        if(($value_menores->intervalo/30)<=23){
-                                            $intervalo = ($value_menores->intervalo/30).' Meses';
+                                        if(($value_menores->intervalo_inicio/30)<=23){
+                                            $intervalo_inicio = ($value_menores->intervalo_inicio/30).' Meses';
                                         } else {
-                                            $intervalo = round((($value_menores->intervalo/30)/12)).' Años';
+                                            $intervalo_inicio = round((($value_menores->intervalo_inicio/30)/12)).' Años';
                                         }
                                     }
                                     if($request['fecha_aplicacion'.$value_menores->id]==NULL && $request['fecha_aplicacion'.$value_menores->id]=="") {
                                         $save_vac_esq = false;  
                                         $falta_dosis = true;
                                         if(in_array($value_menores->id, $esquema_dosis_validada)) { } else {
-                                            $msg_dosis_faltantes.= $tipos_aplicacion[$value_menores->tipo_aplicacion].' de '.$ve->vacuna->clave.' ('.$intervalo.') | ';
+                                            $msg_dosis_faltantes.= $tipo_aplicacion[$value_menores->tipo_aplicacion].' de '.$ve->clave.' ('.$intervalo_inicio.') | ';
                                         }
                                     } else {
                                         // es decir que la fecha si tiene valor, hay que evaluar validez de formato y rango establecido por el esquema
@@ -537,17 +529,17 @@ class PersonaController extends Controller
                                                     $save_vac_esq = false;  
                                                     $falta_dosis = true;
                                                     if(in_array($value_menores->id, $esquema_dosis_validada)) { } else {
-                                                        $msg_dosis_faltantes.= 'Fecha de '.$tipos_aplicacion[$value_menores->tipo_aplicacion].' de '.$ve->vacuna->clave.' debe ser menor a la fecha de la '.$tipos_aplicacion[$ve->tipo_aplicacion].' | ';
+                                                        $msg_dosis_faltantes.= 'Fecha de '.$tipo_aplicacion[$value_menores->tipo_aplicacion].' de '.$ve->clave.' debe ser menor a la fecha de la '.$tipo_aplicacion[$ve->tipo_aplicacion].' | ';
                                                     }
                                                 }
 
-                                                $dias_diferencia_intervalo = $ve->intervalo - $value_menores->intervalo;
+                                                $dias_diferencia_intervalo_inicio = $ve->intervalo_inicio - $value_menores->intervalo_inicio;
                                                 $dias_diferencia = ($mktime_apli - $mktime_apli_menores) / (60 * 60 * 24);
-                                                if($dias_diferencia<$dias_diferencia_intervalo) { // si hay un itervalo valido entre las dos fechas
+                                                if($dias_diferencia<$dias_diferencia_intervalo_inicio) { // si hay un itervalo valido entre las dos fechas
                                                     $save_vac_esq = false;  
                                                     $falta_dosis = true;
                                                     if(in_array($value_menores->id, $esquema_dosis_validada)) { } else {
-                                                        $msg_dosis_faltantes.= $ve->vacuna->clave. ' debe tener al menos '.$dias_diferencia_intervalo.' días de diferencia entre la  '.$tipos_aplicacion[$value_menores->tipo_aplicacion].' y la '.$tipos_aplicacion[$ve->tipo_aplicacion].' | ';
+                                                        $msg_dosis_faltantes.= $ve->clave. ' debe tener al menos '.$dias_diferencia_intervalo_inicio.' días de diferencia entre la  '.$tipo_aplicacion[$value_menores->tipo_aplicacion].' y la '.$tipo_aplicacion[$ve->tipo_aplicacion].' | ';
                                                     }
                                                 }
                                             }
@@ -562,7 +554,7 @@ class PersonaController extends Controller
                                 if($falta_dosis)
                                     $msg_dosis.=$msg_dosis_faltantes;
                             } else {
-                                $msg_dosis.='Fecha de aplicación debe ser mayor o igual a la fecha de nacimiento y menor igual a la fecha actual';
+                                $msg_dosis.='Fecha de aplicación de la '.$tipo_aplicacion[$ve->tipo_aplicacion].' de '.$ve->clave.' debe ser mayor o igual a la fecha de nacimiento y menor igual a la fecha actual o de la última actualización';
                                 $save_vac_esq = false; 
                                 break;
                             }
@@ -578,7 +570,9 @@ class PersonaController extends Controller
                     }
                 }
             }
-            
+
+            //die;
+
             $repeat_curp = Persona::where('curp', $request->curp)->where('deleted_at', NULL)->get();
             if($save_vac_esq==true) {
                 if(count($repeat_curp)<=0) {
@@ -605,11 +599,13 @@ class PersonaController extends Controller
                                     $PersonaVacunaEsquema->id                   = $pve_id;
                                     $PersonaVacunaEsquema->servidor_id          = $clue->servidor;
                                     $PersonaVacunaEsquema->incremento           = $incremento_pve;
-                                    $PersonaVacunaEsquema->personas_id          = $personas_id;
-                                    $PersonaVacunaEsquema->vacunas_esquemas_id  = $ve->id;
+                                    $PersonaVacunaEsquema->personas_id           = $persona_id;
+                                    $PersonaVacunaEsquema->vacunas_esquemas_id    = $ve->id;
                                     $PersonaVacunaEsquema->fecha_aplicacion     = $temp_fecha_aplicacion;
                                     $PersonaVacunaEsquema->lote                 = '00000';
                                     $PersonaVacunaEsquema->dosis                = $ve->dosis_requerida;
+                                    $PersonaVacunaEsquema->usuario_id           = Auth::user()->email;
+                                    $PersonaVacunaEsquema->created_at           = date('Y-m-d H:m:s');
                                     if(!$PersonaVacunaEsquema->save()){
                                         $success = false;
                                         break;
@@ -668,17 +664,30 @@ class PersonaController extends Controller
                 if (Auth::user()->is('root|admin')) {
                     $persona = Persona::where('id', $id)->where('deleted_at', NULL)->with('clue','pais','entidadNacimiento','entidadDomicilio','municipio','localidad','ageb','afiliacion','codigo','tipoParto','personasVacunasEsquemas')->first();
                 } else { // Limitar por clues
-                    $persona = Persona::select('personas.*')->join('clues','clues.id','=','personas.clues_id')->where('personas.id', $id)->where('clues.idJurisdiccion', Auth::user()->idJurisdiccion)->where('personas.deleted_at', NULL)->with('clue','pais','entidadNacimiento','entidadDomicilio','municipio','localidad','ageb','afiliacion','codigo','tipoParto','personasVacunasEsquemas')->first();
+                    $persona = Persona::select('personas.*')->join('clues','clues.id','=','personas.clues_id')->where('personas.id', $id)->where('clues.jurisdicciones_id', Auth::user()->idJurisdiccion)->where('personas.deleted_at', NULL)->with('clue','pais','entidadNacimiento','entidadDomicilio','municipio','localidad','ageb','afiliacion','codigo','tipoParto','personasVacunasEsquemas')->first();
                 }
 
                 $esquema_date = explode('-', $persona->fecha_nacimiento);
                 $esquema = Esquema::find($esquema_date[0]);
-                $vacunas_esquemas = VacunaEsquema::where('esquemas_id', $esquema_date[0])->with('vacuna','esquema')->orderBy('intervalo', 'ASC')->orderBy('orden_esquema', 'ASC')->get();
+                //$vacunas_esquemas = VacunaEsquema::where('esquemas_id', $esquema_date[0])->with('vacuna','esquema')->orderBy('intervalo_inicio', 'ASC')->orderBy('orden_esquema', 'ASC')->get();
                 //$personas_vacunas_esquemas = PersonaVacunaEsquema::where('personas_id', $persona->id)->get();
+                $vacunas_esquemas = DB::table('vacunas_esquemas AS ve')
+                        ->select('ve.id','ve.vacunas_id','ve.esquemas_id','ve.tipo_aplicacion','ve.orden_esquema AS ve_orden_esquema','ve.intervalo_inicio','ve.intervalo_fin','ve.dosis_requerida','ve.fila','ve.columna','v.clave','v.nombre','v.orden_esquema AS v_orden_esquema','v.color_rgb')
+                        ->join('vacunas AS v','v.id','=','ve.vacunas_id')
+                        ->where('ve.esquemas_id', $esquema_date[0])
+                        ->orderBy('v_orden_esquema')
+                        ->orderBy('intervalo_inicio')
+                        ->orderBy('fila')
+                        ->orderBy('columna')
+                        ->get();
+                $fn_tutor = explode("-",$persona->fecha_nacimiento_tutor);
+                $persona->fecha_nacimiento_tutor = date($fn_tutor[2].'-'.$fn_tutor[1].'-'.$fn_tutor[0]);
+                $fn_nino = explode("-",$persona->fecha_nacimiento);
+                $persona->fecha_nacimiento = date($fn_nino[2].'-'.$fn_nino[1].'-'.$fn_nino[0]);
             } else {
                 return response()->view('errors.allPagesError', ['icon' => 'search-minus', 'error' => '404', 'title' => 'Not found / No se encuentra', 'message' => 'El servidor no puede encontrar el recurso solicitado y no es posible determinar si esta ausencia es temporal o permanente.'], 404);
             }
-            return view('persona.show')->with(['esquema' => $esquema, 'persona' => $persona, 'vacunas_esquemas' => $vacunas_esquemas]);
+            return view('persona.show')->with(['esquema' => $esquema, 'data' => $persona, 'vacunas_esquemas' => $vacunas_esquemas]);
         } else {
             return response()->view('errors.allPagesError', ['icon' => 'user-secret', 'error' => '403', 'title' => 'Forbidden / Prohibido', 'message' => 'No tiene autorización para acceder al recurso. Se ha negado el acceso.'], 403);
         }
@@ -697,39 +706,48 @@ class PersonaController extends Controller
             $id_persona = $id;
             if($person) {
                 if (Auth::user()->is('root|admin')) {
-                    $clues = Clue::where('borradoAl',NULL)->get();
-                    $municipios = Municipio::where('borradoAl',NULL)->get();
-                    $localidades = Localidad::where('borradoAl',NULL)->get();
+                    $clues = Clue::where('deleted_at',NULL)->where('estatus_id', 1)->get();
+                    $municipios = Municipio::where('deleted_at',NULL)->get();
+                    $localidades = Localidad::where('deleted_at',NULL)->get();
                     $agebs = Ageb::with('municipio','localidad')->get();
                     $persona = Persona::where('id', $id_persona)->where('deleted_at', NULL)->with('clue','pais','entidadNacimiento','entidadDomicilio','municipio','localidad','ageb','afiliacion','codigo','tipoParto','personasVacunasEsquemas')->first();
                 } else {
                     $localidades = collect();
                     $agebs = collect();
-                    $clues = Clue::where('idJurisdiccion', Auth::user()->idJurisdiccion)->where('borradoAl',NULL)->get();
-                    $municipios = Municipio::where('idJurisdiccion', Auth::user()->idJurisdiccion)->where('borradoAl',NULL)->get();
+                    $clues = Clue::where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->where('estatus_id', 1)->get();
+                    $municipios = Municipio::where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->get();
                     foreach($municipios as $key=> $mpio){
-                        $localidades_temp = Localidad::where('idMunicipio', $mpio->id)->where('borradoAl',NULL)->get(); 
+                        $localidades_temp = Localidad::where('municipios_id', $mpio->id)->where('deleted_at',NULL)->get(); 
                         foreach($localidades_temp as $id=> $item){
                             $localidades->push($item);
                         }
 
-                        $agebs_temp = Ageb::where('idMunicipio', $mpio->id)->where('deleted_at',NULL)->with('municipio','localidad')->get(); 
+                        $agebs_temp = Ageb::where('municipios_id', $mpio->id)->where('deleted_at',NULL)->with('municipio','localidad')->get(); 
                         foreach($agebs_temp as $k=> $i){
                             $agebs->push($i);
                         }
                     }
-                    $persona = Persona::select('personas.*')->join('clues','clues.id','=','personas.clues_id')->where('personas.id', $id_persona)->where('clues.idJurisdiccion', Auth::user()->idJurisdiccion)->where('personas.deleted_at', NULL)->with('clue','pais','entidadNacimiento','entidadDomicilio','municipio','localidad','ageb','afiliacion','codigo','tipoParto','personasVacunasEsquemas')->first();
+                    $persona = Persona::select('personas.*')->join('clues','clues.id','=','personas.clues_id')->where('personas.id', $id_persona)->where('clues.jurisdicciones_id', Auth::user()->idJurisdiccion)->where('personas.deleted_at', NULL)->with('clue','pais','entidadNacimiento','entidadDomicilio','municipio','localidad','ageb','afiliacion','codigo','tipoParto','personasVacunasEsquemas')->first();
                 }
                 
-                //$vacunas_esquemas = VacunaEsquema::select('vacunas_esquemas.*')->join('vacunas','vacunas.id','=','vacunas_esquemas.vacunas_id')->orderBy('vacunas_esquemas.intervalo', 'ASC')->get();
+                //$vacunas_esquemas = VacunaEsquema::select('vacunas_esquemas.*')->join('vacunas','vacunas.id','=','vacunas_esquemas.vacuna_id')->orderBy('vacunas_esquemas.intervalo_inicio', 'ASC')->get();
                 $fecha_actual = explode('-', $persona->fecha_nacimiento);
                 $esquema = Esquema::find($fecha_actual[0]);
-                $vacunas_esquemas = VacunaEsquema::where('esquemas_id', $fecha_actual[0])->with('vacuna','esquema')->orderBy('intervalo', 'ASC')->orderBy('orden_esquema', 'ASC')->get();
-                
-                $estados = Entidad::where('borradoAl',NULL)->get();
+                //$vacunas_esquemas = VacunaEsquema::where('esquemas_id', $fecha_actual[0])->with('vacuna','esquema')->orderBy('intervalo_inicio', 'ASC')->orderBy('orden_esquema', 'ASC')->get();
+                $vacunas_esquemas = DB::table('vacunas_esquemas AS ve')
+                        ->select('ve.id','ve.vacunas_id','ve.esquemas_id','ve.tipo_aplicacion','ve.orden_esquema AS ve_orden_esquema','ve.intervalo_inicio','ve.intervalo_fin','ve.dosis_requerida','ve.fila','ve.columna','v.clave','v.nombre','v.orden_esquema AS v_orden_esquema','v.color_rgb')
+                        ->join('vacunas AS v','v.id','=','ve.vacunas_id')
+                        ->where('ve.esquemas_id', $fecha_actual[0])
+                        ->orderBy('v_orden_esquema')
+                        ->orderBy('intervalo_inicio')
+                        ->orderBy('fila')
+                        ->orderBy('columna')
+                        ->get();
+
+                $estados = Entidad::where('deleted_at',NULL)->get();
                 $paises = Pais::all();
-                $instituciones = Institucion::where('borradoAl',NULL)->get();
-                $codigos = Codigo::where('deleted_at',NULL)->get();
+                $instituciones = Institucion::where('deleted_at',NULL)->get();
+                $codigos = CodigoCenso::where('deleted_at',NULL)->get();
                 $tiposparto = TipoParto::where('deleted_at',NULL)->get();
 
                 $clue_selected = [];
@@ -745,7 +763,7 @@ class PersonaController extends Controller
 
                 $arrayageb[0] = 'Seleccionar AGEB';
                 foreach ($agebs as $ageb) {
-                    $arrayageb[$ageb->id] = $ageb->id.' - '.$ageb->localidad->nombre.', '.$ageb->municipio->nombre;
+                    $arrayageb[$ageb->id] = substr($ageb->id, -4).' - '.$ageb->localidad->nombre.', '.$ageb->municipio->nombre;
                 }
                 
                 foreach ($estados as $estado) {
@@ -775,7 +793,12 @@ class PersonaController extends Controller
                 foreach ($instituciones as $institucion) {
                     $arrayinstitucion[$institucion->id] = $institucion->clave .' - '.$institucion->nombre;
                 }
-                return view('persona.edit')->with(['esquema' => $esquema, 'persona' => $persona, 'agebs' => $arrayageb, 'vacunas_esquemas' => $vacunas_esquemas, 'clue_selected' => $clue_selected, 'instituciones' => $arrayinstitucion, 'localidades' => $arraylocalidad, 'clues' => $arrayclue, 'municipios' => $arraymunicipio, 'estados' => $arrayestado, 'paises' => $arraypais, 'codigos' => $arraycodigo, 'partos' => $arraytipoparto, ]);
+
+                $fn_tutor = explode("-",$persona->fecha_nacimiento_tutor);
+                $persona->fecha_nacimiento_tutor = date($fn_tutor[2].'-'.$fn_tutor[1].'-'.$fn_tutor[0]);
+                $fn_nino = explode("-",$persona->fecha_nacimiento);
+                $persona->fecha_nacimiento = date($fn_nino[2].'-'.$fn_nino[1].'-'.$fn_nino[0]);
+                return view('persona.edit')->with(['esquema' => $esquema, 'data' => $persona, 'agebs' => $arrayageb, 'vacunas_esquemas' => $vacunas_esquemas, 'clue_selected' => $clue_selected, 'instituciones' => $arrayinstitucion, 'localidades' => $arraylocalidad, 'clues' => $arrayclue, 'municipios' => $arraymunicipio, 'estados' => $arrayestado, 'paises' => $arraypais, 'codigos' => $arraycodigo, 'partos' => $arraytipoparto, ]);
             } else {
                 return response()->view('errors.allPagesError', ['icon' => 'search-minus', 'error' => '404', 'title' => 'Not found / No se encuentra', 'message' => 'El servidor no puede encontrar el recurso solicitado y no es posible determinar si esta ausencia es temporal o permanente.'], 404);
             }
@@ -795,10 +818,10 @@ class PersonaController extends Controller
     {
         $msgGeneral = '';
         $type       = 'flash_message_info';
-        $tipos_aplicacion=$this->tipos_aplicacion;
+        $tipo_aplicacion=$this->tipo_aplicacion;
 
         $persona = Persona::findOrFail($id);
-        $personas_id = $id;
+        $persona_id = $id;
 
         if (Auth::user()->can('update.personas') && Auth::user()->activo==1) {
             $messages = [
@@ -809,35 +832,40 @@ class PersonaController extends Controller
                 'unique'   => 'El campo :attribute ya existe',
                 'numeric'  => 'El campo :attribute debe ser un número.',
                 'same'     => 'El campo :attribute debe ser igual al password',
-                'confirmed'=> 'El campo :attribute debe ser confirmado',
-                'date'     => 'El campo :attribute debe ser formato fecha'
+                'confirmed'=> 'La :attribute debe ser confirmada',
+                'date'     => 'La :attribute debe ser formato fecha',
+                'before'   => 'La :attribute debe ser menor o igual a la fecha limite(fecha actual o fecha de nacimiento del niño)'
             ];
 
             $rules = [    
-                'clues_id'             => 'required|min:1|numeric',
-                'tipos_parto_id'       => 'required|min:1|numeric',
-                'municipios_id'        => 'required|min:1|numeric',
-                'localidades_id'       => 'required|min:1|numeric',
-                'calle'                => 'required|min:1|max:100',
-                'numero'               => 'required|min:1|max:5',
-                'tutor'                => 'required|min:10|max:100',
+                'clue_id'                 => 'required|min:1|numeric',
+                'tipo_parto_id'           => 'required|min:1|numeric',
+                'municipio_id'            => 'required|min:1|numeric',
+                'localidad_id'            => 'required|min:1|numeric',
+                'calle'                   => 'required|min:1|max:100',
+                'numero'                  => 'required|min:1|max:5',
+                'tutor'                   => 'required|min:10|max:100',
+                'fecha_nacimiento_tutor'  => 'required|date|before:fecha_nacimiento',
             ];
             
             $this->validate($request, $rules, $messages);
-            $clue = Clue::find($request->clues_id);
+            $clue = Clue::find($request->clue_id);
             
-            if($request->instituciones_id==0)
-                $request->instituciones_id = NULL;
-            if($request->codigos_id==0)
-                $request->codigos_id = NULL;
-            if($request->agebs_id==0)
-                $request->agebs_id = NULL;
-          
-            $persona->clues_id              = $request->clues_id;
-            $persona->tipos_parto_id        = $request->tipos_parto_id;
-            $persona->municipios_id         = $request->municipios_id;
-            $persona->localidades_id        = $request->localidades_id;
-            $persona->agebs_id              = $request->agebs_id;
+            if($request->institucion_id==0)
+                $request->institucion_id = NULL;
+            if($request->codigo_id==0)
+                $request->codigo_id = NULL;
+            if($request->ageb_id==0)
+                $request->ageb_id = NULL;
+
+            $fecha_nacimiento_tutor = explode('-',$request->fecha_nacimiento_tutor);
+            $request->fecha_nacimiento_tutor = $fecha_nacimiento_tutor[2].'-'.$fecha_nacimiento_tutor[1].'-'.$fecha_nacimiento_tutor[0]; // formato valido para guardar fecha n t
+                        
+            $persona->clues_id              = $request->clue_id;
+            $persona->tipos_partos_id       = $request->tipo_parto_id;
+            $persona->municipios_id         = $request->municipio_id;
+            $persona->localidades_id        = $request->localidad_id;
+            $persona->agebs_id              = $request->ageb_id;
             $persona->colonia               = $request->colonia;
             $persona->paises_id             = 155;
             $persona->descripcion_domicilio = $request->descripcion_domicilio;
@@ -846,12 +874,24 @@ class PersonaController extends Controller
             $persona->manzana               = $request->manzana;
             $persona->codigo_postal         = $request->codigo_postal;
             $persona->sector                = $request->sector;
-            $persona->codigos_id            = $request->codigos_id;
-            $persona->instituciones_id      = $request->instituciones_id;
+            $persona->codigos_censos_id     = $request->codigo_id;
+            $persona->instituciones_id      = $request->institucion_id;
             $persona->tutor                 = strtoupper($request->tutor);
+            $persona->fecha_nacimiento_tutor= $request->fecha_nacimiento_tutor;
+            $persona->usuario_id            = Auth::user()->email;
+            $persona->updated_at            = date('Y-m-d H:m:s');
 
             $fecha_nacimiento = explode('-',$persona->fecha_nacimiento);
-            $vacunas_esquemas = VacunaEsquema::where('esquemas_id', $fecha_nacimiento[0])->get();
+            //$vacunas_esquemas = VacunaEsquema::where('esquemas_id', $fecha_nacimiento[0])->get();
+            $vacunas_esquemas = DB::table('vacunas_esquemas AS ve')
+                        ->select('ve.id','ve.vacunas_id','ve.esquemas_id','ve.tipo_aplicacion','ve.orden_esquema AS ve_orden_esquema','ve.intervalo_inicio','ve.intervalo_fin','ve.dosis_requerida','ve.fila','ve.columna','v.clave','v.nombre','v.orden_esquema AS v_orden_esquema','v.color_rgb')
+                        ->join('vacunas AS v','v.id','=','ve.vacunas_id')
+                        ->where('ve.esquemas_id', $fecha_nacimiento[0])
+                        ->orderBy('v_orden_esquema')
+                        ->orderBy('intervalo_inicio')
+                        ->orderBy('fila')
+                        ->orderBy('columna')
+                        ->get();
             $save_vac_esq = true;
             $msg_dosis = '';
             $esquema_dosis_validada = array(); // dosis ya validada por una dosis al menos
@@ -862,7 +902,7 @@ class PersonaController extends Controller
                     if(array_key_exists(0, $fecha_apli) && array_key_exists(1, $fecha_apli) && array_key_exists(2, $fecha_apli)){
                         $temp_fecha_aplicacion = $fecha_apli[2].'-'.$fecha_apli[1].'-'.$fecha_apli[0];
                         if (preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/",$temp_fecha_aplicacion)) { 
-
+                            $dosis_anteriores = VacunaEsquema::where('vacunas_id', $ve->vacunas_id)->where('esquemas_id', $fecha_nacimiento[0])->where('intervalo_inicio','<',$ve->intervalo_inicio)->where('deleted_at', NULL)->orderBy('intervalo_inicio', 'DESC')->take(1)->get();
                             $today  = explode('-', date('Y-m-d'));
                             $mktime_today = mktime(0,0,0,$today[1],$today[2],$today[0]);
                             $born  = explode('-', $persona->fecha_nacimiento);
@@ -872,25 +912,25 @@ class PersonaController extends Controller
 
                             if($mktime_apli>=$mktime_born && $mktime_apli<=$mktime_today) { // Si la fecha de aplicación >= fecha de nacimento y <= la fecha de hoy
                                 // validar que la aplicación actual no salte aplicaciones anteriores de cada vacuna...
-                                $dosis_anteriores = VacunaEsquema::where('vacunas_id', $ve->vacunas_id)->where('esquemas_id', $fecha_nacimiento[0])->where('intervalo','<',$ve->intervalo)->where('deleted_at', NULL)->get();
+                                //$dosis_anteriores = VacunaEsquema::where('vacunas_id', $ve->vacuna_id)->where('esquemas_id', $fecha_nacimiento[0])->where('intervalo_inicio','<',$ve->intervalo_inicio)->where('deleted_at', NULL)->get();
                                 $msg_dosis_faltantes = '';
                                 $falta_dosis = false;
                                 foreach($dosis_anteriores as $index_menores=>$value_menores){
-                                    $intervalo = '';
-                                    if($value_menores->intervalo<=29) { 
-                                        $intervalo = 'Nacimiento'; 
+                                    $intervalo_inicio = '';
+                                    if($value_menores->intervalo_inicio<=29) { 
+                                        $intervalo_inicio = 'Nacimiento'; 
                                     } else {
-                                        if(($value_menores->intervalo/30)<=23){
-                                            $intervalo = ($value_menores->intervalo/30).' Meses';
+                                        if(($value_menores->intervalo_inicio/30)<=23){
+                                            $intervalo_inicio = ($value_menores->intervalo_inicio/30).' Meses';
                                         } else {
-                                            $intervalo = round((($value_menores->intervalo/30)/12)).' Años';
+                                            $intervalo_inicio = round((($value_menores->intervalo_inicio/30)/12)).' Años';
                                         }
                                     }
                                     if($request['fecha_aplicacion'.$value_menores->id]==NULL && $request['fecha_aplicacion'.$value_menores->id]=="") {
                                         $save_vac_esq = false;  
                                         $falta_dosis = true;
                                         if(in_array($value_menores->id, $esquema_dosis_validada)) { } else {
-                                            $msg_dosis_faltantes.= $tipos_aplicacion[$value_menores->tipo_aplicacion].' de '.$ve->vacuna->clave.' ('.$intervalo.') | ';
+                                            $msg_dosis_faltantes.= $tipo_aplicacion[$value_menores->tipo_aplicacion].' de '.$ve->clave.' ('.$intervalo_inicio.') | ';
                                         }
                                     } else {
                                         // es decir que la fecha si tiene valor, hay que evaluar validez de formato y rango establecido por el esquema
@@ -905,17 +945,17 @@ class PersonaController extends Controller
                                                     $save_vac_esq = false;  
                                                     $falta_dosis = true;
                                                     if(in_array($value_menores->id, $esquema_dosis_validada)) { } else {
-                                                        $msg_dosis_faltantes.= 'Fecha de '.$tipos_aplicacion[$value_menores->tipo_aplicacion].' de '.$ve->vacuna->clave.' debe ser menor a la fecha de la '.$tipos_aplicacion[$ve->tipo_aplicacion].' | ';
+                                                        $msg_dosis_faltantes.= 'Fecha de '.$tipo_aplicacion[$value_menores->tipo_aplicacion].' de '.$ve->clave.' debe ser menor a la fecha de la '.$tipo_aplicacion[$ve->tipo_aplicacion].' | ';
                                                     }
                                                 }
 
-                                                $dias_diferencia_intervalo = $ve->intervalo - $value_menores->intervalo;
+                                                $dias_diferencia_intervalo_inicio = $ve->intervalo_inicio - $value_menores->intervalo_inicio;
                                                 $dias_diferencia = ($mktime_apli - $mktime_apli_menores) / (60 * 60 * 24);
-                                                if($dias_diferencia<$dias_diferencia_intervalo) { // si hay un itervalo valido entre las dos fechas
+                                                if($dias_diferencia<$dias_diferencia_intervalo_inicio) { // si hay un itervalo valido entre las dos fechas
                                                     $save_vac_esq = false;  
                                                     $falta_dosis = true;
                                                     if(in_array($value_menores->id, $esquema_dosis_validada)) { } else {
-                                                        $msg_dosis_faltantes.= $ve->vacuna->clave. ' debe tener al menos '.$dias_diferencia_intervalo.' días de diferencia entre la  '.$tipos_aplicacion[$value_menores->tipo_aplicacion].' y la '.$tipos_aplicacion[$ve->tipo_aplicacion].' | ';
+                                                        $msg_dosis_faltantes.= $ve->clave. ' debe tener al menos '.$dias_diferencia_intervalo_inicio.' días de diferencia entre la  '.$tipo_aplicacion[$value_menores->tipo_aplicacion].' y la '.$tipo_aplicacion[$ve->tipo_aplicacion].' | ';
                                                     }
                                                 }
                                             }
@@ -930,7 +970,7 @@ class PersonaController extends Controller
                                 if($falta_dosis)
                                     $msg_dosis.=$msg_dosis_faltantes;
                             } else {
-                                $msg_dosis.='Fecha de aplicación debe ser mayor o igual a la fecha de nacimiento y menor igual a la fecha actual';
+                                $msg_dosis.='Fecha de aplicación de la '.$tipo_aplicacion[$ve->tipo_aplicacion].' de '.$ve->vacuna->clave.' debe ser mayor o igual a la fecha de nacimiento y menor igual a la fecha actual o de la última actualización';
                                 $save_vac_esq = false; 
                                 break;
                             }
@@ -954,7 +994,7 @@ class PersonaController extends Controller
                         DB::beginTransaction();             
                         if($persona->save()) {
                             // ELIMINAR LOS ESQUEMAS YA ALMACENADOS
-                            $delete_vacunas_esquemas = DB::table('personas_vacunas_esquemas')->where('personas_id', '=', $personas_id)->update(['deleted_at' => date('Y-m-d H:m:s')]);
+                            $delete_vacunas_esquemas = DB::table('personas_vacunas_esquemas')->where('personas_id', '=', $persona_id)->update(['deleted_at' => date('Y-m-d H:m:s')]);
                             $success = true;
                             $m = '';
                             foreach($vacunas_esquemas as $key=>$ve){
@@ -976,11 +1016,13 @@ class PersonaController extends Controller
                                     $PersonaVacunaEsquema->id                   = $pve_id;
                                     $PersonaVacunaEsquema->servidor_id          = $clue->servidor;
                                     $PersonaVacunaEsquema->incremento           = $incremento_pve;
-                                    $PersonaVacunaEsquema->personas_id          = $personas_id;
+                                    $PersonaVacunaEsquema->personas_id          = $persona_id;
                                     $PersonaVacunaEsquema->vacunas_esquemas_id  = $ve->id;
                                     $PersonaVacunaEsquema->fecha_aplicacion     = $temp_fecha_aplicacion;
                                     $PersonaVacunaEsquema->lote                 = '00000';
                                     $PersonaVacunaEsquema->dosis                = $ve->dosis_requerida;
+                                    $PersonaVacunaEsquema->usuario_id           = Auth::user()->email;
+                                    $PersonaVacunaEsquema->updated_at           = date('Y-m-d H:m:s');
                                     if(!$PersonaVacunaEsquema->save()){
                                         $success = false;
                                         break;
@@ -1039,10 +1081,14 @@ class PersonaController extends Controller
         if ($request->ajax()) {
             if (Auth::user()->can('delete.personas') && Auth::user()->activo==1) {
                 try {
-                    $updates = DB::table('personas')->where('id', '=', $id)->update(['deleted_at' => date('Y-m-d H:m:s')]);
+                    $updates = DB::table('personas')
+                               ->where('id', '=', $id)
+                               ->update(['deleted_at' => date('Y-m-d H:m:s'), 'usuario_id' => Auth::user()->email]);
                     DB::beginTransaction();
                     if ($updates) {
-                        $updates_pve = DB::table('personas_vacunas_esquemas')->where('personas_id', '=', $id)->update(['deleted_at' => date('Y-m-d H:m:s')]);
+                        $updates_pve = DB::table('personas_vacunas_esquemas')
+                                       ->where('personas_id', '=', $id)
+                                       ->update(['deleted_at' => date('Y-m-d H:m:s'), 'usuario_id' => Auth::user()->email]);
                         if ($updates_pve) {
                             DB::commit();
                             $msgGeneral = 'Se borró el elemento';

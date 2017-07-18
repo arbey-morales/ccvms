@@ -44,11 +44,20 @@ class EsquemaController extends Controller
      */
     public function show($id)
     {
-        $data = Esquema::with('vacunasEsquemas')->find($id);   
-        if ($data) {
-            return response()->json([ 'data' => $data]);
+        $esquema = Esquema::findOrFail($id);  
+        $v_e_two = DB::table('vacunas_esquemas AS ve')
+                        ->select('ve.id','ve.vacunas_id','ve.esquemas_id','ve.tipo_aplicacion','ve.orden_esquema AS ve_orden_esquema','ve.intervalo_inicio','ve.intervalo_fin','ve.dosis_requerida','ve.fila','ve.columna','v.clave','v.nombre','v.orden_esquema AS v_orden_esquema','v.color_rgb')
+                        ->join('vacunas AS v','v.id','=','ve.vacunas_id')
+                        ->where('ve.esquemas_id', $id)
+                        ->orderBy('v_orden_esquema')
+                        ->orderBy('intervalo_inicio')
+                        ->orderBy('fila')
+                        ->orderBy('columna')
+                        ->get(); 
+        if ($esquema) {
+            return response()->json([ 'data' => $v_e_two, 'esquema' => $esquema ]);
         } else {
-           return response()->json([ 'data' => NULL]);
+           return response()->json([ 'data' => NULL, 'esquema' => NULL]);
         }        
     }
 }

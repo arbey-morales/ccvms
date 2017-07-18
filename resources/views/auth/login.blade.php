@@ -62,7 +62,7 @@
                 <br />
                 <div>
                   <h1>  <img src="{{ url('images/salud-mesoamerica.png') }}" alt="..." class="img-rounded" width="290px"></h1>
-                  <p>©2016 Todos los derechos reservados. CCVMS</p>
+                  <p>©2017 Todos los derechos reservados. CCVMS</p>
                 </div>
               </div>
             {!! Form::close() !!}

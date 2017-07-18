@@ -30,7 +30,7 @@ class UserController extends Controller
             } else {
                 $usuarios = User::where('borrado', 0)->where('asRoot', 0)->with('jurisdiccion')->get();
             }
-            return view('usuario.index')->with('usuarios', $usuarios);
+            return view('usuario.index')->with('data', $usuarios);
         } else {
             return response()->view('errors.allPagesError', ['icon' => 'user-secret', 'error' => '403', 'title' => 'Forbidden / Prohibido', 'message' => 'No tiene autorización para acceder al recurso. Se ha negado el acceso.'], 403);
         }
@@ -185,7 +185,7 @@ class UserController extends Controller
             if (!$usuarioSend) {
                 return response()->view('errors.allPagesError', ['icon' => 'search-minus', 'error' => '404', 'title' => 'Not found / No se encuentra', 'message' => 'El servidor no puede encontrar el recurso solicitado y no es posible determinar si esta ausencia es temporal o permanente.'], 404);
             }
-            return view('usuario.show')->with('usuario', $usuarioSend);
+            return view('usuario.show')->with('data', $usuarioSend);
         } else {
             return response()->view('errors.allPagesError', ['icon' => 'user-secret', 'error' => '403', 'title' => 'Forbidden / Prohibido', 'message' => 'No tiene autorización para acceder al recurso. Se ha negado el acceso.'], 403);
         }
@@ -220,7 +220,7 @@ class UserController extends Controller
             if (!$usuarioSend) {
                 return response()->view('errors.allPagesError', ['icon' => 'search-minus', 'error' => '404', 'title' => 'Not found / No se encuentra', 'message' => 'El servidor no puede encontrar el recurso solicitado y no es posible determinar si esta ausencia es temporal o permanente.'], 404);
             }
-            return view('usuario.edit')->with(['usuario' => $usuarioSend, 'jurisdicciones' => $arrayJurisdicciones]);
+            return view('usuario.edit')->with(['data' => $usuarioSend, 'jurisdicciones' => $arrayJurisdicciones]);
         } else {
             return response()->view('errors.allPagesError', ['icon' => 'user-secret', 'error' => '403', 'title' => 'Forbidden / Prohibido', 'message' => 'No tiene autorización para acceder al recurso. Se ha negado el acceso.'], 403);
         }

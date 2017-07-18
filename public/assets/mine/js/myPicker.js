@@ -2,7 +2,7 @@ $(document).ready(function() {
     
     init_fecha_aplicacion();
 
-    $("#fecha_nacimiento").daterangepicker({
+    $("#fecha_nacimiento,#fecha").daterangepicker({
         showDropdowns: true,
         singleDatePicker: true,
         calender_style: "picker_1",
@@ -54,7 +54,7 @@ $(document).ready(function() {
 });
 
 function init_fecha_aplicacion(){
-    $("input[name*='fecha_aplicacion']").daterangepicker({
+    $("input[name*='fecha_aplicacion'], input[name*='-fecha-caducidad'], #fecha_nacimiento_tutor").daterangepicker({
         showDropdowns: true,
         singleDatePicker: true,
         calender_style: "picker_1",

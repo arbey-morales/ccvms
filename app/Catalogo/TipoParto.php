@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class TipoParto extends Model
 {
-    protected $table = 'tipos_parto';
+    protected $table = 'tipos_partos';
 
-    protected $fillable = ["id","clave","descripcion"];
+    protected $fillable = ["clave","descripcion","usuario_id"];
 
     public $timestamps = false;
 }

@@ -18,7 +18,7 @@
                     <span>Configuración</span>
                     </a>
                 </li>
-                <li><a href="javascript:;">Ayuda</a></li>
+                <li><a href="{{ url('storage/manual/ManualCCVMSv1.pdf') }}" download>Ayuda</a></li>
                 <li><a href="{{ route('auth/logout') }}"><i class="fa fa-sign-out pull-right"></i> Salir</a></li>
                 </ul>
             </li>

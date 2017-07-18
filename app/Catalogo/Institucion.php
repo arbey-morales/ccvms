@@ -8,7 +8,7 @@ class Institucion extends Model
 {
     protected $table = 'instituciones';
    
-    protected $fillable = ["id","clave","nombreCorto","nombre","creadoPor","actualizadoPor","creadoAl","modificadoAl","borradoAl"];
+    protected $fillable = ["clave","nombreCorto","nombre"];
 
     public $timestamps = false;
 }

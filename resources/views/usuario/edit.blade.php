@@ -14,7 +14,7 @@
 @section('content')
     <div class="x_panel">
         <div class="x_title">
-        <h2><i class="fa fa-user"></i> Usuario: {{ $usuario->nombre  }} <i class="fa fa-angle-right text-danger"></i><small> Editar</small></h2>
+        <h2><i class="fa fa-user"></i> Usuario: {{ $data->nombre  }} <i class="fa fa-angle-right text-danger"></i><small> Editar</small></h2>
             <ul class="nav navbar-right panel_toolbox">
                 <li>
                     <a class="" href="{{ route('usuario.index') }}">
@@ -30,7 +30,7 @@
             <div class="clearfix"></div>
         </div>
         <div class="x_content">
-            {!! Form::model($usuario, ['route' => ['usuario.update', $usuario], 'method' => 'PUT', 'files' => 'true', 'class' => 'uk-form bt-flabels js-flabels', 'data-parsley-validate' => '', 'data-parsley-errors-messages-disabled' => '']) !!}
+            {!! Form::model($data, ['route' => ['usuario.update', $data], 'method' => 'PUT', 'files' => 'true', 'class' => 'uk-form bt-flabels js-flabels', 'data-parsley-validate' => '', 'data-parsley-errors-messages-disabled' => '']) !!}
                 <div class="" role="tabpanel" data-example-id="togglable-tabs">
                     <ul id="myTab" class="nav nav-tabs bar_tabs" role="tablist">
                         <li role="presentation" class="active">
@@ -79,7 +79,7 @@
                                     <div class="uk-width-1-2">
                                         <div class="bt-flabels__wrapper">
                                             {!! Form::label('idJurisdiccion', 'Jurisdicción', ['for' => 'idJurisdiccion'] ) !!}
-                                            {!! Form::select('idJurisdiccion', array_dot($jurisdicciones),  $usuario->idJurisdiccion, ['class' => 'form-control js-data-jurisdiccion select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'idJurisdiccion', 'style' => 'width:100%'] ) !!}
+                                            {!! Form::select('idJurisdiccion', array_dot($jurisdicciones),  $data->idJurisdiccion, ['class' => 'form-control js-data-jurisdiccion select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'idJurisdiccion', 'style' => 'width:100%'] ) !!}
                                             <span class="bt-flabels__error-desc">Requerido</span>
                                         </div>
                                     </div>
@@ -109,7 +109,7 @@
                                 </div>
                             </div>
                             <h4 class="text-info">Dejar vacio el password para no hacerle cambios.</h4>
-                             <h4 class="text-warning">@if(Auth::user()->id==$usuario->id) Si hace cambios a su mail o password será redireccionado para iniciar sesión @endif </h4>
+                             <h4 class="text-warning">@if(Auth::user()->id==$data->id) Si hace cambios a su mail o password será redireccionado para iniciar sesión @endif </h4>
                             <br>
                             <div class="row">
                                 <div class="col-md-1 text-right">
@@ -145,11 +145,11 @@
                                     <div id="yes-image" class="show">
                                         <div style="display:inline-block; margin-right:50px;" class="text-center">
                                             <h3>Normal</h3>
-                                            <img id="img_destino" src="@if($usuario->foto==null || $usuario->foto=='') {{ url('storage/user/profile/user-default.png') }} @else {{ url('storage/user/profile/'.$usuario->foto) }} @endif" class="img-rounded" border="0px" width="250px" height="250px" alt="">
+                                            <img id="img_destino" src="@if($data->foto==null || $data->foto=='') {{ url('storage/user/profile/user-default.png') }} @else {{ url('storage/user/profile/'.$data->foto) }} @endif" class="img-rounded" border="0px" width="250px" height="250px" alt="">
                                         </div>
                                         <div style="display:inline-block;" class="text-center">
                                             <h3>Perfil</h3>
-                                            <img id="img_destinop" src="@if($usuario->foto==null || $usuario->foto=='') {{ url('storage/user/profile/user-default.png') }} @else {{ url('storage/user/profile/'.$usuario->foto) }} @endif" class="img-circle" border="0px" width="80px" height="80px" alt="">
+                                            <img id="img_destinop" src="@if($data->foto==null || $data->foto=='') {{ url('storage/user/profile/user-default.png') }} @else {{ url('storage/user/profile/'.$data->foto) }} @endif" class="img-circle" border="0px" width="80px" height="80px" alt="">
                                         </div>
                                     </div>
                                    <div id="no-image" class="text-center hidden">
@@ -164,7 +164,7 @@
                 @include('errors.msgAll')
                 <div class="ln_solid"></div>
                 <div class="uk-text-center uk-margin-top">
-                    <a href="{{ url('usuario/'.$usuario->id.'/edit') }}" class="btn btn-primary"> <i class="fa fa-refresh"></i> Recargar</a>
+                    <a href="{{ url('usuario/'.$data->id.'/edit') }}" class="btn btn-primary"> <i class="fa fa-refresh"></i> Recargar</a>
                     @permission('update.usuarios')<button type="submit" class="btn btn-success btn-large js-submit"> <i class="fa fa-save"></i> Guardar Cambios</button>@endpermission
                 </div>
             {!! Form::close() !!}

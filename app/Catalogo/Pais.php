@@ -8,7 +8,7 @@ class Pais extends Model
 {
     protected $table = 'paises';
     
-    protected $fillable = ["id","descripcion","claveISOA2","claveA3","claveN3","prefijoTelefono"];
+    protected $fillable = ["descripcion","claveISOA2","claveA3","claveN3","prefijoTelefono"];
 
     public $timestamps = false;
 }

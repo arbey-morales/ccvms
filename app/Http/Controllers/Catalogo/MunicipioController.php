@@ -25,15 +25,15 @@ class MunicipioController extends Controller
 
         if (Auth::user()->is('root|admin')) {
             if ($parametros['q']) {
-                $data =  Municipio::where('clave','LIKE',"%".$parametros['q']."%")->orWhere('nombre','LIKE',"%".$parametros['q']."%")->with('jurisdiccion')->where('borradoAl',NULL)->get();
+                $data =  Municipio::where('clave','LIKE',"%".$parametros['q']."%")->orWhere('nombre','LIKE',"%".$parametros['q']."%")->with('jurisdiccion')->where('deleted_at',NULL)->get();
             } else {
-                $data =  Municipio::with('jurisdiccion')->where('borradoAl',NULL)->get();
+                $data =  Municipio::with('jurisdiccion')->where('deleted_at',NULL)->get();
             }
         } else {
             if ($parametros['q']) {
-                $data = Municipio::where('clave','LIKE',"%".$parametros['q']."%")->orWhere('nombre','LIKE',"%".$parametros['q']."%")->where('idJurisdiccion', Auth::user()->idJurisdiccion)->where('borradoAl',NULL)->with('jurisdiccion')->get();
+                $data = Municipio::where('clave','LIKE',"%".$parametros['q']."%")->orWhere('nombre','LIKE',"%".$parametros['q']."%")->where('idJurisdiccion', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->with('jurisdiccion')->get();
             } else {
-                $data = Municipio::where('idJurisdiccion', Auth::user()->idJurisdiccion)->where('borradoAl',NULL)->with('jurisdiccion')->get();
+                $data = Municipio::where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->with('jurisdiccion')->get();
             }
         }       
         return view('catalogo.municipio.index')->with('municipios', $data);    

@@ -26,24 +26,24 @@ class LocalidadController extends Controller
        
         if (Auth::user()->is('root|admin')) {
             if ($parametros['q']) {
-                $data =  Localidad::where('clave','LIKE',"%".$parametros['q']."%")->orWhere('nombre','LIKE',"%".$parametros['q']."%")->with('municipio')->where('borradoAl',NULL)->get();
+                $data =  Localidad::where('clave','LIKE',"%".$parametros['q']."%")->orWhere('nombre','LIKE',"%".$parametros['q']."%")->with('municipio')->where('deleted_at',NULL)->get();
             } else {
-                $data =  Localidad::with('municipio')->where('borradoAl',NULL)->get();
+                $data =  Localidad::with('municipio')->where('deleted_at',NULL)->get();
             }
         } else {
             $data = collect();
             if ($parametros['q']) {
-                $municipios = Municipio::where('idJurisdiccion', Auth::user()->idJurisdiccion)->where('borradoAl',NULL)->get();
+                $municipios = Municipio::where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->get();
                 foreach($municipios as $key=> $mpio){
-                    $localidades_temp = Localidad::where('idMunicipio', $mpio->id)->where('borradoAl',NULL)->where('clave','LIKE',"%".$parametros['q']."%")->orWhere('nombre','LIKE',"%".$parametros['q']."%")->with('municipio')->get(); 
+                    $localidades_temp = Localidad::where('municipios_id', $mpio->id)->where('deleted_at',NULL)->where('clave','LIKE',"%".$parametros['q']."%")->orWhere('nombre','LIKE',"%".$parametros['q']."%")->with('municipio')->get(); 
                     foreach($localidades_temp as $id=> $item){
                         $data->push($item);
                     }
                 }
             } else {
-                $municipios = Municipio::where('idJurisdiccion', Auth::user()->idJurisdiccion)->where('borradoAl',NULL)->get();
+                $municipios = Municipio::where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->get();
                 foreach($municipios as $key=> $mpio){
-                    $localidades_temp = Localidad::where('idMunicipio', $mpio->id)->where('borradoAl',NULL)->with('municipio')->get(); 
+                    $localidades_temp = Localidad::where('municipios_id', $mpio->id)->where('deleted_at',NULL)->with('municipio')->get(); 
                     foreach($localidades_temp as $id=> $item){
                         $data->push($item);
                     }
