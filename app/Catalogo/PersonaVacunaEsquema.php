@@ -13,7 +13,7 @@ class PersonaVacunaEsquema extends Model
     public $timestamps = false;
 
     public function esquema(){
-		  return $this->belongsTo('App\Catalogo\VacunaEsquema', 'vacunas_esquemas_id', 'id')->where('deleted_at', NULL)->with('vacuna')->orderBy('intervalo', 'ASC')->orderBy('orden_esquema', 'ASC');
+		  return $this->belongsTo('App\Catalogo\VacunaEsquema', 'vacunas_esquemas_id', 'id')->where('deleted_at', NULL)->with('vacuna')->orderBy('intervalo_inicio', 'ASC')->orderBy('orden_esquema', 'ASC');
 	}
 
 }
