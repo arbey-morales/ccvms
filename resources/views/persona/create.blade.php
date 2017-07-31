@@ -254,51 +254,17 @@
                     </div>
                 </div>                
                 
-                @if(count($vacunas_esquemas)>0)
-                    <div class="x_panel">
-                        <div class="x_title">
-                            <h2 id="title-esquema"><i class="fa fa-calendar text-success"></i> @if(count($esquema)>0) {{ $esquema->descripcion }} @endif </h2>
-                            <ul class="nav navbar-right panel_toolbox">
-                            </ul>
-                            <div class="clearfix"></div>
-                        </div>
-                        <div class="x_content" id="content-esquema">
-                            @if(count($vacunas_esquemas)>0)
-                                @foreach($vacunas_esquemas as $key=>$ve)
-                                    <?php $key_plus = $key; $key_plus = $key_plus + 1; $col_md = 12; $plu_col_md = 0; ?>
-                                    @if(count($vacunas_esquemas) - 1 > $key)
-                                        @foreach ($vacunas_esquemas as $k => $v)
-                                            @if($ve->fila==$v->fila)
-                                                <?php $plu_col_md++; ?>
-                                            @endif 
-                                        @endforeach 
-                                        <?php $col_md = round(12 / $plu_col_md); ?>                                 
-                                        <div class="animated flipInY col-md-{{$col_md}} col-xs-12"><br>
-                                            <div class="tile-stats" style="color:white; margin:0px; padding:3px; border:solid 2px #{{$ve->color_rgb}}; background-color:#{{$ve->color_rgb}} !important;">
-                                                <div class="row">
-                                                    <div class="col-md-12"> <span style="font-size:large;font-weight:bold;"> {{$ve->clave}} <small> @if($ve->tipo_aplicacion==1) Única @endif @if($ve->tipo_aplicacion==2) 1a Dosis @endif @if($ve->tipo_aplicacion==3) 2a Dosis @endif @if($ve->tipo_aplicacion==4) 3a Dosis @endif @if($ve->tipo_aplicacion==5) 4a Dosis @endif @if($ve->tipo_aplicacion==6) Refuerzo @endif  </small> </span> <span style="font-size:large;" class="pull-right"> @if($ve->intervalo_inicio<=29) Nacimiento @else  @if(($ve->intervalo_inicio/30)<=23){{($ve->intervalo_inicio/30)}} Meses @else {{round((($ve->intervalo_inicio/30)/12))}} Años @endif @endif  </span></div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="bt-flabels__wrapper">
-                                                        {!! Form::label('fecha_aplicacion'.$ve->id, 'Fecha de aplicación', ['for' => 'fecha_aplicacion'.$ve->id] ) !!}
-                                                        {!! Form::text('fecha_aplicacion'.$ve->id, null , ['class' => 'form-control has-feedback-left', 'aria-describedby' => 'inputSuccess2Status', 'id' => 'fecha_aplicacion'.$ve->id, 'autocomplete' => 'off', 'placeholder' => 'Fecha de aplicación' ]  ) !!}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        @if($vacunas_esquemas[$key_plus]->fila != $ve->fila)
-                                            <div class="clearfix"></div>
-                                        @endif
-                                    @endif
-                                @endforeach
-                            @else
-                                <div class="col-md-12 text-center text-info"> <i class="fa fa-info-circle text-danger" style="font-size:x-large;"></i> <h3>Sin esquema</h3></div>
-                            @endif
-                        </div>
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2 id="title-esquema"> Esquema</h2>
+                        <ul class="nav navbar-right panel_toolbox">
+                        </ul>
+                        <div class="clearfix"></div>
                     </div>
-                @else
-                    <div class="col-md-12 text-center text-info"> <i class="fa fa-info-circle text-danger" style="font-size:x-large;"></i> <h3>Sin esquema</h3></div>
-                @endif
+                    <div class="x_content" id="content-esquema">
+                        <div class="col-md-12 text-center text-info"> <i class="fa fa-info-circle text-danger" style="font-size:x-large;"></i> <h3>Sin esquema</h3></div>
+                    </div>
+                </div>
 
                 <div class="uk-text-center uk-margin-top pull-right">
                     <button type="reset" class="btn btn-primary btn-lg"> <i class="fa fa-eraser"></i> Limpiar</button>
@@ -335,6 +301,27 @@
 
     <!-- Select2 personalizado -->
     <script>
+        var last_vacunas_esquemas = ''; 
+        function getFormattedDate() {
+            var date = new Date();
+            var str = "01-01-"+date.getFullYear();
+            return str;
+        }
+
+        function getFormattedPartTime(partTime){
+            if (partTime<10)
+            return "0"+partTime;
+            return partTime;
+        }
+
+        setTimeout(function() {
+            var date = new Date();
+            var year = date.getFullYear();
+            var fecha = getFormattedDate();            
+            get_esquema(year,fecha);
+            $("#fecha_nacimiento").val(fecha);
+        }, 100);
+
         var estados_equivalencia = ["X","AS","BC","BS","CC","CL","CM","CS","CH","DF","DG","GT","GR","HG","JC","MC","MN","MS","NT","NL","OC","PL","QT","QR","SP","SL","SR","TC","TS","TL","VZ","YN","ZS"];
         var localidad = { 'id':null, 'nombre':'Localidad'};
         $(".js-data-clue,.js-data-ageb,.js-data-genero,.js-data-parto,.js-data-estado,.js-data-municipio,.js-data-codigo,.js-data-institucion,.js-data-localidad").select2();
@@ -343,14 +330,16 @@
             setTimeout(function(){ validate_inputs_curp(); }, 1000);
         });
         
-        $("input[name*='fecha_aplicacion']").on("blur", function(){
-            valoraFecha($(this).val(), replaceAll($(this).attr('name'),"_", " "));
+        $("#content-esquema").on("blur","input[name*='fecha_aplicacion']", function(){
+            valoraFecha($(this).val(), replaceAll($(this).attr('name'),"_", " "),true);
         });
-        $("#fecha_nacimiento,#fecha_nacimiento_tutor,input[name*='fecha_aplicacion']").blur(function(){
-            valoraFecha($(this).val(), replaceAll($(this).attr('name'),"_", " "));             
+
+        // CADA QUE SE COLOCA UNA FECHA DE APLICACIÓN SE ENVÍA A VALIDACIÓN
+        $("#fecha_nacimiento,#fecha_nacimiento_tutor").blur(function(){
+            valoraFecha($(this).val(), replaceAll($(this).attr('name'),"_", " "),false);             
         });
         
-
+        // SI LA CLUE CAMBIA; SE SELECCIONAN SU LOCALIDAD Y MUNICIPIO
         $(".js-data-clue").change(function(){
             var clue_id = $(this).val();
             $.get('../catalogo/clue/'+clue_id, function(response, status){ // Consulta CURP
@@ -367,11 +356,14 @@
             });
         });
 
+        // CADA QUE ESTOS ELEMENTOS PIERDEN EL FOCO, SE VALIDAN PARA CONSULTAR LA CURP
         $("#fecha_nacimiento,#paterno,#materno,#nombre").blur(function(){            
             setTimeout(function(){ validate_inputs_curp(); }, 1000);
         });
 
-        function valoraFecha(date,name){
+        // SE ENCARGA DE VALIDAR EL FORMATO Y LA EXISTENCIA DE LA FECHA PROPORCIONADA COMO PARAMETRO
+        function valoraFecha(date,name,es_aplicacion){
+            console.log(date,es_aplicacion);
             if(date!=null && date!="") {
                 var fn_validar = replaceAll(date,"-", "/");                
                 var errors = 0;
@@ -391,14 +383,15 @@
                         type: 'info',
                         styling: 'bootstrap3'
                     });
-                } 
+                }
             }
         }
 
-        function get_esquema(esquema) {
+        // CONSULTA POR GET EL ESQUEMA
+        function get_esquema(esquema,fecha_nacimiento) {
             $('#title-esquema').empty().html('Buscando esquema '+esquema);
             $('#content-esquema').empty().html('<div class="col-md-12 text-center"> <i class="fa fa-circle-o-notch fa-spin" style="font-size:x-large;"></i> </div> ');
-            $.get('../catalogo/esquema/'+esquema, {}, function(response, status){ // Consulta esquema
+            $.get('../catalogo/esquema/'+esquema, {fecha_nacimiento:fecha_nacimiento}, function(response, status){ // Consulta esquema
                 if(response.data==null){
                     new PNotify({
                         title: 'Oye!',
@@ -409,67 +402,77 @@
                     $('#title-esquema').empty().html('No se encuentra el esquema: '+esquema+'. ');
                     $('#content-esquema').empty().html('<div class="col-md-12 text-center text-danger"> <h2 class="text-danger"> <i class="fa fa-info-circle text-info"></i> Imposible encontrar el esquema '+esquema+'. Seleccione otra fecha de nacimiento o asegurese que exista el esquema que busca. </h2></div> ');
                 } else {
-                    $('#title-esquema').empty().html('<i class="fa fa-calendar text-success"></i> '+response.esquema.descripcion);
+                    $('#title-esquema').empty().html('<a class="btn btn-danger btn-lg"><i class="fa fa-calendar"></i> '+response.esquema.descripcion+'</a>  <a class="btn btn-lg btn-default">'+response.letra_edad+'</a>');
                     $('#content-esquema').empty();
-                    var vacunas_esquemas = response.data;
-                    var key_plus = 0;
-                    $.each(vacunas_esquemas, function( key, ve ) {
-                        key_plus++;
-                        var col_md = 12;
-                        var plu_col_md = 0;
-                        $.each(vacunas_esquemas,  function( k, v ){
-                            if(ve.fila==v.fila){
-                                plu_col_md++;
-                            } 
-                        });
-                        col_md = 12 / plu_col_md; // numero de columnas por fila
-                        var tipo_aplicacion = '';
-                        var intervalo_inicio = '';
-                        if(ve.tipo_aplicacion==1) {
-                            tipo_aplicacion = 'Dosis única';
-                        } 
-                        if(ve.tipo_aplicacion==2) {
-                            tipo_aplicacion = '1a Dosis';
-                        } 
-                        if(ve.tipo_aplicacion==3) {
-                            tipo_aplicacion = '2a Dosis';
-                        }
-                        if(ve.tipo_aplicacion==4){ 
-                            tipo_aplicacion = '3a Dosis'; 
-                        }
-                        if(ve.tipo_aplicacion==5){ 
-                            tipo_aplicacion = '4a Dosis'; 
-                        }
-                        if(ve.tipo_aplicacion==6) {
-                            tipo_aplicacion = 'Refuerzo';
-                        }
-
-                        if(ve.intervalo_inicio<=29) {
-                            intervalo_inicio = 'Nacimiento'; 
-                        } else {
-                            if((ve.intervalo_inicio/30)<=23) { 
-                                intervalo_inicio = Math.round((ve.intervalo_inicio/30))+' Meses';
-                            } else { 
-                                intervalo_inicio = Math.round(((ve.intervalo_inicio/30)/12))+' Años';
-                            }
-                        }
-                        if(vacunas_esquemas.length - 1 > key){
-                            $('#content-esquema').append('<div class="animated flipInY col-md-'+Math.round(col_md)+' col-xs-12"><br> <div class="tile-stats" style="color:white; margin:0px; padding:3px; border:solid 2px #'+ve.color_rgb+'; background-color:#'+ve.color_rgb+' !important;"> <div class="row"> <div class="col-md-12"> <span style="font-size:large;font-weight:bold;"> '+ve.clave+' <small> '+tipo_aplicacion+' </small> </span> <span style="font-size:large;" class="pull-right"> '+intervalo_inicio+' </span> </div> </div> <div class="row"> <div class="bt-flabels__wrapper"> <input id="fecha_aplicacion'+ve.id+'" name="fecha_aplicacion'+ve.id+'" type="text" value="" class="form-control has-feedback-left" aria-describedby="inputSuccess2Status" autocomplete="off" placeholder="Fecha de aplicación"> </div> </div> </div> </div>');
-                            if(vacunas_esquemas[key_plus].fila != ve.fila){
-                                $('#content-esquema').append('<div class="clearfix"></div>');
-                            }
-                        }
-                    });
-
-                    setTimeout(function() {
-                        init_fecha_aplicacion();
-                    }, 500);
+                    draw_esquema(response.data);
                 }
             }).fail(function(){                   
                 $('#title-esquema').empty().html('No se encuentra el esquema: '+esquema+'. ');
                 $('#content-esquema').empty().html('<div class="col-md-12 text-center text-danger"> <h2 class="text-danger"> <i class="fa fa-info-circle text-info"></i> Imposible encontrar el esquema '+esquema+'. Seleccione otra fecha de nacimiento o asegurese que exista el esquema que busca. </h2></div> ');
             });
         }
+
+        function draw_esquema(aplicaciones){
+            last_vacunas_esquemas = aplicaciones;
+            var key_plus = 0;
+            $.each(aplicaciones, function( key, ve ) {
+                key_plus++;                        
+                var col_md = 12;
+                var plu_col_md = 0;
+                $.each(aplicaciones,  function( k, v ){
+                    if(ve.fila==v.fila){
+                        plu_col_md++;
+                    } 
+                });
+                col_md = 12 / plu_col_md; // numero de columnas por fila
+                var tipo_aplicacion = '';
+                var intervalo_inicio = '';
+                if(ve.tipo_aplicacion==1) {
+                    tipo_aplicacion = 'Dosis única';
+                } 
+                if(ve.tipo_aplicacion==2) {
+                    tipo_aplicacion = '1a Dosis';
+                } 
+                if(ve.tipo_aplicacion==3) {
+                    tipo_aplicacion = '2a Dosis';
+                }
+                if(ve.tipo_aplicacion==4){ 
+                    tipo_aplicacion = '3a Dosis'; 
+                }
+                if(ve.tipo_aplicacion==5){ 
+                    tipo_aplicacion = '4a Dosis'; 
+                }
+                if(ve.tipo_aplicacion==6) {
+                    tipo_aplicacion = 'Refuerzo';
+                }
+
+                if(ve.intervalo_inicio<=29) {
+                    intervalo_inicio = 'Nacimiento'; 
+                } else {
+                    if((ve.intervalo_inicio/30)<=23) { 
+                        intervalo_inicio = Math.round((ve.intervalo_inicio/30))+' Meses';
+                    } else { 
+                        intervalo_inicio = Math.round(((ve.intervalo_inicio/30)/12))+' Años';
+                    }
+                }
+                //console.log(aplicaciones.length - 1, key);
+                //Math.round(col_md)
+                if(aplicaciones.length - 1 > key){ // último registro de esquemasvacunas
+                    $('#content-esquema').append('<div class="animated flipInY col-md-2 col-xs-12"><br> <div class="tile-stats" style="color:white; margin:0px; padding:3px; border:solid 2px #'+ve.color_rgb+'; background-color:#'+ve.color_rgb+' !important;"> <div class="row"> <div class="col-md-12"> <span style="font-size:large;font-weight:bold;"> '+ve.clave+' <small> '+tipo_aplicacion+' </small> </span> <span style="font-size:large;" class="pull-right"> '+intervalo_inicio+' </span> </div> </div> <div class="row"> <div class="bt-flabels__wrapper"> <input id="fecha_aplicacion'+ve.id+'" name="fecha_aplicacion'+ve.id+'" type="text" value="" class="form-control has-feedback-left" aria-describedby="inputSuccess2Status" autocomplete="off" placeholder="Fecha de aplicación"> </div> </div> </div> </div>');
+                    if(aplicaciones[key_plus].fila != ve.fila){
+                        $('#content-esquema').append('<div class="clearfix"></div>');
+                    }
+                } else {
+                    $('#content-esquema').append('<div class="animated flipInY col-md-2 col-xs-12"><br> <div class="tile-stats" style="color:white; margin:0px; padding:3px; border:solid 2px #'+ve.color_rgb+'; background-color:#'+ve.color_rgb+' !important;"> <div class="row"> <div class="col-md-12"> <span style="font-size:large;font-weight:bold;"> '+ve.clave+' <small> '+tipo_aplicacion+' </small> </span> <span style="font-size:large;" class="pull-right"> '+intervalo_inicio+' </span> </div> </div> <div class="row"> <div class="bt-flabels__wrapper"> <input id="fecha_aplicacion'+ve.id+'" name="fecha_aplicacion'+ve.id+'" type="text" value="" class="form-control has-feedback-left" aria-describedby="inputSuccess2Status" autocomplete="off" placeholder="Fecha de aplicación"> </div> </div> </div> </div>');
+                }
+            });
+
+            setTimeout(function() {
+                init_fecha_aplicacion();
+            }, 500);
+        }
+
+        
 
         function validate_inputs_curp(){
             var estado = $(".js-data-estado").val();
@@ -576,7 +579,6 @@
         function replaceAll(str, find, replace) {
             return str.replace(new RegExp(find, 'g'), replace);
         }
-
-       
+        
     </script>
 @endsection

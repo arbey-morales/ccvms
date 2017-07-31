@@ -1,7 +1,7 @@
 @if(Auth::user()->activo==1)
 <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
     <div class="menu_section">
-        <h3> {{Auth::user()->jurisdiccion->nombre}}</h3>
+        <h3> @role('admin|root') CENTRAL @endrole @role('captura'){{Auth::user()->jurisdiccion->nombre}}@endrole</h3>
         <ul class="nav side-menu">
             <li>
                 <a href="{{ url('/') }}"><i class="fa fa-dashboard"></i> Tablero </a>
@@ -53,6 +53,7 @@
                 <li><a><i class="fa fa-universal-access"></i> Seguridad <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                         @permission('show.usuarios')<li><a href="{{ route('usuario.index') }}">Usuarios</a></li>@endpermission
+                        @permission('show.usuarios')<li><a href="{{ route('monitoreo.index') }}">Monitoreo</a></li>@endpermission
                         @role('root') 
                             @permission('show.roles')<li><a href="#">Roles</a></li>@endpermission
                             @permission('show.permissions')<li><a href="#">Permisos</a></li>@endpermission

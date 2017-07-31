@@ -8,7 +8,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach($esquemas as $key=>$item)
+        @foreach($data as $key=>$item)
             <tr>
                 <td class="text-center"><strong> {{ ++$key }} </strong></td>
                 <td class="text-left">{{ $item->id }}</td>

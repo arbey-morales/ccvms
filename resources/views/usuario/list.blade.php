@@ -16,7 +16,18 @@
                 <td class="text-left">{{ $item->nombre }} {{ $item->paterno }} {{ $item->materno }}</td>
                 <td class="text-left">{{ $item->direccion }}</td>
                 <td class="text-left">{{ $item->email }}</td>
-                <td class="text-left"><strong>{{ $item->jurisdiccion->clave }}</strong> {{ $item->jurisdiccion->nombre }}</td>
+                <td class="text-left">
+                @foreach($item->rolesuser as $k=>$rol) 
+                    @if($rol->role->slug=='admin')
+                        OFICINA CENTRAL
+                    @else
+                        @if($rol->role->slug=='captura')
+                            Captura: 
+                        @endif 
+                        <strong>{{ $item->jurisdiccion->clave }}</strong> {{ $item->jurisdiccion->nombre }}
+                    @endif
+                @endforeach                
+               </td>
                 <td class="text-center col-md-1">
                     @include('partials.layout.actions')
                 </td>

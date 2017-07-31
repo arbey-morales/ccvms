@@ -6,7 +6,7 @@
     <span> 
     <!-- Roles -->
     </span>
-    <h2> {{Auth::user()->jurisdiccion->clave}} <small>Jurisdicción</small>
+    <h2>@role('admin|root') OFICINA @endrole @role('captura') {{Auth::user()->jurisdiccion->clave}} <small>Jurisdicción</small>@endrole
     </h2>
     </div>
 </div>

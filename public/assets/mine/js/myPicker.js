@@ -46,7 +46,7 @@ $(document).ready(function() {
             if(validarFormatoFecha(fn_validar)){ 
                 if(existeFecha(fn_validar)){
                     var born_date = fn_validar.split('/');
-                    get_esquema(born_date[2]);
+                    get_esquema(born_date[2], $("#fecha_nacimiento").val());
                 }
             }
         }, 500);
