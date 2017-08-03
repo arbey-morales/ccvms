@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use Auth;
 use DB;
 use Input;
+use Carbon\Carbon;
 
 use Session;    
 use App\Transaccion\Persona;
@@ -291,20 +292,6 @@ class PersonaController extends Controller
                     }
                 }
 			}
-
-            //$vacunas_esquemas = VacunaEsquema::select('vacunas_esquemas.*')->join('vacunas','vacunas.id','=','vacunas_esquemas.vacuna_id')->orderBy('vacunas_esquemas.intervalo_inicio', 'ASC')->get();
-            $fecha_actual = explode('-', date('Y-m-d'));
-            $esquema = Esquema::find($fecha_actual[0]);            
-            //$vacunas_esquemas = VacunaEsquema::where('esquemas_id', $fecha_actual[0])->with('vacuna','esquema')->orderBy('intervalo_inicio', 'ASC')->orderBy('orden_esquema', 'ASC')->get();
-            $vacunas_esquemas = DB::table('vacunas_esquemas AS ve')
-                        ->select('ve.id','ve.vacunas_id','ve.esquemas_id','ve.tipo_aplicacion','ve.orden_esquema AS ve_orden_esquema','ve.intervalo_inicio','ve.intervalo_fin','ve.dosis_requerida','ve.fila','ve.columna','v.clave','v.nombre','v.orden_esquema AS v_orden_esquema','v.color_rgb')
-                        ->join('vacunas AS v','v.id','=','ve.vacunas_id')
-                        ->where('ve.esquemas_id', $fecha_actual[0])
-                        ->orderBy('v_orden_esquema')
-                        ->orderBy('intervalo_inicio')
-                        ->orderBy('fila')
-                        ->orderBy('columna')
-                        ->get();
             
             $estados = Entidad::where('deleted_at',NULL)->get();
 			$paises = Pais::all();
@@ -355,8 +342,8 @@ class PersonaController extends Controller
 			foreach ($instituciones as $institucion) {
                 $arrayinstitucion[$institucion->id] = $institucion->clave .' - '.$institucion->nombre;
             }
-            //dd(json_encode($esquema),json_encode($vacunas_esquemas)); die;
-            return view('persona.create')->with(['esquema' => $esquema, 'agebs' => $arrayageb, 'clue_selected' => $clue_selected, 'instituciones' => $arrayinstitucion, 'localidades' => $arraylocalidad, 'clues' => $arrayclue, 'municipios' => $arraymunicipio, 'estados' => $arrayestado, 'paises' => $arraypais, 'codigos' => $arraycodigo, 'partos' => $arraytipoparto, ]);
+            
+            return view('persona.create')->with(['agebs' => $arrayageb, 'clue_selected' => $clue_selected, 'instituciones' => $arrayinstitucion, 'localidades' => $arraylocalidad, 'clues' => $arrayclue, 'municipios' => $arraymunicipio, 'estados' => $arrayestado, 'paises' => $arraypais, 'codigos' => $arraycodigo, 'partos' => $arraytipoparto, ]);
         } else {
             return response()->view('errors.allPagesError', ['icon' => 'user-secret', 'error' => '403', 'title' => 'Forbidden / Prohibido', 'message' => 'No tiene autorización para acceder al recurso. Se ha negado el acceso.'], 403);
         }
@@ -467,7 +454,7 @@ class PersonaController extends Controller
 
             //$vacunas_esquemas = VacunaEsquema::where('esquemas_id', $fecha_nacimiento[2])->with('vacuna')->get();
             $vacunas_esquemas = DB::table('vacunas_esquemas AS ve')
-                        ->select('ve.id','ve.vacunas_id','ve.esquemas_id','ve.tipo_aplicacion','ve.orden_esquema AS ve_orden_esquema','ve.intervalo_inicio','ve.intervalo_fin','ve.dosis_requerida','ve.fila','ve.columna','v.clave','v.nombre','v.orden_esquema AS v_orden_esquema','v.color_rgb')
+                        ->select('ve.id','ve.vacunas_id','ve.esquemas_id','ve.tipo_aplicacion','ve.orden_esquema AS ve_orden_esquema','ve.intervalo_inicio','ve.intervalo_fin','ve.maximo_ideal','ve.dias_agregar_siguiente_dosis','ve.dosis_requerida','ve.fila','ve.columna','v.clave','v.nombre','v.orden_esquema AS v_orden_esquema','v.color_rgb')
                         ->join('vacunas AS v','v.id','=','ve.vacunas_id')
                         ->where('ve.esquemas_id', $fecha_nacimiento[2])
                         ->orderBy('v_orden_esquema')
@@ -669,17 +656,39 @@ class PersonaController extends Controller
 
                 $esquema_date = explode('-', $persona->fecha_nacimiento);
                 $esquema = Esquema::find($esquema_date[0]);
-                //$vacunas_esquemas = VacunaEsquema::where('esquemas_id', $esquema_date[0])->with('vacuna','esquema')->orderBy('intervalo_inicio', 'ASC')->orderBy('orden_esquema', 'ASC')->get();
-                //$personas_vacunas_esquemas = PersonaVacunaEsquema::where('personas_id', $persona->id)->get();
-                $vacunas_esquemas = DB::table('vacunas_esquemas AS ve')
-                        ->select('ve.id','ve.vacunas_id','ve.esquemas_id','ve.tipo_aplicacion','ve.orden_esquema AS ve_orden_esquema','ve.intervalo_inicio','ve.intervalo_fin','ve.dosis_requerida','ve.fila','ve.columna','v.clave','v.nombre','v.orden_esquema AS v_orden_esquema','v.color_rgb')
-                        ->join('vacunas AS v','v.id','=','ve.vacunas_id')
-                        ->where('ve.esquemas_id', $esquema_date[0])
-                        ->orderBy('v_orden_esquema')
-                        ->orderBy('intervalo_inicio')
-                        ->orderBy('fila')
-                        ->orderBy('columna')
-                        ->get();
+                
+                $letra_edad = NULL; 
+                $letra_years = 'Años'; $letra_months = 'Meses'; $letra_days = 'Días';
+
+                $ahora = Carbon::now("America/Mexico_City");
+                $fecha_nacimiento = Carbon::parse($esquema_date[2]."-".$esquema_date[1]."-".$esquema_date[0]." 00:00:00","America/Mexico_City");
+                $intervalo_dias = $fecha_nacimiento->diffInDays($ahora);
+                $diff = abs(strtotime(date("Y-m-d")) - strtotime($persona->fecha_nacimiento));
+                $years = floor($diff / (365*60*60*24)); 
+                if($years==1)
+                    $letra_years = 'Año';           
+                $months = floor(($diff - $years * 365*60*60*24) / (30*60*60*24));
+                if($months==1)
+                    $letra_months = 'Mes';
+                $days = floor(($diff - $years * 365*60*60*24 - $months*30*60*60*24)/ (60*60*24)); 
+                if($days==1)
+                    $letra_days = 'Día';           
+                $persona->edad = $years.' '.$letra_years.' '.$months.' '.$letra_months.' '.$days.' '.$letra_days;
+
+                $esquema_detalle = DB::table('vacunas_esquemas AS ve')
+                    ->select('ve.id','ve.vacunas_id','ve.esquemas_id','ve.tipo_aplicacion','ve.orden_esquema AS ve_orden_esquema','ve.intervalo_inicio','ve.intervalo_fin','ve.maximo_ideal','ve.dias_agregar_siguiente_dosis','ve.dosis_requerida','ve.fila','ve.columna','v.clave','v.nombre','v.orden_esquema AS v_orden_esquema','v.color_rgb')
+                    ->join('vacunas AS v','v.id','=','ve.vacunas_id')
+                    ->where('ve.esquemas_id', $esquema_date[0])
+                    ->where('ve.intervalo_inicio','<',($intervalo_dias+1))
+                    ->orderBy('v_orden_esquema')
+                    ->orderBy('intervalo_inicio')
+                    ->orderBy('fila')
+                    ->orderBy('columna')
+                    ->get(); 
+
+
+
+
                 $fn_tutor = explode("-",$persona->fecha_nacimiento_tutor);
                 $persona->fecha_nacimiento_tutor = date($fn_tutor[2].'-'.$fn_tutor[1].'-'.$fn_tutor[0]);
                 $fn_nino = explode("-",$persona->fecha_nacimiento);
@@ -687,7 +696,7 @@ class PersonaController extends Controller
             } else {
                 return response()->view('errors.allPagesError', ['icon' => 'search-minus', 'error' => '404', 'title' => 'Not found / No se encuentra', 'message' => 'El servidor no puede encontrar el recurso solicitado y no es posible determinar si esta ausencia es temporal o permanente.'], 404);
             }
-            return view('persona.show')->with(['esquema' => $esquema, 'data' => $persona, 'vacunas_esquemas' => $vacunas_esquemas]);
+            return view('persona.show')->with(['esquema' => $esquema, 'data' => $persona, 'vacunas_esquemas' => $esquema_detalle]);
         } else {
             return response()->view('errors.allPagesError', ['icon' => 'user-secret', 'error' => '403', 'title' => 'Forbidden / Prohibido', 'message' => 'No tiene autorización para acceder al recurso. Se ha negado el acceso.'], 403);
         }
@@ -735,7 +744,7 @@ class PersonaController extends Controller
                 $esquema = Esquema::find($fecha_actual[0]);
                 //$vacunas_esquemas = VacunaEsquema::where('esquemas_id', $fecha_actual[0])->with('vacuna','esquema')->orderBy('intervalo_inicio', 'ASC')->orderBy('orden_esquema', 'ASC')->get();
                 $vacunas_esquemas = DB::table('vacunas_esquemas AS ve')
-                        ->select('ve.id','ve.vacunas_id','ve.esquemas_id','ve.tipo_aplicacion','ve.orden_esquema AS ve_orden_esquema','ve.intervalo_inicio','ve.intervalo_fin','ve.dosis_requerida','ve.fila','ve.columna','v.clave','v.nombre','v.orden_esquema AS v_orden_esquema','v.color_rgb')
+                        ->select('ve.id','ve.vacunas_id','ve.esquemas_id','ve.tipo_aplicacion','ve.orden_esquema AS ve_orden_esquema','ve.intervalo_inicio','ve.intervalo_fin','ve.maximo_ideal','ve.dias_agregar_siguiente_dosis','ve.dosis_requerida','ve.fila','ve.columna','v.clave','v.nombre','v.orden_esquema AS v_orden_esquema','v.color_rgb')
                         ->join('vacunas AS v','v.id','=','ve.vacunas_id')
                         ->where('ve.esquemas_id', $fecha_actual[0])
                         ->orderBy('v_orden_esquema')
@@ -884,7 +893,7 @@ class PersonaController extends Controller
             $fecha_nacimiento = explode('-',$persona->fecha_nacimiento);
             //$vacunas_esquemas = VacunaEsquema::where('esquemas_id', $fecha_nacimiento[0])->get();
             $vacunas_esquemas = DB::table('vacunas_esquemas AS ve')
-                        ->select('ve.id','ve.vacunas_id','ve.esquemas_id','ve.tipo_aplicacion','ve.orden_esquema AS ve_orden_esquema','ve.intervalo_inicio','ve.intervalo_fin','ve.dosis_requerida','ve.fila','ve.columna','v.clave','v.nombre','v.orden_esquema AS v_orden_esquema','v.color_rgb')
+                        ->select('ve.id','ve.vacunas_id','ve.esquemas_id','ve.tipo_aplicacion','ve.orden_esquema AS ve_orden_esquema','ve.intervalo_inicio','ve.intervalo_fin','ve.maximo_ideal','ve.dias_agregar_siguiente_dosis','ve.dosis_requerida','ve.fila','ve.columna','v.clave','v.nombre','v.orden_esquema AS v_orden_esquema','v.color_rgb')
                         ->join('vacunas AS v','v.id','=','ve.vacunas_id')
                         ->where('ve.esquemas_id', $fecha_nacimiento[0])
                         ->orderBy('v_orden_esquema')

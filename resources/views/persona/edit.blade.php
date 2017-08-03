@@ -57,7 +57,7 @@
         </div>
         <div class="x_content">
             @include('errors.msgAll') <!-- Mensages -->
-            {!! Form::model($data, ['route' => ['persona.update', $data], 'method' => 'PUT', 'files' => 'true', 'class' => 'uk-form bt-flabels js-flabels', 'data-parsley-validate' => '', 'data-parsley-errors-messages-disabled' => '']) !!}
+            {!! Form::model($data, ['route' => ['persona.update', $data], 'method' => 'PUT', 'id' => 'personas-form', 'files' => 'true', 'class' => 'uk-form bt-flabels js-flabels', 'data-parsley-validate' => '', 'data-parsley-errors-messages-disabled' => '']) !!}
 
                 <div class="bt-form__wrapper">
                     <div class="bt-flabels__wrapper">
@@ -343,6 +343,13 @@
 
     <!-- Select2 Personalizado -->
     <script>
+        // ENVÍA FORM CON ctrl+enter
+        $('#personas-form').keydown(function(event) {
+            if (event.ctrlKey && event.keyCode === 13) {
+                $(this).trigger('submit');
+            }
+        });
+
         $(".js-data-clue,.js-data-ageb,.js-data-genero,.js-data-parto,.js-data-estado,.js-data-municipio,.js-data-codigo,.js-data-institucion,.js-data-localidad").select2();
 
         $(".js-data-genero,.js-data-estado").prop("readonly", true);

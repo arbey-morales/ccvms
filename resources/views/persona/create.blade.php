@@ -282,7 +282,11 @@
     {!! Html::script('assets/vendors/jquery.tagsinput/src/jquery.tagsinput.js') !!}
     <!-- bootstrap-daterangepicker -->
     {!! Html::script('assets/app/js/moment/moment.min.js') !!}
-    {!! Html::script('assets/app/js/datepicker/daterangepicker.js') !!}
+    {!! Html::script('assets/app/js/moment/moment-timezone.js') !!}
+    {!! Html::script('assets/app/js/moment/moment-with-locales.js') !!}
+    {!! Html::script('assets/app/js/datepicker/daterangepicker.js') !!}    
+    <!-- jQuery Masked -->
+    {!! Html::script('assets/vendors/masked-input-plugin/masked-input.js') !!}
     <!-- Bootstrap Colorpicker -->
     {!! Html::script('assets/vendors/mjolnic-bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js') !!}
     <!-- Switchery -->
@@ -294,49 +298,68 @@
     {!! Html::script('assets/mine/js/floating-labels.js') !!}
     {!! Html::script('assets/mine/js/myCheckBox.js') !!}
     {!! Html::script('assets/mine/js/myMessage.js') !!}
-    {!! Html::script('assets/mine/js/myfileImage.js') !!}
     {!! Html::script('assets/mine/js/myTags.js') !!}
-    {!! Html::script('assets/mine/js/myPicker.js') !!}
     {!! Html::script('assets/mine/js/mx_CURP_RFC.js') !!}
 
     <!-- Select2 personalizado -->
     <script>
-        var last_vacunas_esquemas = ''; 
-        function getFormattedDate() {
-            var date = new Date();
-            var str = "01-01-"+date.getFullYear();
-            return str;
-        }
+        // MASCARA TIPO DD-MM-AAAA
+        $("#fecha_nacimiento_tutor,#fecha_nacimiento").mask("99-99-9999");
+        // GUARADARÁ EL ESQUEMA SELECCIONADO
+        var ultimo_esquema = ''; 
+        var ultima_fecha_nacimiento = '';
 
-        function getFormattedPartTime(partTime){
-            if (partTime<10)
-            return "0"+partTime;
-            return partTime;
-        }
+        // CARGA EL ESQUEMA CON BASE A LA FECHA 01-01-AÑO ACTUAL
+        setTimeout(function() {          
+            conseguirEsquema(moment().format('YYYY'),"01-01-"+moment().format('YYYY'));
+        }, 1000);
 
-        setTimeout(function() {
-            var date = new Date();
-            var year = date.getFullYear();
-            var fecha = getFormattedDate();            
-            get_esquema(year,fecha);
-            $("#fecha_nacimiento").val(fecha);
-        }, 100);
+        // ENVÍA FORM CON ctrl+enter
+        $('#personas-form').keydown(function(event) {
+            if (event.ctrlKey && event.keyCode === 13) {
+                $(this).trigger('submit');
+            }
+        });
 
+        // EQUIVALENCIA DE CLAVES ESTADOS
         var estados_equivalencia = ["X","AS","BC","BS","CC","CL","CM","CS","CH","DF","DG","GT","GR","HG","JC","MC","MN","MS","NT","NL","OC","PL","QT","QR","SP","SL","SR","TC","TS","TL","VZ","YN","ZS"];
         var localidad = { 'id':null, 'nombre':'Localidad'};
+
+        // INICIA SELECT2 PARA ESTOS SELECTORES
         $(".js-data-clue,.js-data-ageb,.js-data-genero,.js-data-parto,.js-data-estado,.js-data-municipio,.js-data-codigo,.js-data-institucion,.js-data-localidad").select2();
         
+        // SI CAMBIAN ESTOS SELECTS VALIDAR LOS CAMPOS DE ENTRADA PARA VALIDAR CURP
         $(".js-data-estado,.js-data-genero").change(function(){
-            setTimeout(function(){ validate_inputs_curp(); }, 1000);
-        });
-        
-        $("#content-esquema").on("blur","input[name*='fecha_aplicacion']", function(){
-            valoraFecha($(this).val(), replaceAll($(this).attr('name'),"_", " "),true);
+            setTimeout(function(){ validarCamposCURP(); }, 1000);
         });
 
-        // CADA QUE SE COLOCA UNA FECHA DE APLICACIÓN SE ENVÍA A VALIDACIÓN
-        $("#fecha_nacimiento,#fecha_nacimiento_tutor").blur(function(){
-            valoraFecha($(this).val(), replaceAll($(this).attr('name'),"_", " "),false);             
+        // OBTIENE VALUE DE FECHA DE APLICACIÓN Y SE ENVÍA A VALIDACIÓN
+        function validaAplicacion(indice,id_vacuna_esquema, index){
+            if (moment($("#fecha_aplicacion"+id_vacuna_esquema).val(),'DD-MM-YYYY').isValid()) {
+                comprobarFecha($("#fecha_aplicacion"+id_vacuna_esquema).val(), $("#fecha_aplicacion"+id_vacuna_esquema).attr('data-placeholder'), 3, index);
+                /* @params: (fecha de aplicaión, texto que describe la aplicación, 3 = pertenece a aplicaciones, index del arreglo de vacunas esquemas )*/
+            } else {
+                notificar('Información','Verifique la fecha de aplicación de '+$("#fecha_aplicacion"+id_vacuna_esquema).attr('data-placeholder'),'info',3000);
+            }            
+        }
+
+        // CADA QUE SE COLOCA UNA FECHA DE  NACIMIENTO DEL INFANTE SE ENVÍA A VALIDACIÓN
+        $("#fecha_nacimiento").blur(function(){
+            if (moment($(this).val(),'DD-MM-YYYY').isValid()) {
+                 comprobarFecha($(this).val(), $(this).attr('placeholder'), 1, null);
+            } else {
+                $(this).val(ultima_fecha_nacimiento);
+                notificar('Información','Verifique la fecha de nacimiento del infante.\n \n Se cargará la última fecha valida '+moment(ultima_fecha_nacimiento,'DD-MM-YYYY').format('LL'),'info',5000);
+            }            
+        });
+
+        // CADA QUE SE COLOCA UNA FECHA DE  DEL TUTOR SE ENVÍA A VALIDACIÓN
+        $("#fecha_nacimiento_tutor").blur(function(){
+            if (moment($(this).val(),'DD-MM-YYYY').isValid()) {
+                 comprobarFecha($(this).val(), $(this).attr('placeholder'), 2, null);
+            } else {
+                notificar('Información','Verifique la fecha de nacimiento del tutor','info',3000);
+            }            
         });
         
         // SI LA CLUE CAMBIA; SE SELECCIONAN SU LOCALIDAD Y MUNICIPIO
@@ -346,74 +369,154 @@
                 $(".js-data-estado").val(response.data.entidades_id).trigger("change");
                 $(".js-data-municipio").val(response.data.municipios_id).trigger("change");
                 $(".js-data-localidad").val(response.data.localidades_id).trigger("change");
-            }).fail(function(){  // Calcula CURP                    
-                new PNotify({
-                    title: 'Info!',
-                    text: 'No se consultó detalles de la unidad de salud',
-                    type: 'warning',
-                    styling: 'bootstrap3'
-                });
+            }).fail(function(){  // Calcula CURP
+                notificar('Información','No se consultaron los detalles de la unidad de salud','warning',2000);
             });
         });
 
         // CADA QUE ESTOS ELEMENTOS PIERDEN EL FOCO, SE VALIDAN PARA CONSULTAR LA CURP
         $("#fecha_nacimiento,#paterno,#materno,#nombre").blur(function(){            
-            setTimeout(function(){ validate_inputs_curp(); }, 1000);
+            setTimeout(function(){ validarCamposCURP(); }, 1000);
         });
 
         // SE ENCARGA DE VALIDAR EL FORMATO Y LA EXISTENCIA DE LA FECHA PROPORCIONADA COMO PARAMETRO
-        function valoraFecha(date,name,es_aplicacion){
-            console.log(date,es_aplicacion);
-            if(date!=null && date!="") {
-                var fn_validar = replaceAll(date,"-", "/");                
-                var errors = 0;
-                var warning = '';
+        function comprobarFecha(fecha,texto,tipo_fecha,index){               
+            var errors = 0;
+            var mensaje = '';
+            var titulo = '';            
+            if(tipo_fecha==1){ // FECHA DE NACIMENTO 
+                var temp = fecha.split("-"); // fecha recibida partida 
+                if (moment(fecha,'DD-MM-YYYY') > moment())  {                          
+                    errors++; mensaje='Marty McFly! No puedes agregar niños nacidos el '+moment(fecha,'DD-MM-YYYY').format('LL')+', Ellos aún no nacen! \n \n Se cargará la última fecha valida '+moment(ultima_fecha_nacimiento,'DD-MM-YYYY').format('LL');
+                    fecha = ultima_fecha_nacimiento;
+                    temp = fecha.split("-");
+                }
+                if(fecha!=ultima_fecha_nacimiento){
+                    conseguirEsquema(temp[2],fecha);
+                }
+            }
+            if(tipo_fecha==2){ // FECHA DE NACIMENTO DEL TUTOR 
+                if (moment(fecha,'DD-MM-YYYY') > moment() || moment(fecha,'DD-MM-YYYY') >= moment(ultima_fecha_nacimiento,'DD-MM-YYYY'))  {                          
+                    errors++; mensaje='El tutor debe haber nacido ya y además antes que '+$("#nombre").val();
+                }
+            }
+            if(tipo_fecha==3){ // APLICACIONES-DOSIS
+                if (moment(ultima_fecha_nacimiento,'DD-MM-YYYY').isValid()) {
+                    var dias_diferencia_nacimiento = moment(fecha,'DD-MM-YYYY').diff(moment(ultima_fecha_nacimiento,'DD-MM-YYYY'), 'days');
+                    var dias_diferencia_hoy = moment(fecha,'DD-MM-YYYY').diff(moment(), 'days');
+                    if(dias_diferencia_nacimiento>=0 && dias_diferencia_hoy<=0){ // SI ES MAYOR QUE EL MACIMIENTO Y MENOR A MAÑANA
+                        if (ultimo_esquema[index]) { // sabemos que tiene un esquema y tiene datos a validar
+                            // TODAS LAS APLICACIONES DE UNA VACUNA  
+                            var vacunasMenores = []; var vacunasMayores = [];
+                            $.each(ultimo_esquema, function( i, ve ) { // TODAS LAS APLICACIONES DEL ESQUEMA
+                                if(ve.vacunas_id==ultimo_esquema[index].vacunas_id && ve.id!=ultimo_esquema[index].id && ve.intervalo_inicio<=ultimo_esquema[index].intervalo_inicio){
+                                    // SI LAS APLICACIONES SON DE LA MISMA VACUNA QUE LA FECHA SELECCIONADA Y SI EL INTERVALO DE LA VACUNA COMPARADA ES MENOR AL DE LA SELECCIONADA 
+                                    vacunasMenores.push(ve);                                    
+                                }
+                                if(ve.vacunas_id==ultimo_esquema[index].vacunas_id && ve.id!=ultimo_esquema[index].id && ve.intervalo_inicio>=ultimo_esquema[index].intervalo_inicio){
+                                    // SI LAS APLICACIONES SON DE LA MISMA VACUNA QUE LA FECHA SELECCIONADA Y SI EL INTERVALO DE LA VACUNA COMPARADA ES MAYOR AL DE LA SELECCIONADA 
+                                    vacunasMayores.push(ve);                                    
+                                }
+                            });   
+                            
+                            //  LIMITE INFERIOR Y SUPERIOR DE LA APLICACION                       
+                            var dias_inferior = moment(fecha,'DD-MM-YYYY').diff(moment(ultima_fecha_nacimiento,'DD-MM-YYYY').add(ultimo_esquema[index].intervalo_inicio, 'days'), 'days');
+                            var dias_superior = moment(ultima_fecha_nacimiento,'DD-MM-YYYY').add(ultimo_esquema[index].intervalo_fin, 'days').diff(moment(fecha,'DD-MM-YYYY'), 'days');
+                            if(dias_inferior>=ultimo_esquema[index].intervalo_inicio && dias_superior<=ultimo_esquema[index].intervalo_fin){
+                                if(vacunasMenores.length){ // EVALUA LAS MENORES
+                                    var este = vacunasMenores[vacunasMenores.length-1]; //ÚLTIMA VACUNA. DE LAS MENORES, LA MAYOR
+                                    if (moment($("#fecha_aplicacion"+este.id).val(),'DD-MM-YYYY').isValid()) {
+                                        // CON BASE A LA ÚLTIMA FECHA DE DOSIS APLICADA
+                                        /*var dias_entre_aplicaciones = moment(fecha,'DD-MM-YYYY').diff(moment($("#fecha_aplicacion"+este.id).val(),'DD-MM-YYYY'), 'days');
+                                        if(dias_entre_aplicaciones<ultimo_esquema[index].intervalo_inicio){ // EVALUAR CON LA MENOR
+                                            errors++; mensaje='Esta dosis se puede aplicar desde de '+moment($("#fecha_aplicacion"+este.id).val(), 'DD-MM-YYYY').add(ultimo_esquema[index].intervalo_inicio, 'days').format('LL')+' teniendo en cuenta la '+$("#fecha_aplicacion"+este.id).attr('data-placeholder');
+                                        }*/                                    
+                                        
+                                        //CON BASE EN 'INTERVALO' ENTRE LA ÚLTIMA DOSIS APLICADA Y LA SIGUIENTE                                    
+                                        var dias_entre_aplicaciones = moment(fecha,'DD-MM-YYYY').diff(moment($("#fecha_aplicacion"+este.id).val(),'DD-MM-YYYY'), 'days');
+                                        if(dias_entre_aplicaciones<(ultimo_esquema[index].intervalo_inicio-este.intervalo_inicio)){ // EVALUAR CON LA MENOR
+                                            errors++; mensaje='Esta dosis se puede aplicar desde de '+moment($("#fecha_aplicacion"+este.id).val(), 'DD-MM-YYYY').add((ultimo_esquema[index].intervalo_inicio-este.intervalo_inicio), 'days').format('LL')+' teniendo en cuenta la '+$("#fecha_aplicacion"+este.id).attr('data-placeholder');
+                                        }
+                                        
+                                        
+                                        // CON BASE EL FECHA DE NACIMIENTO
+                                        /*var dias_entre_aplicaciones = moment(fecha,'DD-MM-YYYY').diff(moment(ultima_fecha_nacimiento,'DD-MM-YYYY'), 'days');
+                                        if(dias_entre_aplicaciones<ultimo_esquema[index].intervalo_inicio){ // EVALUAR CON LA MENOR
+                                            errors++; mensaje='Esta dosis se puede aplicar desde de '+moment(ultima_fecha_nacimiento, 'DD-MM-YYYY').add(ultimo_esquema[index].intervalo_inicio, 'days').format('LL')+' teniendo en cuenta la '+$("#fecha_aplicacion"+este.id).attr('data-placeholder');
+                                        } */
+                                    } else {
+                                        errors++; mensaje='Antes debe aplicar '+$("#fecha_aplicacion"+este.id).attr('data-placeholder');
+                                    }
+                                }
 
-                if(validarFormatoFecha(fn_validar)){ 
-                    if(!existeFecha(fn_validar)){
-                        errors++; warning+= "La fecha que acaba agregar no existe. \n";
+                                if(vacunasMayores.length){ // EVALUA LAS MAYORES
+                                    var este = vacunasMayores[0]; //ÚLTIMA VACUNA. DE LAS MAYORES, LA MENOR
+                                    if (moment($("#fecha_aplicacion"+este.id).val(),'DD-MM-YYYY').isValid()) {
+                                        var dias_entre_aplicaciones = moment($("#fecha_aplicacion"+este.id).val(),'DD-MM-YYYY').diff(moment(fecha,'DD-MM-YYYY'), 'days');
+                                        if(dias_entre_aplicaciones<(este.intervalo_inicio - ultimo_esquema[index].intervalo_inicio)){ // EVALUAR CON LA MENOR
+                                            errors++; mensaje = 'La dosis siguiente:  '+$("#fecha_aplicacion"+este.id).attr('data-placeholder')+' puede aplicarse desde '+moment(fecha, 'DD-MM-YYYY').add((este.intervalo_inicio-ultimo_esquema[index].intervalo_inicio), 'days').format('LL');
+                                        } 
+                                    }
+                                    // SI TIENE DOSIS POSTERIOR Y UN MÁXIMO IDEAL
+                                    if(ultimo_esquema[index].maximo_ideal!=null && ultimo_esquema[index].dias_agregar_siguiente_dosis!=null){
+                                        var dias_diferencia = moment(fecha,'DD-MM-YYYY').diff(moment(ultima_fecha_nacimiento,'DD-MM-YYYY').add(ultimo_esquema[index].maximo_ideal, 'days'), 'days');
+                                        if(dias_diferencia>=0){
+                                            $("#intervalo_text"+este.id).html(conseguirIntervalo(este.intervalo_inicio + ultimo_esquema[index].dias_agregar_siguiente_dosis));
+                                            ultimo_esquema[este.id].intervalo_inicio = (este.intervalo_inicio + ultimo_esquema[index].dias_agregar_siguiente_dosis);
+                                            //ultimo_esquema[este.id].insert('intervalo_inicio', (este.intervalo_inicio + ultimo_esquema[index].dias_agregar_siguiente_dosis));
+                                        }
+                                        console.log(dias_diferencia,ultimo_esquema[este.id]);
+                                    }
+                                } 
+                            } else {
+                                errors++; mensaje='Esta aplicación debe ser entre '+moment(ultima_fecha_nacimiento,'DD-MM-YYYY').add(ultimo_esquema[index].intervalo_inicio, 'days').format('LL')+' y '+moment(ultima_fecha_nacimiento,'DD-MM-YYYY').add(ultimo_esquema[index].intervalo_fin, 'days').format('LL');
+                            }                                                             
+                        } else {
+                            errors++; mensaje='No se encontraron los detalles de la dosis a aplicar';
+                        }
+                    } else {
+                        errors++; mensaje='La fecha: '+moment(fecha,'DD-MM-YYYY').format('LL')+', que acaba de agregar debe ser mayor o igual a la fecha de nacimiento y menor al día de mañana';
                     }
-                }else{
-                    errors++; warning+= "El formato de la fecha que acaba agregar es incorrecto. \n";
+                } else {
+                    $("input[name*='fecha_aplicacion']").val('');
+                    $("#fecha_nacimiento").focus();
+                    errors++; mensaje='Seleccione una fecha de nacimiento primero';
                 }
-                if(errors>0){
-                    new PNotify({
-                        title: 'Info!',
-                        text: name+': '+warning,
-                        type: 'info',
-                        styling: 'bootstrap3'
-                    });
-                }
+                
+            }
+            if(errors>0){
+                notificar(texto , mensaje, 'danger', 4000);
             }
         }
 
-        // CONSULTA POR GET EL ESQUEMA
-        function get_esquema(esquema,fecha_nacimiento) {
+        // CONSULTA POR :GET: EL ESQUEMA
+        function conseguirEsquema(esquema,fecha_nacimiento) {
             $('#title-esquema').empty().html('Buscando esquema '+esquema);
             $('#content-esquema').empty().html('<div class="col-md-12 text-center"> <i class="fa fa-circle-o-notch fa-spin" style="font-size:x-large;"></i> </div> ');
             $.get('../catalogo/esquema/'+esquema, {fecha_nacimiento:fecha_nacimiento}, function(response, status){ // Consulta esquema
                 if(response.data==null){
-                    new PNotify({
-                        title: 'Oye!',
-                        text: 'No se encontró el esquema que buscas',
-                        type: 'warning',
-                        styling: 'bootstrap3'
-                    });
+                    $('#fecha_nacimiento').val('');
+                    notificar('Información','No se encontró el esquema que buscas','warning',4000);
                     $('#title-esquema').empty().html('No se encuentra el esquema: '+esquema+'. ');
                     $('#content-esquema').empty().html('<div class="col-md-12 text-center text-danger"> <h2 class="text-danger"> <i class="fa fa-info-circle text-info"></i> Imposible encontrar el esquema '+esquema+'. Seleccione otra fecha de nacimiento o asegurese que exista el esquema que busca. </h2></div> ');
                 } else {
+                    notificar('Información','Cargando esquema','success',2000);
                     $('#title-esquema').empty().html('<a class="btn btn-danger btn-lg"><i class="fa fa-calendar"></i> '+response.esquema.descripcion+'</a>  <a class="btn btn-lg btn-default">'+response.letra_edad+'</a>');
                     $('#content-esquema').empty();
-                    draw_esquema(response.data);
+                    $('#fecha_nacimiento').val(fecha_nacimiento);
+                    ultima_fecha_nacimiento = fecha_nacimiento;
+                    generarEsquema(response.data);
                 }
-            }).fail(function(){                   
+            }).fail(function(){ 
+                $('#fecha_nacimiento').val('');                  
                 $('#title-esquema').empty().html('No se encuentra el esquema: '+esquema+'. ');
                 $('#content-esquema').empty().html('<div class="col-md-12 text-center text-danger"> <h2 class="text-danger"> <i class="fa fa-info-circle text-info"></i> Imposible encontrar el esquema '+esquema+'. Seleccione otra fecha de nacimiento o asegurese que exista el esquema que busca. </h2></div> ');
             });
         }
 
-        function draw_esquema(aplicaciones){
-            last_vacunas_esquemas = aplicaciones;
+        // GENERA EL ESQUEMA DENTRO DEL DIV-CONTENT
+        function generarEsquema(aplicaciones){
+            ultimo_esquema = aplicaciones; // LAS VALIDACIONES DEL ESQUEMA ESTÁN AQUÍ
             var key_plus = 0;
             $.each(aplicaciones, function( key, ve ) {
                 key_plus++;                        
@@ -446,35 +549,25 @@
                     tipo_aplicacion = 'Refuerzo';
                 }
 
-                if(ve.intervalo_inicio<=29) {
-                    intervalo_inicio = 'Nacimiento'; 
-                } else {
-                    if((ve.intervalo_inicio/30)<=23) { 
-                        intervalo_inicio = Math.round((ve.intervalo_inicio/30))+' Meses';
-                    } else { 
-                        intervalo_inicio = Math.round(((ve.intervalo_inicio/30)/12))+' Años';
-                    }
-                }
-                //console.log(aplicaciones.length - 1, key);
-                //Math.round(col_md)
+                intervalo_inicio = conseguirIntervalo(ve.intervalo_inicio);
                 if(aplicaciones.length - 1 > key){ // último registro de esquemasvacunas
-                    $('#content-esquema').append('<div class="animated flipInY col-md-2 col-xs-12"><br> <div class="tile-stats" style="color:white; margin:0px; padding:3px; border:solid 2px #'+ve.color_rgb+'; background-color:#'+ve.color_rgb+' !important;"> <div class="row"> <div class="col-md-12"> <span style="font-size:large;font-weight:bold;"> '+ve.clave+' <small> '+tipo_aplicacion+' </small> </span> <span style="font-size:large;" class="pull-right"> '+intervalo_inicio+' </span> </div> </div> <div class="row"> <div class="bt-flabels__wrapper"> <input id="fecha_aplicacion'+ve.id+'" name="fecha_aplicacion'+ve.id+'" type="text" value="" class="form-control has-feedback-left" aria-describedby="inputSuccess2Status" autocomplete="off" placeholder="Fecha de aplicación"> </div> </div> </div> </div>');
+                    $('#content-esquema').append('<div class="animated flipInY col-md-2 col-xs-12"><br> <div class="tile-stats" style="color:white; margin:0px; padding:3px; border:solid 2px #'+ve.color_rgb+'; background-color:#'+ve.color_rgb+' !important;"> <div class="row"> <div class="col-md-12"> <span style="font-size:large;font-weight:bold;"> '+ve.clave+' <small> '+tipo_aplicacion+' </small> </span> <span style="font-size:large;" class="pull-right"> <span class="badge bg-white" style="color:#'+ve.color_rgb+'" id="intervalo_text'+ve.id+'">'+intervalo_inicio+'</span> </span> </div> </div> <div class="row"> <div class="bt-flabels__wrapper"> <input id="fecha_aplicacion'+ve.id+'" name="fecha_aplicacion'+ve.id+'" type="text" onBlur="validaAplicacion('+key+','+ve.id+','+key+')" data-placeholder="'+ve.clave+' '+tipo_aplicacion+'('+intervalo_inicio+')" value="" class="form-control has-feedback-left" aria-describedby="inputSuccess2Status" autocomplete="off" style="font-size:x-large; text-align:center;"> </div> </div> </div> </div>');
                     if(aplicaciones[key_plus].fila != ve.fila){
                         $('#content-esquema').append('<div class="clearfix"></div>');
                     }
                 } else {
-                    $('#content-esquema').append('<div class="animated flipInY col-md-2 col-xs-12"><br> <div class="tile-stats" style="color:white; margin:0px; padding:3px; border:solid 2px #'+ve.color_rgb+'; background-color:#'+ve.color_rgb+' !important;"> <div class="row"> <div class="col-md-12"> <span style="font-size:large;font-weight:bold;"> '+ve.clave+' <small> '+tipo_aplicacion+' </small> </span> <span style="font-size:large;" class="pull-right"> '+intervalo_inicio+' </span> </div> </div> <div class="row"> <div class="bt-flabels__wrapper"> <input id="fecha_aplicacion'+ve.id+'" name="fecha_aplicacion'+ve.id+'" type="text" value="" class="form-control has-feedback-left" aria-describedby="inputSuccess2Status" autocomplete="off" placeholder="Fecha de aplicación"> </div> </div> </div> </div>');
+                    $('#content-esquema').append('<div class="animated flipInY col-md-2 col-xs-12"><br> <div class="tile-stats" style="color:white; margin:0px; padding:3px; border:solid 2px #'+ve.color_rgb+'; background-color:#'+ve.color_rgb+' !important;"> <div class="row"> <div class="col-md-12"> <span style="font-size:large;font-weight:bold;"> '+ve.clave+' <small> '+tipo_aplicacion+' </small> </span> <span style="font-size:large;" class="pull-right"> <span class="badge bg-white" style="color:#'+ve.color_rgb+'" id="intervalo_text'+ve.id+'">'+intervalo_inicio+'</span> </span> </div> </div> <div class="row"> <div class="bt-flabels__wrapper"> <input id="fecha_aplicacion'+ve.id+'" name="fecha_aplicacion'+ve.id+'" type="text" onBlur="validaAplicacion('+key+','+ve.id+','+key+')" data-placeholder="'+ve.clave+' '+tipo_aplicacion+'('+intervalo_inicio+')" value="" class="form-control has-feedback-left" aria-describedby="inputSuccess2Status" autocomplete="off" style="font-size:x-large; text-align:center;"> </div> </div> </div> </div>');
                 }
             });
 
+            // APLICA MASCARA DD-MM-AAAA PARA LAS FECHAS DE APLICACIÓN
             setTimeout(function() {
-                init_fecha_aplicacion();
-            }, 500);
+                $("input[name*='fecha_aplicacion']").mask("99-99-9999");
+            }, 100);
         }
 
-        
-
-        function validate_inputs_curp(){
+        // VERIFICA QUE LOS CAMPOS PARA LA CURP SEAN CORRECTOS
+        function validarCamposCURP(){            
             var estado = $(".js-data-estado").val();
             var born_state =  estados_equivalencia[estado];
             if($(".js-data-genero").val()=="M") {
@@ -483,7 +576,7 @@
             if($(".js-data-genero").val()=="F") {
                 var gender = 2;
             }
-            var fn_validar = replaceAll($('#fecha_nacimiento').val(),"-", "/");
+            var fn_validar = reemplazarTodo($('#fecha_nacimiento').val(),"-", "/");
             var born_date = fn_validar.split('/');
             var name = $('#nombre').val();
             var father_surname = $('#paterno').val();
@@ -519,46 +612,46 @@
                 // Sending form
                 var form = $("#personas-form");
                 var data = form.serialize();
-                $.post('curp ', data, function(response, status){ // Consulta CURP
+                $.post('curp', data, function(response, status){ // Consulta CURP
                     if(response.find==true){                        
                         $("#curp").val(response.curp);
-                        new PNotify({
-                            title: 'Info!',
-                            text: 'Se encontró la CURP, asegurese que sea correcta',
-                            type: 'info',
-                            styling: 'bootstrap3'
-                        });
+                        notificar('Información','Se encontró la CURP, asegurese que sea correcta','info',4000);
                     }
                     if(response.find==false || response.curp==""){ 
-                        calcula_curp(name, father_surname, mother_surname, born_date[0], born_date[1], born_date[2], born_state, gender);
+                        calcularCURP(name, father_surname, mother_surname, born_date[0], born_date[1], born_date[2], born_state, gender);
                     }
                 }).fail(function(){  // Calcula CURP                    
-                    calcula_curp(name, father_surname, mother_surname, born_date[0], born_date[1], born_date[2], born_state, gender);
+                    calcularCURP(name, father_surname, mother_surname, born_date[0], born_date[1], born_date[2], born_state, gender);
                 });
 
             } else {
                 if(errors<2){
-                    new PNotify({
-                        title: 'Oh No!',
-                        text: warning,
-                        type: 'info',
-                        styling: 'bootstrap3'
-                    });
+                    notificar('Información',warning,'info',3000);
                 }
             }
         }
 
-        function calcula_curp(name, father_surname, mother_surname, born_date_d, born_date_m, born_date_a, born_state, gender){
-            var  curp = mxk.getCURP(name, father_surname, mother_surname, born_date_d, born_date_m, born_date_a, born_state, gender);
-            $("#curp").val(curp);
-            new PNotify({
-                title: 'Oh No!',
-                text: 'Se calculó la CURP, verifique los datos',
-                type: 'warning',
-                styling: 'bootstrap3'
-            });
+        // DEVUELVE 'UN 1M, 3A, NAC, ...' TEXTO CON BASE A LOS DIAS QUE RECIBE
+        function conseguirIntervalo(dias){
+            if(dias<=29) {
+                return 'Nac'; 
+            } else {
+                if((dias/30)<=23) { 
+                    return Math.round((dias/30))+'M';
+                } else { 
+                    return Math.round(((dias/30)/12))+'A';
+                }
+            }
         }
 
+        // USA UN SCRIPT PARA CALCULAR CURP
+        function calcularCURP(name, father_surname, mother_surname, born_date_d, born_date_m, born_date_a, born_state, gender){
+            var  curp = mxk.getCURP(name, father_surname, mother_surname, born_date_d, born_date_m, born_date_a, born_state, gender);
+            $("#curp").val(curp);
+            notificar('Información','Se CALCULÓ la CURP, verifique los datos','warning',3000);
+        }
+
+        // TRUE, SI LA FECHA TIENE FORMATO VALIDO
         function validarFormatoFecha(campo) {
             var RegExPattern = /^\d{1,2}\/\d{1,2}\/\d{2,4}$/;
             if ((campo.match(RegExPattern)) && (campo!='')) {
@@ -568,6 +661,7 @@
             }
         }
 
+        // VALIDA SI EXISTE LA FECHA
         function existeFecha(fecha){
             var fechaf = fecha.split("/");
             var d = fechaf[0];
@@ -576,8 +670,21 @@
             return m > 0 && m < 13 && y > 0 && y < 32768 && d > 0 && d <= (new Date(y, m, 0)).getDate();
         }
 
-        function replaceAll(str, find, replace) {
+        // REEMPLAZA LO QUE SE LE PIDA EN UNA CADENA
+        function reemplazarTodo(str, find, replace) {
             return str.replace(new RegExp(find, 'g'), replace);
+        }
+
+        // LANZA EL NOTIFY
+        function notificar(titulo,texto,tipo,retardo){
+            new PNotify({
+                title: titulo,
+                text: texto,
+                type: tipo,
+                delay: retardo,
+                animate_speed: 'fast',
+                styling: 'bootstrap3'
+            });
         }
         
     </script>
