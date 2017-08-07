@@ -1194,10 +1194,11 @@ class PersonaController extends Controller
         if ($request->ajax()) {
             if (Auth::user()->can('delete.personas') && Auth::user()->activo==1) {
                 try {
+                    DB::beginTransaction();
                     $updates = DB::table('personas')
                                ->where('id', '=', $id)
                                ->update(['deleted_at' => date('Y-m-d H:m:s'), 'usuario_id' => Auth::user()->email]);
-                    DB::beginTransaction();
+                    
                     if ($updates) {
                         $updates_pve = DB::table('personas_vacunas_esquemas')
                                        ->where('personas_id', '=', $id)
