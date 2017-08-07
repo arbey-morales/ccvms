@@ -1189,10 +1189,8 @@ class PersonaController extends Controller
     {
         $msgGeneral     = '';
         $type           = 'flash_message_info';
-        $type2          = 'error';
-        
+        $type2          = 'error';        
         $persona = Persona::findOrFail($id);
-        
         if ($request->ajax()) {
             if (Auth::user()->can('delete.personas') && Auth::user()->activo==1) {
                 try {
