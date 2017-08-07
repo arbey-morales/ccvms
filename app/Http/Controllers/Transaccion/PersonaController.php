@@ -58,6 +58,7 @@ class PersonaController extends Controller
                     $personas = Persona::select('personas.*')->join('clues','clues.id','=','personas.clues_id')->where('clues.jurisdicciones_id', Auth::user()->idJurisdiccion)->where('personas.deleted_at', NULL)->with('municipio','localidad','clue')->orderBy('personas.id', 'DESC')->take(500)->get();
                  }
             }
+            dd($personas); die;
             return view('persona.index')->with('data', $personas)->with('q', $q);
         } else {
             return response()->view('errors.allPagesError', ['icon' => 'user-secret', 'error' => '403', 'title' => 'Forbidden / Prohibido', 'message' => 'No tiene autorización para acceder al recurso. Se ha negado el acceso.'], 403);
