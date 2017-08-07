@@ -1192,6 +1192,7 @@ class PersonaController extends Controller
         $type2          = 'error';
         
         $persona = Persona::findOrFail($id);
+        
         if ($request->ajax()) {
             if (Auth::user()->can('delete.personas') && Auth::user()->activo==1) {
                 try {
