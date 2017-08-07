@@ -73,11 +73,19 @@ class EsquemaController extends Controller
                 ->join('vacunas AS v','v.id','=','ve.vacunas_id')
                 ->where('ve.esquemas_id', $id)
                 ->where('ve.intervalo_inicio','<',($intervalo_dias+1))
+                ->where('ve.deleted_at', NULL)
+                ->where('v.deleted_at', NULL)                
                 ->orderBy('v_orden_esquema')
                 ->orderBy('intervalo_inicio')
                 ->orderBy('fila')
                 ->orderBy('columna')
                 ->get(); 
+            foreach ($esquema_detalle as $key => $value) {
+                $value->int_inicio_normal = $value->intervalo_inicio;
+                $value->int_fin_normal = $value->intervalo_fin;
+                $value->mayores = VacunaEsquema::where('vacunas_id', $value->vacunas_id)->where('esquemas_id', $id)->where('intervalo_inicio', '>=', $value->intervalo_inicio)->where('id', '!=', $value->id)->where('deleted_at', NULL)->orderBy('intervalo_inicio', 'ASC')->take(1)->get();
+                $value->menores = VacunaEsquema::where('vacunas_id', $value->vacunas_id)->where('esquemas_id', $id)->where('intervalo_inicio', '<=', $value->intervalo_inicio)->where('id', '!=', $value->id)->where('deleted_at', NULL)->orderBy('intervalo_inicio', 'DESC')->take(1)->get();
+            }
         } else {
             $esquema_detalle = DB::table('vacunas_esquemas AS ve')
                 ->select('ve.id','ve.vacunas_id','ve.esquemas_id','ve.tipo_aplicacion','ve.orden_esquema AS ve_orden_esquema','ve.intervalo_inicio','ve.intervalo_fin','ve.maximo_ideal','ve.dias_agregar_siguiente_dosis','ve.dosis_requerida','ve.fila','ve.columna','v.clave','v.nombre','v.orden_esquema AS v_orden_esquema','v.color_rgb')

@@ -37,7 +37,7 @@
         $(document).ready(function() {
             $('#datatable-responsive').DataTable({
                 language: {
-                    url: '/assets/mine/js/dataTables/es_MX.json'
+                    url: '/assets/mine/js/dataTables/es-MX.json'
                 }
             });
 

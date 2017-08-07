@@ -111,12 +111,13 @@
                             <h4 class="text-info">Dejar vacio el password para no hacerle cambios.</h4>
                              <h4 class="text-warning">@if(Auth::user()->id==$data->id) Si hace cambios a su mail o password será redireccionado para iniciar sesión @endif </h4>
                             <br>
+                            <?php $check = true;  if($data->activo==0)  $check= false; ?>
                             <div class="row">
                                 <div class="col-md-1 text-right">
-                                    {!! Form::checkbox('activo', '1', true, ['class' => 'js-switch', 'id' => 'activo'] ) !!}
+                                    {!! Form::checkbox('activo', '1', $check, ['class' => 'js-switch', 'id' => 'activo'] ) !!}
                                 </div>
                                 <div class="col-md-3">
-                                    <span class="active-ratio switch-mine switch-yes show " ><i class="fa fa-heart span-active"></i> En actividad! </span> <span class="text-default switch-mine switch-not hidden " ><i class="fa fa-heartbeat text-default"></i> Inactivo </span> 
+                                    <span class="active-ratio switch-mine switch-yes @if($data->activo==1) show @else hidden @endif" ><i class="fa fa-heart span-active"></i> En actividad! </span> <span class="text-default switch-mine switch-not @if($data->activo==0) show @else hidden @endif" ><i class="fa fa-heartbeat text-default"></i> Inactivo </span> 
                                 </div>
                                 <div class="col-md-1 text-right">
                                     
