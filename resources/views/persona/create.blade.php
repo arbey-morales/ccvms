@@ -313,8 +313,6 @@
         setTimeout(function() {          
             conseguirEsquema(moment().format('YYYY'),"01-01-"+moment().format('YYYY'));
         }, 500);
-
-        // ENVÍA FORM CON ctrl+enter
        
         $("#personas-form").submit(function(e){
             e.preventDefault();

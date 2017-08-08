@@ -93,7 +93,7 @@
                         <div class="uk-width-1-2">
                             <div class="bt-flabels__wrapper bt-flabels--right">
                                 {!! Form::label('fecha_nacimiento', '* Fecha de nacimiento', ['for' => 'fecha_nacimiento'] ) !!}
-                                {!! Form::text('fecha_nacimiento', $data->fecha_nacimiento, ['class' => 'form-control has-feedback-left',  'data-parsley-required' => 'true', 'readonly' => 'on', 'id' => 'fecha_nacimientos', 'autocomplete' => 'off', 'placeholder' => '* Fecha de nacimiento' ]  ) !!}
+                                {!! Form::text('fecha_nacimiento', $data->fecha_nacimiento, ['class' => 'form-control has-feedback-left',  'data-parsley-required' => 'true', 'id' => 'fecha_nacimientos', 'readonly' => 'on', 'autocomplete' => 'off', 'placeholder' => '* Fecha de nacimiento' ]  ) !!}
                                 <span id="inputSuccess2Status" class="sr-only">(success)</span>
                                 <span class="bt-flabels__error-desc">Requerido</span>
                             </div>
@@ -325,7 +325,11 @@
     {!! Html::script('assets/vendors/jquery.tagsinput/src/jquery.tagsinput.js') !!}
     <!-- bootstrap-daterangepicker -->
     {!! Html::script('assets/app/js/moment/moment.min.js') !!}
-    {!! Html::script('assets/app/js/datepicker/daterangepicker.js') !!}
+    {!! Html::script('assets/app/js/moment/moment-timezone.js') !!}
+    {!! Html::script('assets/app/js/moment/moment-with-locales.js') !!}
+    {!! Html::script('assets/app/js/datepicker/daterangepicker.js') !!}    
+    <!-- jQuery Masked -->
+    {!! Html::script('assets/vendors/masked-input-plugin/masked-input.js') !!}
     <!-- Bootstrap Colorpicker -->
     {!! Html::script('assets/vendors/mjolnic-bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js') !!}
     <!-- File Input -->
@@ -343,12 +347,15 @@
 
     <!-- Select2 Personalizado -->
     <script>
-        // ENVÍA FORM CON ctrl+enter
-        $('#personas-form').keydown(function(event) {
-            if (event.ctrlKey && event.keyCode === 13) {
-                $(this).trigger('submit');
-            }
+        var fecha_nacimiento = '{{$data->fecha_nacimiento}}';
+        var personas_id = '{{$data->id}}';
+        // MASCARA TIPO DD-MM-AAAA
+        $("#fecha_nacimiento_tutor,#fecha_nacimiento").mask("99-99-9999");
+
+        $("#fecha_nacimiento").keyup(function(){
+            
         });
+        console.log(fecha_nacimiento,personas_id);
 
         $(".js-data-clue,.js-data-ageb,.js-data-genero,.js-data-parto,.js-data-estado,.js-data-municipio,.js-data-codigo,.js-data-institucion,.js-data-localidad").select2();
 

@@ -11,7 +11,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach($personas as $key=>$item)
+        @foreach($data as $key=>$item)
             <tr data-id="{{ $item->id }}" data-toggle="tooltip" data-placement="top">
                 <td class="text-center"><strong> {{ ++$key }} </strong></td>
                 <td class="text-left"><a class="btn btn-default" href="{{ url(Route::getCurrentRoute()->getPath().'/'.$item->id) }}" class="button">@if($item->genero=='M') <i class="fa fa-male" style="color:#4d81bf; font-size:large;"></i> @endif @if($item->genero=='F') <i class="fa fa-female" style="color:#ed1586; font-size:large;"></i> @endif </a> {{ $item->nombre }} {{ $item->apellido_paterno }} {{ $item->apellido_materno }}</td>
