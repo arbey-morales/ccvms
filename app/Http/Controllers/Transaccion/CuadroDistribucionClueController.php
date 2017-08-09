@@ -26,7 +26,7 @@ use App\Catalogo\Esquema;
 use App\Catalogo\VacunaEsquema;
 use App\Catalogo\PersonaVacunaEsquema;
 
-class PersonaController extends Controller
+class CuadroDistribucionClueController extends Controller
 {
     public $tipo_aplicacion = array("X","Única","1a Dosis","2a Dosis","3a Dosis","4a Dosis","Refuerzo");
     

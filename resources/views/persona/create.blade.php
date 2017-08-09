@@ -441,7 +441,7 @@
                                         
                                         //CON BASE EN 'INTERVALO' ENTRE LA ÚLTIMA DOSIS APLICADA Y LA SIGUIENTE                                    
                                         var dias_entre_aplicaciones = moment(fecha,'DD-MM-YYYY').diff(moment($("#fecha_aplicacion"+este.id).val(),'DD-MM-YYYY'), 'days');
-                                        if(dias_entre_aplicaciones<(ultimo_esquema[index].intervalo_inicio-ultimo_esquema[indice].intervalo_inicio)){ // EVALUAR CON LA MENOR
+                                        if(dias_entre_aplicaciones<(parseInt(ultimo_esquema[index].intervalo_inicio)-parseInt(ultimo_esquema[indice].intervalo_inicio))){ // EVALUAR CON LA MENOR
                                             errors++; mensaje='Esta dosis se puede aplicar desde de '+moment($("#fecha_aplicacion"+este.id).val(), 'DD-MM-YYYY').add((ultimo_esquema[index].intervalo_inicio-ultimo_esquema[indice].intervalo_inicio), 'days').format('LL')+' teniendo en cuenta la '+$("#fecha_aplicacion"+este.id).attr('data-placeholder');
                                         }
 
@@ -471,7 +471,7 @@
                                     //console.log(ultimo_esquema[index],'Mayores: ',este);
                                     if (moment($("#fecha_aplicacion"+este.id).val(),'DD-MM-YYYY').isValid()) {
                                         var dias_entre_aplicaciones = moment($("#fecha_aplicacion"+este.id).val(),'DD-MM-YYYY').diff(moment(fecha,'DD-MM-YYYY'), 'days');
-                                        if(dias_entre_aplicaciones<(este.intervalo_inicio - ultimo_esquema[index].intervalo_inicio)){ // EVALUAR CON LA MENOR
+                                        if(dias_entre_aplicaciones<(parseInt(este.intervalo_inicio) - parseInt(ultimo_esquema[index].intervalo_inicio))){ // EVALUAR CON LA MENOR
                                             errors++; mensaje = 'La dosis siguiente:  '+$("#fecha_aplicacion"+este.id).attr('data-placeholder')+' puede aplicarse desde '+moment(fecha, 'DD-MM-YYYY').add((este.intervalo_inicio-ultimo_esquema[index].intervalo_inicio), 'days').format('LL');
                                         } 
                                     }
@@ -482,9 +482,8 @@
                                         var dias_diferencia = moment(fecha,'DD-MM-YYYY').diff(moment(ultima_fecha_nacimiento,'DD-MM-YYYY').add(ultimo_esquema[index].maximo_ideal, 'days'), 'days');
                                         //  conseguir el index del la aplicaion a afectar
                                         if(dias_diferencia>=0){
-                                            $("#intervalo_text"+este.id).html(conseguirIntervalo(ultimo_esquema[indice].int_inicio_normal + ultimo_esquema[index].dias_agregar_siguiente_dosis));
-                                            ultimo_esquema[indice].intervalo_inicio = (ultimo_esquema[indice].int_inicio_normal + ultimo_esquema[index].dias_agregar_siguiente_dosis);
-                                            //ultimo_esquema[indice].insert('intervalo_inicio', (este.intervalo_inicio + ultimo_esquema[index].dias_agregar_siguiente_dosis));
+                                            $("#intervalo_text"+este.id).html(conseguirIntervalo(parseInt(ultimo_esquema[indice].int_inicio_normal) + parseInt(ultimo_esquema[index].dias_agregar_siguiente_dosis)));
+                                            ultimo_esquema[indice].intervalo_inicio = (parseInt(ultimo_esquema[indice].int_inicio_normal) + parseInt(ultimo_esquema[index].dias_agregar_siguiente_dosis));
                                         } else {  
                                             ultimo_esquema[indice].intervalo_inicio = ultimo_esquema[indice].int_inicio_normal;
                                             $("#intervalo_text"+este.id).html(conseguirIntervalo(ultimo_esquema[indice].intervalo_inicio));
