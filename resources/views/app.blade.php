@@ -105,6 +105,13 @@
     {!! Html::script('assets/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js') !!}
     <!-- iCheck -->
     {!! Html::script('assets/vendors/iCheck/icheck.min.js') !!}
+    <!-- bootstrap-daterangepicker -->
+    {!! Html::script('assets/app/js/moment/moment.min.js') !!}
+    {!! Html::script('assets/app/js/moment/moment-timezone.js') !!}
+    {!! Html::script('assets/app/js/moment/moment-with-locales.js') !!}
+    {!! Html::script('assets/app/js/datepicker/daterangepicker.js') !!}    
+    <!-- jQuery Masked -->
+    {!! Html::script('assets/vendors/masked-input-plugin/masked-input.js') !!}
     <!-- Skycons -->
     {!! Html::script('assets/vendors/skycons/skycons.js') !!}
     <!-- Flot -->
@@ -124,12 +131,28 @@
     {!! Html::script('assets/vendors/pnotify/dist/pnotify.js') !!}
     {!! Html::script('assets/vendors/pnotify/dist/pnotify.buttons.js') !!}
     {!! Html::script('assets/vendors/pnotify/dist/pnotify.nonblock.js') !!}
+    {!! Html::script('assets/vendors/pnotify/dist/pnotify.confirm.js') !!}
 
     <!-- My Scripts -->
     @yield('my_scripts')
 
     <!-- Custom Theme Scripts -->
     {!! Html::script('assets/build/js/custom.min.js') !!}
+
+    <script>
+      // LANZA EL NOTIFY
+      function notificar(titulo,texto,tipo,retardo){
+          new PNotify({
+              title: titulo,
+              text: texto,
+              type: tipo,
+              delay: retardo,
+              animate_speed: 'fast',
+              styling: 'bootstrap3'
+          });
+      }
+      
+    </script>
 
   </body>
 </html>

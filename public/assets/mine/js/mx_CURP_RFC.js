@@ -55,7 +55,7 @@ var mxk = {
                 bornYear        = StringUtilities.clearString(bornYear);
 
                 curp = this.getCommonPart(name, surnameFather, surnameMother, bornDay, bornMonth, bornYear,0);
-                console.log(curp)
+                //console.log(curp)
                 //TODO Remove bad words
 
                 curp += this.getGenderLetter(gender);

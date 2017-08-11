@@ -279,14 +279,7 @@
     {!! Html::script('assets/vendors/select2-4.0.3/dist/js/select2.min.js') !!}
     {!! Html::script('assets/vendors/select2-4.0.3/dist/js/i18n/es.js') !!}
     <!-- jQuery Tags Input -->
-    {!! Html::script('assets/vendors/jquery.tagsinput/src/jquery.tagsinput.js') !!}
-    <!-- bootstrap-daterangepicker -->
-    {!! Html::script('assets/app/js/moment/moment.min.js') !!}
-    {!! Html::script('assets/app/js/moment/moment-timezone.js') !!}
-    {!! Html::script('assets/app/js/moment/moment-with-locales.js') !!}
-    {!! Html::script('assets/app/js/datepicker/daterangepicker.js') !!}    
-    <!-- jQuery Masked -->
-    {!! Html::script('assets/vendors/masked-input-plugin/masked-input.js') !!}
+    {!! Html::script('assets/vendors/jquery.tagsinput/src/jquery.tagsinput.js') !!}    
     <!-- Bootstrap Colorpicker -->
     {!! Html::script('assets/vendors/mjolnic-bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js') !!}
     <!-- Switchery -->
@@ -634,7 +627,7 @@
                 // Sending form
                 var form = $("#personas-form");
                 var data = form.serialize();
-                $.post('curp', data, function(response, status){ // Consulta CURP
+                $.get('curp', data, function(response, status){ // Consulta CURP
                     if(response.find==true){                        
                         $("#curp").val(response.curp);
                         notificar('Información','Se encontró la CURP, asegurese que sea correcta','info',4000);
@@ -695,19 +688,7 @@
         // REEMPLAZA LO QUE SE LE PIDA EN UNA CADENA
         function reemplazarTodo(str, find, replace) {
             return str.replace(new RegExp(find, 'g'), replace);
-        }
-
-        // LANZA EL NOTIFY
-        function notificar(titulo,texto,tipo,retardo){
-            new PNotify({
-                title: titulo,
-                text: texto,
-                type: tipo,
-                delay: retardo,
-                animate_speed: 'fast',
-                styling: 'bootstrap3'
-            });
-        }
+        }                
         
     </script>
 @endsection

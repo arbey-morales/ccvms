@@ -26,6 +26,28 @@
              @include('persona.list')
         </div>
     </div>
+    <!-- Modal delete -->
+    <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+
+            <div class="modal-header alert-danger">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                </button>
+                <h3 class="modal-title" id="myModalLabel"> <i class="fa fa-question" style="padding-right:15px;"></i>  Confirmación </h3>
+            </div>
+            <div class="modal-body">
+                <h3>Seguro que quiere eliminar lo datos de <span id="modal-text" class="text text-danger"></span>?</h3>
+                <h4>Además borrará todo registro de aplicaciones realizadas. Si esta de acuerdo presione "Sí, eliminar".</h4>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-warning" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger btn-lg btn-confirm-delete" data-dismiss="modal">Sí, eliminar</button>
+            </div>
+
+            </div>
+        </div>
+    </div>
     {!! Form::open(['route' => ['persona.destroy', ':ITEM_ID'], 'method' => 'DELETE', 'id' => 'form-delete']) !!}
     {!! Form::close() !!}
 @endsection
@@ -39,6 +61,7 @@
 
     <!-- Datatables -->
     <script type="text/javascript">
+    var registro_borrar = null;
         $(document).ready(function() {
             $('#datatable-responsive').DataTable({
                 language: {
@@ -50,44 +73,33 @@
             $('.btn-delete').click(function(e){
                 e.preventDefault();
                 var row = $(this).parents('tr');
-                var id = row.data('id');
-                var form = $("#form-delete");
-                var url_delete = form.attr('action').replace(":ITEM_ID", id);
-                var data = form.serialize();
-              
-                // Sending form
-                $.post(url_delete, data, function(response, status){
-                    if (response.code==1) {
-                        new PNotify({
-                            title: response.title,
-                            text: response.text,
-                            type: response.type,
-                            styling: response.styling
-                        });
-                        if(response.type=='success') {
-                            row.fadeOut();
-                        }
-
-                    }
-                    if (response.code==0) {
-                        new PNotify({
-                            title: 'Oh No!',
-                            text: 'Ocurrió un error al intentar borrar el registro, verifique!',
-                            type: 'error',
-                            styling: 'bootstrap3'
-                        });
-                    }
-                }).fail(function(){
-                    new PNotify({
-                        title: 'Lo sentimos!',
-                        text: 'No se procesó la eliminación del registro',
-                        type: 'error',
-                        styling: 'bootstrap3'
-                    });
-                    row.fadeIn();
-                });
+                registro_borrar = row.data('id');
+                $("#modal-text").html(row.data('nombre'));
             });
         });
+
+        // Confirm delete on Ajax
+        $('.btn-confirm-delete').click(function(e){
+            var row = $("tr#"+registro_borrar);
+            var form = $("#form-delete");
+            var url_delete = form.attr('action').replace(":ITEM_ID", registro_borrar);
+            var data = $("#form-delete").serialize();
+            $.post(url_delete, data, function(response, status){
+                if (response.code==1) {
+                    notificar(response.title,response.text,response.type,3000);
+                    if(response.type=='success') {
+                        row.fadeOut();
+                    }
+                }
+                if (response.code==0) {
+                    notificar('Error','Ocurrió un error al intentar borrar el registro, verifique!','error',3000);
+                }
+            }).fail(function(){
+                notificar('Error','No se procesó la eliminación del registro','error',3000);
+                row.fadeIn();
+            });
+        });
+        
     </script>
     <!-- /Datatables -->
 @endsection

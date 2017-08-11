@@ -42,21 +42,6 @@ class CuadroDistribucionClueController extends Controller
         
     }
 
-    /**
-     * Display a index of reports.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function report()
-    {
-        
-    }
-
-    public function curp(Request $request)
-    {
-        
-    }
-
 	/**
      * Show the form for creating a new resource.
      *

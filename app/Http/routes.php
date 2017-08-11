@@ -26,7 +26,7 @@ Route::group(['namespace' => 'Transaccion', 'middleware' => 'auth'], function ()
     // Trancacciones
     Route::resource('usuario',                             'UserController');
     Route::resource('monitoreo',                           'MonitoreoController');
-    Route::post('persona/curp',                            'PersonaController@curp');
+    Route::get('persona/curp',                            'PersonaController@curp');
     Route::get('persona/reporte',                          'PersonaController@report');
     Route::resource('persona',                             'PersonaController');
     Route::resource('cuadro-dist-juris',                   'CuadroDistribucionJurisdiccionalController');
@@ -36,7 +36,7 @@ Route::group(['namespace' => 'Transaccion', 'middleware' => 'auth'], function ()
 Route::group(['prefix' => 'catalogo', 'namespace' => 'Catalogo', 'middleware' => 'auth'], function () {
     // Catalogos
     Route::resource('ageb',             'AgebController',            ['only' => ['index', 'show']]);
-    Route::resource('clue',             'ClueController',            ['only' => ['index', 'show']]);
+    Route::resource('clue',             'ClueController');
     Route::resource('codigo',           'CodigoCensoController',     ['only' => ['index', 'show']]);
     Route::resource('entidad',          'EntidadController',         ['only' => ['index', 'show']]);
     Route::resource('esquema',          'EsquemaController',         ['only' => ['index', 'show']]);
