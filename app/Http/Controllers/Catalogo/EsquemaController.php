@@ -69,7 +69,7 @@ class EsquemaController extends Controller
             $letra_edad = $years.' '.$letra_years.' '.$months.' '.$letra_months.' '.$days.' '.$letra_days;
 
             $esquema_detalle = DB::table('vacunas_esquemas AS ve')
-                ->select('ve.id','ve.vacunas_id','ve.esquemas_id','ve.tipo_aplicacion','ve.orden_esquema AS ve_orden_esquema','ve.intervalo_inicio','ve.intervalo_fin','ve.maximo_ideal','ve.dias_agregar_siguiente_dosis','ve.dosis_requerida','ve.fila','ve.columna','v.clave','v.nombre','v.orden_esquema AS v_orden_esquema','v.color_rgb')
+                ->select('ve.id','ve.vacunas_id','ve.esquemas_id','ve.tipo_aplicacion','ve.orden_esquema AS ve_orden_esquema','ve.intervalo_inicio','ve.intervalo_fin','ve.edad_ideal','ve.dias_entre_siguiente_dosis','ve.margen_anticipacion','ve.etiqueta_no_ideal','ve.etiqueta_ideal','ve.dosis_requerida','ve.fila','ve.columna','v.clave','v.nombre','v.orden_esquema AS v_orden_esquema','v.color_rgb')
                 ->join('vacunas AS v','v.id','=','ve.vacunas_id')
                 ->where('ve.esquemas_id', $id)
                 ->where('ve.intervalo_inicio','<',($intervalo_dias+1))
@@ -88,7 +88,7 @@ class EsquemaController extends Controller
             }
         } else {
             $esquema_detalle = DB::table('vacunas_esquemas AS ve')
-                ->select('ve.id','ve.vacunas_id','ve.esquemas_id','ve.tipo_aplicacion','ve.orden_esquema AS ve_orden_esquema','ve.intervalo_inicio','ve.intervalo_fin','ve.maximo_ideal','ve.dias_agregar_siguiente_dosis','ve.dosis_requerida','ve.fila','ve.columna','v.clave','v.nombre','v.orden_esquema AS v_orden_esquema','v.color_rgb')
+                ->select('ve.id','ve.vacunas_id','ve.esquemas_id','ve.tipo_aplicacion','ve.orden_esquema AS ve_orden_esquema','ve.intervalo_inicio','ve.intervalo_fin','ve.edad_ideal','ve.dias_entre_siguiente_dosis','ve.margen_anticipacion','ve.etiqueta_no_ideal','ve.etiqueta_ideal','ve.dosis_requerida','ve.fila','ve.columna','v.clave','v.nombre','v.orden_esquema AS v_orden_esquema','v.color_rgb')
                 ->join('vacunas AS v','v.id','=','ve.vacunas_id')
                 ->where('ve.esquemas_id', $id)
                 ->orderBy('v_orden_esquema')
@@ -119,7 +119,7 @@ class EsquemaController extends Controller
     {
         $esquema = Esquema::findOrFail($id);  
         $esquema = DB::table('vacunas_esquemas AS ve')
-                        ->select('ve.id','ve.vacunas_id','ve.esquemas_id','ve.tipo_aplicacion','ve.orden_esquema AS ve_orden_esquema','ve.intervalo_inicio','ve.intervalo_fin','ve.maximo_ideal','ve.dias_agregar_siguiente_dosis','ve.dosis_requerida','ve.fila','ve.columna','v.clave','v.nombre','v.orden_esquema AS v_orden_esquema','v.color_rgb')
+                        ->select('ve.id','ve.vacunas_id','ve.esquemas_id','ve.tipo_aplicacion','ve.orden_esquema AS ve_orden_esquema','ve.intervalo_inicio','ve.intervalo_fin','ve.edad_ideal','ve.dias_entre_siguiente_dosis','ve.margen_anticipacion','ve.etiqueta_no_ideal','ve.etiqueta_ideal','ve.dosis_requerida','ve.fila','ve.columna','v.clave','v.nombre','v.orden_esquema AS v_orden_esquema','v.color_rgb')
                         ->join('vacunas AS v','v.id','=','ve.vacunas_id')
                         ->where('ve.esquemas_id', $id)
                         ->orderBy('v_orden_esquema')

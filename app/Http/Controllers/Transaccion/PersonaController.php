@@ -459,7 +459,7 @@ class PersonaController extends Controller
             $ahora = $ahora->toDateString();
 
             $vacunas_esquemas = DB::table('vacunas_esquemas AS ve')
-                ->select('ve.id','ve.vacunas_id','ve.esquemas_id','ve.tipo_aplicacion','ve.orden_esquema AS ve_orden_esquema','ve.intervalo_inicio','ve.intervalo_fin','ve.maximo_ideal','ve.dias_agregar_siguiente_dosis','ve.dosis_requerida','ve.fila','ve.columna','v.clave','v.nombre','v.orden_esquema AS v_orden_esquema','v.color_rgb')
+                ->select('ve.id','ve.vacunas_id','ve.esquemas_id','ve.tipo_aplicacion','ve.orden_esquema AS ve_orden_esquema','ve.intervalo_inicio','ve.intervalo_fin','ve.edad_ideal','ve.dias_entre_siguiente_dosis','ve.margen_anticipacion','ve.etiqueta_no_ideal','ve.etiqueta_ideal','ve.dosis_requerida','ve.fila','ve.columna','v.clave','v.nombre','v.orden_esquema AS v_orden_esquema','v.color_rgb')
                 ->join('vacunas AS v','v.id','=','ve.vacunas_id')
                 ->where('ve.esquemas_id', $fecha_nacimiento[2])
                 ->where('ve.intervalo_inicio','<',($intervalo_dias+1))
@@ -604,10 +604,10 @@ class PersonaController extends Controller
                                                     $msg_dosis_faltantes.= $ve->clave. ' VRE QUE VAALIDAR '.$dias_diferencia_intervalo_inicio.' días de diferencia entre la  '.$tipo_aplicacion[$value_mayores->tipo_aplicacion].' y la '.$tipo_aplicacion[$ve->tipo_aplicacion].' | ';
                                                 }*/
 
-                                                if ($ve->maximo_ideal!=NULL && $ve->dias_agregar_siguiente_dosis!=NULL) {
+                                                if ($ve->edad_ideal!=NULL && $ve->dias_entre_siguiente_dosis!=NULL) {
                                                     $dias_diferencia = ($mktime_apli - $mktime_born) / (60 * 60 * 24); // dias diferencia entre las dos fecha
-                                                    if($dias_diferencia>$ve->maximo_ideal) {
-                                                        $vacunas_esquemas[$indice]->intervalo_inicio = ($vacunas_esquemas[$indice]->int_inicio_normal + $vacunas_esquemas[$key]->dias_agregar_siguiente_dosis);
+                                                    if($dias_diferencia>$ve->edad_ideal) {
+                                                        $vacunas_esquemas[$indice]->intervalo_inicio = ($vacunas_esquemas[$indice]->int_inicio_normal + $vacunas_esquemas[$key]->dias_entre_siguiente_dosis);
                                                        // dd($tipo_aplicacion[$value_mayores->tipo_aplicacion], 'cambió', $vacunas_esquemas[$indice]->intervalo_inicio); die;
                                                     } else {
                                                         $vacunas_esquemas[$indice]->intervalo_inicio = $vacunas_esquemas[$indice]->int_inicio_normal;
@@ -768,7 +768,7 @@ class PersonaController extends Controller
                 $persona->edad = $years.' '.$letra_years.' '.$months.' '.$letra_months.' '.$days.' '.$letra_days;
 
                 $esquema_detalle = DB::table('vacunas_esquemas AS ve')
-                    ->select('ve.id','ve.vacunas_id','ve.esquemas_id','ve.tipo_aplicacion','ve.orden_esquema AS ve_orden_esquema','ve.intervalo_inicio','ve.intervalo_fin','ve.maximo_ideal','ve.dias_agregar_siguiente_dosis','ve.dosis_requerida','ve.fila','ve.columna','v.clave','v.nombre','v.orden_esquema AS v_orden_esquema','v.color_rgb')
+                    ->select('ve.id','ve.vacunas_id','ve.esquemas_id','ve.tipo_aplicacion','ve.orden_esquema AS ve_orden_esquema','ve.intervalo_inicio','ve.intervalo_fin','ve.edad_ideal','ve.dias_entre_siguiente_dosis','ve.margen_anticipacion','ve.etiqueta_no_ideal','ve.etiqueta_ideal','ve.dosis_requerida','ve.fila','ve.columna','v.clave','v.nombre','v.orden_esquema AS v_orden_esquema','v.color_rgb')
                     ->join('vacunas AS v','v.id','=','ve.vacunas_id')
                     ->where('ve.esquemas_id', $esquema_date[0])
                     ->where('ve.intervalo_inicio','<',($intervalo_dias+1))
@@ -853,7 +853,7 @@ class PersonaController extends Controller
                 $persona->edad = $years.' '.$letra_years.' '.$months.' '.$letra_months.' '.$days.' '.$letra_days;
 
                 $esquema_detalle = DB::table('vacunas_esquemas AS ve')
-                    ->select('ve.id','ve.vacunas_id','ve.esquemas_id','ve.tipo_aplicacion','ve.orden_esquema AS ve_orden_esquema','ve.intervalo_inicio','ve.intervalo_fin','ve.maximo_ideal','ve.dias_agregar_siguiente_dosis','ve.dosis_requerida','ve.fila','ve.columna','v.clave','v.nombre','v.orden_esquema AS v_orden_esquema','v.color_rgb')
+                    ->select('ve.id','ve.vacunas_id','ve.esquemas_id','ve.tipo_aplicacion','ve.orden_esquema AS ve_orden_esquema','ve.intervalo_inicio','ve.intervalo_fin','ve.edad_ideal','ve.dias_entre_siguiente_dosis','ve.margen_anticipacion','ve.etiqueta_no_ideal','ve.etiqueta_ideal','ve.dosis_requerida','ve.fila','ve.columna','v.clave','v.nombre','v.orden_esquema AS v_orden_esquema','v.color_rgb')
                     ->join('vacunas AS v','v.id','=','ve.vacunas_id')
                     ->where('ve.esquemas_id', $esquema_date[0])
                     ->where('ve.intervalo_inicio','<',($intervalo_dias+1))
@@ -1051,7 +1051,7 @@ class PersonaController extends Controller
             $ahora = $ahora->toDateString();
 
             $vacunas_esquemas = DB::table('vacunas_esquemas AS ve')
-                ->select('ve.id','ve.vacunas_id','ve.esquemas_id','ve.tipo_aplicacion','ve.orden_esquema AS ve_orden_esquema','ve.intervalo_inicio','ve.intervalo_fin','ve.maximo_ideal','ve.dias_agregar_siguiente_dosis','ve.dosis_requerida','ve.fila','ve.columna','v.clave','v.nombre','v.orden_esquema AS v_orden_esquema','v.color_rgb')
+                ->select('ve.id','ve.vacunas_id','ve.esquemas_id','ve.tipo_aplicacion','ve.orden_esquema AS ve_orden_esquema','ve.intervalo_inicio','ve.intervalo_fin','ve.edad_ideal','ve.dias_entre_siguiente_dosis','ve.margen_anticipacion','ve.etiqueta_no_ideal','ve.etiqueta_ideal','ve.dosis_requerida','ve.fila','ve.columna','v.clave','v.nombre','v.orden_esquema AS v_orden_esquema','v.color_rgb')
                 ->join('vacunas AS v','v.id','=','ve.vacunas_id')
                 ->where('ve.esquemas_id', $fecha_nacimiento[2])
                 ->where('ve.intervalo_inicio','<',($intervalo_dias+1))
@@ -1196,10 +1196,10 @@ class PersonaController extends Controller
                                                     $msg_dosis_faltantes.= $ve->clave. ' VRE QUE VAALIDAR '.$dias_diferencia_intervalo_inicio.' días de diferencia entre la  '.$tipo_aplicacion[$value_mayores->tipo_aplicacion].' y la '.$tipo_aplicacion[$ve->tipo_aplicacion].' | ';
                                                 }*/
 
-                                                if ($ve->maximo_ideal!=NULL && $ve->dias_agregar_siguiente_dosis!=NULL) {
+                                                if ($ve->edad_ideal!=NULL && $ve->dias_entre_siguiente_dosis!=NULL) {
                                                     $dias_diferencia = ($mktime_apli - $mktime_born) / (60 * 60 * 24); // dias diferencia entre las dos fecha
-                                                    if($dias_diferencia>$ve->maximo_ideal) {
-                                                        $vacunas_esquemas[$indice]->intervalo_inicio = ($vacunas_esquemas[$indice]->int_inicio_normal + $vacunas_esquemas[$key]->dias_agregar_siguiente_dosis);
+                                                    if($dias_diferencia>$ve->edad_ideal) {
+                                                        $vacunas_esquemas[$indice]->intervalo_inicio = ($vacunas_esquemas[$indice]->int_inicio_normal + $vacunas_esquemas[$key]->dias_entre_siguiente_dosis);
                                                        // dd($tipo_aplicacion[$value_mayores->tipo_aplicacion], 'cambió', $vacunas_esquemas[$indice]->intervalo_inicio); die;
                                                     } else {
                                                         $vacunas_esquemas[$indice]->intervalo_inicio = $vacunas_esquemas[$indice]->int_inicio_normal;

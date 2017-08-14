@@ -443,12 +443,12 @@
                                     
                                     // SI TIENE DOSIS POSTERIOR Y UN MÁXIMO IDEAL
                                    
-                                    if(ultimo_esquema[index].maximo_ideal!=null && ultimo_esquema[index].dias_agregar_siguiente_dosis!=null){
-                                        var dias_diferencia = moment(fecha,'DD-MM-YYYY').diff(moment(ultima_fecha_nacimiento,'DD-MM-YYYY').add(ultimo_esquema[index].maximo_ideal, 'days'), 'days');
+                                    if(ultimo_esquema[index].edad_ideal!=null && ultimo_esquema[index].dias_entre_siguiente_dosis!=null){
+                                        var dias_diferencia = moment(fecha,'DD-MM-YYYY').diff(moment(ultima_fecha_nacimiento,'DD-MM-YYYY').add(ultimo_esquema[index].edad_ideal, 'days'), 'days');
                                         //  conseguir el index del la aplicaion a afectar
                                         if(dias_diferencia>=0){
-                                            $("#intervalo_text"+este.id).html(conseguirIntervalo(parseInt(ultimo_esquema[indice].int_inicio_normal) + parseInt(ultimo_esquema[index].dias_agregar_siguiente_dosis)));
-                                            ultimo_esquema[indice].intervalo_inicio = (parseInt(ultimo_esquema[indice].int_inicio_normal) + parseInt(ultimo_esquema[index].dias_agregar_siguiente_dosis));
+                                            $("#intervalo_text"+este.id).html(conseguirIntervalo(parseInt(ultimo_esquema[indice].int_inicio_normal) + parseInt(ultimo_esquema[index].dias_entre_siguiente_dosis)));
+                                            ultimo_esquema[indice].intervalo_inicio = (parseInt(ultimo_esquema[indice].int_inicio_normal) + parseInt(ultimo_esquema[index].dias_entre_siguiente_dosis));
                                         } else {  
                                             ultimo_esquema[indice].intervalo_inicio = ultimo_esquema[indice].int_inicio_normal;
                                             $("#intervalo_text"+este.id).html(conseguirIntervalo(ultimo_esquema[indice].intervalo_inicio));
@@ -563,12 +563,12 @@
                             var este = aplicaciones[k].mayores[0]; //ÚLTIMA VACUNA. DE LAS MAYORES, LA MENOR
                             // SI TIENE DOSIS POSTERIOR Y UN MÁXIMO IDEAL
                             
-                            if(aplicaciones[k].maximo_ideal!=null && aplicaciones[k].dias_agregar_siguiente_dosis!=null){
-                                var dias_diferencia = moment(fecha_aplicacion,'DD-MM-YYYY').diff(moment(ultima_fecha_nacimiento,'DD-MM-YYYY').add(aplicaciones[k].maximo_ideal, 'days'), 'days');
+                            if(aplicaciones[k].edad_ideal!=null && aplicaciones[k].dias_entre_siguiente_dosis!=null){
+                                var dias_diferencia = moment(fecha_aplicacion,'DD-MM-YYYY').diff(moment(ultima_fecha_nacimiento,'DD-MM-YYYY').add(aplicaciones[k].edad_ideal, 'days'), 'days');
                                 //  conseguir el index del la aplicaion a afectar
                                 if(dias_diferencia>=0){
-                                    $("#intervalo_text"+este.id).html(conseguirIntervalo(parseInt(ultimo_esquema[indice].int_inicio_normal) + parseInt(aplicaciones[k].dias_agregar_siguiente_dosis)));
-                                    ultimo_esquema[indice].intervalo_inicio = (parseInt(ultimo_esquema[indice].int_inicio_normal) + parseInt(aplicaciones[k].dias_agregar_siguiente_dosis));
+                                    $("#intervalo_text"+este.id).html(conseguirIntervalo(parseInt(ultimo_esquema[indice].int_inicio_normal) + parseInt(aplicaciones[k].dias_entre_siguiente_dosis)));
+                                    ultimo_esquema[indice].intervalo_inicio = (parseInt(ultimo_esquema[indice].int_inicio_normal) + parseInt(aplicaciones[k].dias_entre_siguiente_dosis));
                                 } else {  
                                     ultimo_esquema[indice].intervalo_inicio = ultimo_esquema[indice].int_inicio_normal;
                                     $("#intervalo_text"+este.id).html(conseguirIntervalo(ultimo_esquema[indice].intervalo_inicio));

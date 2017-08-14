@@ -271,8 +271,32 @@
                     @permission('create.personas')<button type="submit" class="btn btn-success btn-lg js-submit"> <i class="fa fa-save"></i> Guardar</button>@endpermission
                 </div>
             {!! Form::close() !!}
+            
         </div>
     </div>
+
+    <!-- Modal detalles dosis -->
+    <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+
+            <div class="modal-header alert">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                </button>
+                <h3 class="modal-title" id="myModalLabel"> <i class="fa fa-excalmation-circle" style="padding-right:15px;"></i>  Información <span id="dosis"></span> </h3>
+            </div>
+            <div class="modal-body">
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success btn-lg btn-detalle" data-dismiss="modal">Ok!</button>
+                <!--<button type="button" class="btn btn-danger btn-lg btn-confirm-delete" data-dismiss="modal">Sí, eliminar</button>-->
+            </div>
+
+            </div>
+        </div>
+    </div>
+
 @endsection
 @section('my_scripts')
     <!-- Select2 -->
@@ -410,79 +434,94 @@
                     var dias_diferencia_hoy = moment(fecha,'DD-MM-YYYY').diff(moment(), 'days');
                     if(dias_diferencia_nacimiento>=0 && dias_diferencia_hoy<=0){ // SI ES MAYOR QUE EL MACIMIENTO Y MENOR A MAÑANA
                         if (ultimo_esquema[index]) { // sabemos que tiene un esquema y tiene datos a validar
-
-                            //  LIMITE INFERIOR Y SUPERIOR DE LA APLICACION                       
-                            var dias_inferior = moment(fecha,'DD-MM-YYYY').diff(moment(ultima_fecha_nacimiento,'DD-MM-YYYY').add(ultimo_esquema[index].intervalo_inicio, 'days'), 'days');
-                            var dias_superior = moment(ultima_fecha_nacimiento,'DD-MM-YYYY').add(ultimo_esquema[index].intervalo_fin, 'days').diff(moment(fecha,'DD-MM-YYYY'), 'days');
-                           
-                                if(ultimo_esquema[index].menores.length){ // EVALUA LAS MENORES
-                                    var indice = 0; //Es el que se debe modificar
+                            var aplicacion_actual = ultimo_esquema[index];                       
+                            // EDAD IDEAL DE APLICACIÓN, DÍAS DE DIREFENCIA ENTRE LA FECHA PRONOSTICADA COMO IDEAL Y LA FECHA DE NACIMIENTO
+                            if(aplicacion_actual.menores.length){ // Tiene dosis menores y hay que ver si son ideales
+                                var este = [];
+                                $.each( ultimo_esquema, function( ins, apl ) {
+                                    if(aplicacion_actual.menores[0].id==apl.id){
+                                        este = apl;
+                                        return false;
+                                    }                                        
+                                });
+                                
+                                var este_mayor = [];
+                                if(aplicacion_actual.mayores.length){ // SI TIENE DOSIS MAYORES                                     
                                     $.each( ultimo_esquema, function( ins, apl ) {
-                                        if(ultimo_esquema[index].menores[0].id==apl.id){
-                                            indice = ins;
+                                        if(aplicacion_actual.mayores[0].id==apl.id){  
+                                            este_mayor = apl; 
                                             return false;
                                         }                                        
                                     });
-                                    var este = ultimo_esquema[index].menores[0]; //ÚLTIMA VACUNA. DE LAS MENORES, LA MAYOR
-                                    //console.log(ultimo_esquema[index],' MENORES: ',este);
-                                    if (moment($("#fecha_aplicacion"+este.id).val(),'DD-MM-YYYY').isValid()) {
-                                        // CON BASE A LA ÚLTIMA FECHA DE DOSIS APLICADA
-                                        /*var dias_entre_aplicaciones = moment(fecha,'DD-MM-YYYY').diff(moment($("#fecha_aplicacion"+este.id).val(),'DD-MM-YYYY'), 'days');
-                                        if(dias_entre_aplicaciones<ultimo_esquema[index].intervalo_inicio){ // EVALUAR CON LA MENOR
-                                            errors++; mensaje='Esta dosis se puede aplicar desde de '+moment($("#fecha_aplicacion"+este.id).val(), 'DD-MM-YYYY').add(ultimo_esquema[index].intervalo_inicio, 'days').format('LL')+' teniendo en cuenta la '+$("#fecha_aplicacion"+este.id).attr('data-placeholder');
-                                        }*/                                    
-                                        
-                                        //CON BASE EN 'INTERVALO' ENTRE LA ÚLTIMA DOSIS APLICADA Y LA SIGUIENTE                                    
-                                        var dias_entre_aplicaciones = moment(fecha,'DD-MM-YYYY').diff(moment($("#fecha_aplicacion"+este.id).val(),'DD-MM-YYYY'), 'days');
-                                        if(dias_entre_aplicaciones<(parseInt(ultimo_esquema[index].intervalo_inicio)-parseInt(ultimo_esquema[indice].intervalo_inicio))){ // EVALUAR CON LA MENOR
-                                            errors++; mensaje='Esta dosis se puede aplicar desde de '+moment($("#fecha_aplicacion"+este.id).val(), 'DD-MM-YYYY').add((ultimo_esquema[index].intervalo_inicio-ultimo_esquema[indice].intervalo_inicio), 'days').format('LL')+' teniendo en cuenta la '+$("#fecha_aplicacion"+este.id).attr('data-placeholder');
+                                }
+
+                                if(este.es_ideal) { // la dosis anterior es ideal, validar conforme a rango de dosis actual
+                                    var dias_ideal = moment(fecha,'DD-MM-YYYY').diff(moment(ultima_fecha_nacimiento,'DD-MM-YYYY').add(aplicacion_actual.edad_ideal, 'days'), 'days');
+                                    console.log('anterior es ideal');
+                                    if(dias_ideal<=0) {
+                                        $("#intervalo_text"+aplicacion_actual.id).html(conseguirIntervalo(parseInt(aplicacion_actual.etiqueta_ideal)));
+                                        ultimo_esquema[index].es_ideal = true;                            
+                                        var dias_superior = moment(ultima_fecha_nacimiento,'DD-MM-YYYY').add((parseInt(aplicacion_actual.intervalo_fin)), 'days').diff(moment(fecha,'DD-MM-YYYY'), 'days');
+                                        var dias_inferior = moment(fecha,'DD-MM-YYYY').diff(moment(ultima_fecha_nacimiento,'DD-MM-YYYY').add((parseInt(aplicacion_actual.intervalo_inicio) - parseInt(aplicacion_actual.margen_anticipacion)), 'days'), 'days');
+                                        if(dias_inferior>=0 && dias_inferior<=parseInt(aplicacion_actual.intervalo_fin) && dias_superior>=0 && dias_superior<=parseInt(aplicacion_actual.intervalo_fin)) {                            
+                                            // Si la fecha es valida                               
+                                        } else { 
+                                            errors++; mensaje='Se puede aplicar desde: '+moment(ultima_fecha_nacimiento,'DD-MM-YYYY').add((parseInt(aplicacion_actual.intervalo_inicio) - parseInt(aplicacion_actual.margen_anticipacion)), 'days').format('LL')+' hasta el '+moment(ultima_fecha_nacimiento,'DD-MM-YYYY').add((parseInt(aplicacion_actual.intervalo_fin)), 'days').format('LL');
                                         }
-
-                                        //console.log(dias_entre_aplicaciones,ultimo_esquema[index].intervalo_inicio,'-',este.intervalo_inicio);
-
-                                        
-                                        
-                                        // CON BASE EL FECHA DE NACIMIENTO
-                                        /*var dias_entre_aplicaciones = moment(fecha,'DD-MM-YYYY').diff(moment(ultima_fecha_nacimiento,'DD-MM-YYYY'), 'days');
-                                        if(dias_entre_aplicaciones<ultimo_esquema[index].intervalo_inicio){ // EVALUAR CON LA MENOR
-                                            errors++; mensaje='Esta dosis se puede aplicar desde de '+moment(ultima_fecha_nacimiento, 'DD-MM-YYYY').add(ultimo_esquema[index].intervalo_inicio, 'days').format('LL')+' teniendo en cuenta la '+$("#fecha_aplicacion"+este.id).attr('data-placeholder');
-                                        } */
+                                    } else { // LA DOSIS SIGUIENTE HAY QUE MOFIFICARLA
+                                        //$("#intervalo_text"+aplicacion_actual.id).html(conseguirIntervalo(parseInt(aplicacion_actual.etiqueta_no_ideal)));
+                                        ultimo_esquema[index].es_ideal = false;
+                                        var dias_entre_aplicaciones = moment(fecha,'DD-MM-YYYY').diff(moment($("#fecha_aplicacion"+este.id).val(),'DD-MM-YYYY').add(parseInt(este.dias_entre_siguiente_dosis) - parseInt(aplicacion_actual.margen_anticipacion), 'days'), 'days');
+                                        if(dias_entre_aplicaciones>0) {
+                                        } else {
+                                            errors++; mensaje='Se debe aplicar después del '+moment($("#fecha_aplicacion"+este.id).val(),'DD-MM-YYYY').add(parseInt(este.dias_entre_siguiente_dosis) - parseInt(aplicacion_actual.margen_anticipacion), 'days').format('LL');
+                                        }
+                                    }
+                                } else { // la dosis anterior NO es ideal, validar conforme intervalo establecido
+                                    console.log('anterior no es ideal');
+                                    ultimo_esquema[index].es_ideal = false;
+                                    $("#intervalo_text"+aplicacion_actual.id).html(conseguirIntervalo(parseInt(aplicacion_actual.etiqueta_no_ideal)));
+                                    var dias_entre_aplicaciones = moment(fecha,'DD-MM-YYYY').diff(moment($("#fecha_aplicacion"+este.id).val(),'DD-MM-YYYY').add(parseInt(este.dias_entre_siguiente_dosis) - parseInt(aplicacion_actual.margen_anticipacion), 'days'), 'days');
+                                    if(dias_entre_aplicaciones>0) {
                                     } else {
-                                        errors++; mensaje='Antes debe aplicar '+$("#fecha_aplicacion"+este.id).attr('data-placeholder');
+                                        errors++; mensaje='Se debe aplicar después del '+moment($("#fecha_aplicacion"+este.id).val(),'DD-MM-YYYY').add(parseInt(este.dias_entre_siguiente_dosis) - parseInt(aplicacion_actual.margen_anticipacion), 'days').format('LL');
+                                    }
+                                }  
+                            } else { // Significa que es la primera aplicación de la vacuna
+                                var este = [];                                
+                                if(aplicacion_actual.mayores.length){ // SI TIENE DOSIS MAYORES                                     
+                                    $.each( ultimo_esquema, function( ins, apl ) {
+                                        if(aplicacion_actual.mayores[0].id==apl.id){                                            
+                                            este = apl;
+                                            return false;
+                                        }                                        
+                                    });
+                                }
+                                var dias_ideal = moment(fecha,'DD-MM-YYYY').diff(moment(ultima_fecha_nacimiento,'DD-MM-YYYY').add(aplicacion_actual.edad_ideal, 'days'), 'days');
+                                if(dias_ideal<0) { // No tiene menores y es ideal
+                                    ultimo_esquema[index].es_ideal = true;
+                                    // ES IDEAL: es decir la aplicación es antes de la edad máxima ideal, por lo tanto no se modifican la dosis siguientes 
+                                    $("#intervalo_text"+aplicacion_actual.id).html(conseguirIntervalo(parseInt(aplicacion_actual.etiqueta_ideal)));
+                                    if(aplicacion_actual.mayores.length){ // SI TIENE DOSIS MAYORES
+                                        $("#intervalo_text"+este.id).html(conseguirIntervalo(parseInt(este.edad_ideal)));
+                                    }
+                                } else { // No tiene menores y NO es ideal
+                                    ultimo_esquema[index].es_ideal = false;
+                                    $("#intervalo_text"+aplicacion_actual.id).html(conseguirIntervalo(parseInt(aplicacion_actual.etiqueta_no_ideal)));
+                                    if(aplicacion_actual.mayores.length){ // SI TIENE DOSIS MAYORES
+                                        $("#intervalo_text"+este.id).html(conseguirIntervalo(parseInt(este.etiqueta_no_ideal)));
                                     }
                                 }
-                                //console.log(ultimo_esquema[index],'\n');
-                                if(ultimo_esquema[index].mayores.length){ // EVALUA LAS MAYORES
-                                    var indice = 0; //Es el que se debe modificar
-                                    $.each( ultimo_esquema, function( ins, apl ) {
-                                        if(ultimo_esquema[index].mayores[0].id==apl.id){
-                                            indice = ins;
-                                            return false;
-                                        }                                        
-                                    });
-                                    var este = ultimo_esquema[index].mayores[0]; //ÚLTIMA VACUNA. DE LAS MAYORES, LA MENOR
-                                    //console.log(ultimo_esquema[index],'Mayores: ',este);
-                                    if (moment($("#fecha_aplicacion"+este.id).val(),'DD-MM-YYYY').isValid()) {
-                                        var dias_entre_aplicaciones = moment($("#fecha_aplicacion"+este.id).val(),'DD-MM-YYYY').diff(moment(fecha,'DD-MM-YYYY'), 'days');
-                                        if(dias_entre_aplicaciones<(parseInt(este.intervalo_inicio) - parseInt(ultimo_esquema[index].intervalo_inicio))){ // EVALUAR CON LA MENOR
-                                            errors++; mensaje = 'La dosis siguiente:  '+$("#fecha_aplicacion"+este.id).attr('data-placeholder')+' puede aplicarse desde '+moment(fecha, 'DD-MM-YYYY').add((este.intervalo_inicio-ultimo_esquema[index].intervalo_inicio), 'days').format('LL');
-                                        } 
-                                    }
-                                    
-                                    // SI TIENE DOSIS POSTERIOR Y UN MÁXIMO IDEAL
-                                   
-                                    if(ultimo_esquema[index].maximo_ideal!=null && ultimo_esquema[index].dias_agregar_siguiente_dosis!=null){
-                                        var dias_diferencia = moment(fecha,'DD-MM-YYYY').diff(moment(ultima_fecha_nacimiento,'DD-MM-YYYY').add(ultimo_esquema[index].maximo_ideal, 'days'), 'days');
-                                        //  conseguir el index del la aplicaion a afectar
-                                        if(dias_diferencia>=0){
-                                            $("#intervalo_text"+este.id).html(conseguirIntervalo(parseInt(ultimo_esquema[indice].int_inicio_normal) + parseInt(ultimo_esquema[index].dias_agregar_siguiente_dosis)));
-                                            ultimo_esquema[indice].intervalo_inicio = (parseInt(ultimo_esquema[indice].int_inicio_normal) + parseInt(ultimo_esquema[index].dias_agregar_siguiente_dosis));
-                                        } else {  
-                                            ultimo_esquema[indice].intervalo_inicio = ultimo_esquema[indice].int_inicio_normal;
-                                            $("#intervalo_text"+este.id).html(conseguirIntervalo(ultimo_esquema[indice].intervalo_inicio));
-                                        }
-                                    }
-                                }                                                             
+
+                                //  Como no tiene menores se evalua con el mismo rango                             
+                                var dias_superior = moment(ultima_fecha_nacimiento,'DD-MM-YYYY').add((parseInt(aplicacion_actual.intervalo_fin)), 'days').diff(moment(fecha,'DD-MM-YYYY'), 'days');
+                                var dias_inferior = moment(fecha,'DD-MM-YYYY').diff(moment(ultima_fecha_nacimiento,'DD-MM-YYYY').add((parseInt(aplicacion_actual.intervalo_inicio) - parseInt(aplicacion_actual.margen_anticipacion)), 'days'), 'days');
+                                if(dias_inferior>=0 && dias_inferior<=parseInt(aplicacion_actual.intervalo_fin) && dias_superior>=0 && dias_superior<=parseInt(aplicacion_actual.intervalo_fin)) {                            
+                                    // Si la fecha es valida                               
+                                } else { 
+                                    errors++; mensaje='Se puede aplicar desde: '+moment(ultima_fecha_nacimiento,'DD-MM-YYYY').add((parseInt(aplicacion_actual.intervalo_inicio) - parseInt(aplicacion_actual.margen_anticipacion)), 'days').format('LL')+' hasta el '+moment(ultima_fecha_nacimiento,'DD-MM-YYYY').add((parseInt(aplicacion_actual.intervalo_fin)), 'days').format('LL');
+                                }  
+                            }                                                                                 
                         } else {
                             errors++; mensaje='No se encontraron los detalles de la dosis a aplicar';
                         }
@@ -511,10 +550,15 @@
                     notificar('Información','No se encontró el esquema que buscas','warning',4000);
                     $('#title-esquema').empty().html('No se encuentra el esquema: '+esquema+'. ');
                     $('#content-esquema').empty().html('<div class="col-md-12 text-center text-danger"> <h2 class="text-danger"> <i class="fa fa-info-circle text-info"></i> Imposible encontrar el esquema '+esquema+'. Seleccione otra fecha de nacimiento o asegurese que exista el esquema que busca. </h2></div> ');
-                } else {
-                    notificar('Información','Cargando esquema','info',2000);
+                } else {                    
+                    if(response.data.length<=0){
+                        notificar('Información','Al esquema no se le han programado aplicaciones, verifique!','warning',4000);
+                        $('#content-esquema').empty().html('Sin aplicaciones programadas, verifique!');
+                    } else {
+                        notificar('Información','Cargando esquema','info',2000);
+                        $('#content-esquema').empty();
+                    }  
                     $('#title-esquema').empty().html('<a class="btn btn-danger btn-lg"><i class="fa fa-calendar"></i> '+response.esquema.descripcion+'</a>  <a class="btn btn-lg btn-default">'+response.letra_edad+'</a>');
-                    $('#content-esquema').empty();
                     $('#fecha_nacimiento').val(fecha_nacimiento);
                     ultima_fecha_nacimiento = fecha_nacimiento;
                     generarEsquema(response.data);
@@ -561,17 +605,18 @@
                     tipo_aplicacion = 'Refuerzo';
                 }
                 var placeholder = '';
-                if(ve.intervalo_inicio<30){
+                if(ve.etiqueta_ideal<30){
                     placeholder = ultima_fecha_nacimiento;
                 }
-                intervalo_inicio = conseguirIntervalo(ve.intervalo_inicio);                
+                ve.es_ideal = true;
+                intervalo_inicio = conseguirIntervalo(ve.etiqueta_ideal);                
                 if(aplicaciones.length - 1 > key){ // último registro de esquemasvacunas
-                    $('#content-esquema').append('<div class="animated flipInY col-md-2 col-xs-12"><br> <div class="tile-stats" style="color:white; margin:0px; padding:3px; border:solid 2px #'+ve.color_rgb+'; background-color:#'+ve.color_rgb+' !important;"> <div class="row"> <div class="col-md-12"> <span style="font-size:large;font-weight:bold;"> '+ve.clave+' <small> '+tipo_aplicacion+' </small> </span> <span style="font-size:large;" class="pull-right"> <span class="badge bg-white" style="color:#'+ve.color_rgb+'" id="intervalo_text'+ve.id+'">'+intervalo_inicio+'</span> </span> </div> </div> <div class="row"> <div class="bt-flabels__wrapper"> <input id="fecha_aplicacion'+ve.id+'" name="fecha_aplicacion'+ve.id+'" type="text" onBlur="validaAplicacion('+ve.id+','+key+')" placeholder="'+placeholder+'" data-placeholder="'+ve.clave+' '+tipo_aplicacion+'('+intervalo_inicio+')" value="" class="form-control has-feedback-left" aria-describedby="inputSuccess2Status" autocomplete="off" style="font-size:x-large; text-align:center;"> </div> </div> </div> </div>');
+                    $('#content-esquema').append('<div class="animated flipInY col-md-2 col-xs-12"><br> <div class="tile-stats" style="color:white; margin:0px; padding:3px; border:solid 2px #'+ve.color_rgb+'; background-color:#'+ve.color_rgb+' !important;"> <div class="row"> <div class="col-md-12" onClick="verDetalles('+key+')" data-toggle="modal" data-target=".bs-example-modal-lg"> <span style="font-size:large;font-weight:bold;"> '+ve.clave+' <small> '+tipo_aplicacion+' </small> </span> <span style="font-size:large;" class="pull-right"> <span class="badge bg-white" style="color:#'+ve.color_rgb+'" id="intervalo_text'+ve.id+'">'+intervalo_inicio+'</span> </span> </div> </div> <div class="row"> <div class="bt-flabels__wrapper"> <input id="fecha_aplicacion'+ve.id+'" name="fecha_aplicacion'+ve.id+'" type="text" onBlur="validaAplicacion('+ve.id+','+key+')" placeholder="'+placeholder+'" data-placeholder="'+ve.clave+' '+tipo_aplicacion+'('+intervalo_inicio+')" value="" class="form-control has-feedback-left" aria-describedby="inputSuccess2Status" autocomplete="off" style="font-size:x-large; text-align:center;"> </div> </div> </div> </div>');
                     if(aplicaciones[key_plus].fila != ve.fila){
                         $('#content-esquema').append('<div class="clearfix"></div>');
                     }
                 } else {
-                    $('#content-esquema').append('<div class="animated flipInY col-md-2 col-xs-12"><br> <div class="tile-stats" style="color:white; margin:0px; padding:3px; border:solid 2px #'+ve.color_rgb+'; background-color:#'+ve.color_rgb+' !important;"> <div class="row"> <div class="col-md-12"> <span style="font-size:large;font-weight:bold;"> '+ve.clave+' <small> '+tipo_aplicacion+' </small> </span> <span style="font-size:large;" class="pull-right"> <span class="badge bg-white" style="color:#'+ve.color_rgb+'" id="intervalo_text'+ve.id+'">'+intervalo_inicio+'</span> </span> </div> </div> <div class="row"> <div class="bt-flabels__wrapper"> <input id="fecha_aplicacion'+ve.id+'" name="fecha_aplicacion'+ve.id+'" type="text" onBlur="validaAplicacion('+ve.id+','+key+')" placeholder="'+placeholder+'" data-placeholder="'+ve.clave+' '+tipo_aplicacion+'('+intervalo_inicio+')" value="" class="form-control has-feedback-left" aria-describedby="inputSuccess2Status" autocomplete="off" style="font-size:x-large; text-align:center;"> </div> </div> </div> </div>');
+                    $('#content-esquema').append('<div class="animated flipInY col-md-2 col-xs-12"><br> <div class="tile-stats" style="color:white; margin:0px; padding:3px; border:solid 2px #'+ve.color_rgb+'; background-color:#'+ve.color_rgb+' !important;"> <div class="row"> <div class="col-md-12" onClick="verDetalles('+key+')" data-toggle="modal" data-target=".bs-example-modal-lg"> <span style="font-size:large;font-weight:bold;"> '+ve.clave+' <small> '+tipo_aplicacion+' </small> </span> <span style="font-size:large;" class="pull-right"> <span class="badge bg-white" style="color:#'+ve.color_rgb+'" id="intervalo_text'+ve.id+'">'+intervalo_inicio+'</span> </span> </div> </div> <div class="row"> <div class="bt-flabels__wrapper"> <input id="fecha_aplicacion'+ve.id+'" name="fecha_aplicacion'+ve.id+'" type="text" onBlur="validaAplicacion('+ve.id+','+key+')" placeholder="'+placeholder+'" data-placeholder="'+ve.clave+' '+tipo_aplicacion+'('+intervalo_inicio+')" value="" class="form-control has-feedback-left" aria-describedby="inputSuccess2Status" autocomplete="off" style="font-size:x-large; text-align:center;"> </div> </div> </div> </div>');
                 }
             });
 
@@ -644,6 +689,14 @@
                     notificar('Información',warning,'info',3000);
                 }
             }
+        }
+
+        function verDetalles(id){
+            var apl = ultimo_esquema[id];
+            $("span#dosis").html(apl.color_rgb);
+            $("button.btn-detalle").attr('style',  'background-color:#'+apl.color_rgb);
+            $("div.modal-body").attr('style',  'color:#'+apl.color_rgb);
+            $("div.modal-header").attr('style',  'background-color:#'+apl.color_rgb);
         }
 
         // DEVUELVE 'UN 1M, 3A, NAC, ...' TEXTO CON BASE A LOS DIAS QUE RECIBE
