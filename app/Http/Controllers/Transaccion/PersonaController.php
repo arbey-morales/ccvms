@@ -843,7 +843,7 @@ class PersonaController extends Controller
                     $municipios = Municipio::select('id','clave','nombre')->where('deleted_at',NULL)->get();
                     $localidades = Localidad::select('id','clave','nombre')->where('deleted_at',NULL)->get();
                     $colonias = Colonia::select('id','nombre','municipios_id')->where('deleted_at',NULL)->with('municipio')->get();
-                    $agebs = Ageb::select('id')->where('deleted_at',NULL)->with('municipio','localidad')->get();
+                    $agebs = Ageb::select('id','municipios_id','localidades_id')->where('deleted_at',NULL)->with('municipio','localidad')->get();
                     $persona = Persona::where('id', $id_persona)->where('deleted_at', NULL)->with('clue','pais','entidadNacimiento','entidadDomicilio','municipio','localidad','colonia','ageb','afiliacion','codigo','tipoParto','personasVacunasEsquemas')->first();
                 } else {
                     $localidades = collect();
