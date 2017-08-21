@@ -37,6 +37,10 @@ class Persona extends Model
 		return $this->belongsTo('App\Catalogo\Localidad', 'localidades_id', 'id')->select('id','clave','nombre');
 	}
 
+	public function colonia(){
+		return $this->belongsTo('App\Catalogo\Colonia', 'colonias_id', 'id')->select('id','nombre')->with('municipio');
+	}
+
     public function ageb(){
 		return $this->belongsTo('App\Catalogo\Ageb', 'agebs_id', 'id')->select('id','municipios_id','localidades_id');
 	}

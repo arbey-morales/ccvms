@@ -46,7 +46,7 @@
           <div class="left_col scroll-view">
             <div class="navbar nav_title" style="border: 0;">
             
-               <a href="{{ url('/') }}" class="site_title"> <img src="{{ url('images/salud-mesoamerica.png') }}" alt="..." class="img-rounded" width="120px"> <span>CCVMS</span></a>
+               <a href="{{ url('/') }}" class="site_title"> <img src="{{ url('images/sm.png') }}" alt="..." class="img-rounded" width="70px"> <span>CCVMS</span></a>
             </div>
 
             <div class="clearfix"></div>

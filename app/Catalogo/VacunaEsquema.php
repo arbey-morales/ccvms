@@ -8,7 +8,7 @@ class VacunaEsquema extends Model
 {
     protected $table = 'vacunas_esquemas';
     
-    protected $fillable = ["vacunas_id","esquemas_id","tipo_aplicacion","intervalo","dosis_requerida","usuario_id"];
+    protected $fillable = ["vacunas_id","esquemas_id","tipo_aplicacion","intervalo_inicio_anio","intervalo_inicio_mes","intervalo_inicio_dia","dosis_requerida","usuario_id"];
 
     public $timestamps = false;
 

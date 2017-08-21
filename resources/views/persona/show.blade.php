@@ -8,128 +8,141 @@
     {!! Html::style('assets/mine/css/responsive.bootstrap.min.css') !!}
 @endsection
 @section('content') 
-    <div class="x_panel">
-        <div class="x_title">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_panel">
+            <div class="x_title">
         <h2><i class="fa fa-group"></i> Censo nominal <i class="fa fa-angle-right text-danger"></i><small> Detalles </small></h2>
-            <ul class="nav navbar-right panel_toolbox">
-                <li>
-                    <a class="" href="{{ route('persona.index') }}">
-                        <i class="fa fa-long-arrow-left"></i>
-                    </a>
-                </li>
-                <li>
-                    <a class="collapse-link">
-                        <i class="fa fa-chevron-up"></i>
-                    </a>
-                </li>
-            </ul>
+            
+             @permission('update.personas')<a href="{{ route('persona.edit', $data->id) }}" class="btn btn-primary pull-right"><i class="fa fa-edit m-right-xs"></i> Hacer Cambios</a>@endpermission
             <div class="clearfix"></div>
         </div>
-
-
         <div class="x_content">
-            <div class="col-md-3 col-sm-3 col-xs-12 profile_left">
-                <div class="btn btn-default col-md-12" style="font-size:x-large;">
-                    <h2>@if($data->genero=='M') <i class="fa fa-male" style="color:#4d81bf; font-size:xx-large;"></i> @endif @if($data->genero=='F') <i class="fa fa-female" style="color:#ed1586; font-size:xx-large;"></i>  @endif  <i class="fa fa-qrcode "></i> {{$data->curp}}</h2>
-                </div>
-                <div class="btn btn-success col-md-12" style="font-size:x-large;">
-                    <h2>{{$data->edad}}</h2>
-                </div>
-                <h4>{{$data->nombre}} {{$data->apellido_paterno}} {{$data->apellido_materno}}</h4>
-                <h5> <i class="fa fa-calendar text-warning"></i> Nacimiento:  <strong>{{$data->fecha_nacimiento}}</strong> / <strong class="text-primary">{{$data->tipoParto->clave}}: {{$data->tipoParto->descripcion}}</strong> </h5>
-                <h5> <i class="fa fa-map-marker text-danger"></i> {{ $data->calle }} {{ $data->numero }}, {{ $data->colonia }}, {{ $data->localidad->nombre }}, {{ $data->municipio->nombre }} </h5>
-                <h5 class="text-danger"> <i class="fa fa-legal text-primary"></i> Tutor:  {{$data->tutor}} / <strong> {{$data->fecha_nacimiento_tutor}} </strong> </h5>
-                <h5> <i class="fa fa-hospital-o text-success"></i> {{$data->clue->clues}} - {{$data->clue->nombre}}</h5>
 
-                <br>
-                @permission('update.personas')<a href="{{ route('persona.edit', $data->id) }}" class="btn btn-primary pull-right"><i class="fa fa-edit m-right-xs"></i> Hacer Cambios</a>@endpermission
-                <br>
-
-                <!-- start skills -->
-                <h4>...</h4>
-                <ul class="list-unstyled user_data">
-                <li>
-                    <p>....</p>
-                    <div class="progress progress_sm">
-                    <div class="progress-bar bg-green" role="progressbar" data-transitiongoal="50" style="width: 50%;" aria-valuenow="49"></div>
-                    </div>
+            <div class="col-xs-3 col-sm-2 col-md-1">
+                <!-- required for floating -->
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs tabs-left">
+                <li class="active"><a href="#home" data-toggle="tab">General</a>
                 </li>
-                <li>
-                    <p>....</p>
-                    <div class="progress progress_sm">
-                    <div class="progress-bar bg-green" role="progressbar" data-transitiongoal="70" style="width: 70%;" aria-valuenow="69"></div>
-                    </div>
+                <li><a href="#profile" data-toggle="tab">Seguimientos</a>
                 </li>
-                <li>
-                    <p>....</p>
-                    <div class="progress progress_sm">
-                    <div class="progress-bar bg-green" role="progressbar" data-transitiongoal="30" style="width: 30%;" aria-valuenow="29"></div>
-                    </div>
+                <li><a href="#messages" data-toggle="tab">Estadísticas</a>
                 </li>
-                <li>
-                    <p>...</p>
-                    <div class="progress progress_sm">
-                    <div class="progress-bar bg-green" role="progressbar" data-transitiongoal="50" style="width: 50%;" aria-valuenow="49"></div>
-                    </div>
+                <li><a href="#settings" data-toggle="tab">Otros</a>
                 </li>
                 </ul>
-                <!-- end of skills -->
-
             </div>
-            <div class="col-md-9 col-sm-9 col-xs-12">
-                @if(count($vacunas_esquemas)>0)
-                    <div class="x_panel">
-                        <div class="x_title">
-                            <h2 id="title-esquema"><i class="fa fa-calendar text-success"></i> @if(count($esquema)>0){{ $esquema->descripcion }} @endif</h2>
-                            <ul class="nav navbar-right panel_toolbox">
-                            </ul>
-                            <div class="clearfix"></div>
-                        </div>
-                        <div class="x_content" id="content-esquema">
-                        @foreach($vacunas_esquemas as $key=>$ve)     
-                            <div class="animated flipInY col-md-2 col-xs-12"><br>
-                                <div class="tile-stats" style="color:white; margin:0px; padding:3px; border:solid 2px #{{$ve->color_rgb}}; background-color:#{{$ve->color_rgb}} !important;">
-                                    <div class="row">
-                                        <div class="col-md-12"> <span style="font-size:large;font-weight:bold;"> {{$ve->clave}} <small> @if($ve->tipo_aplicacion==1) Única @endif @if($ve->tipo_aplicacion==2) 1a Dosis @endif @if($ve->tipo_aplicacion==3) 2a Dosis @endif @if($ve->tipo_aplicacion==4) 3a Dosis @endif @if($ve->tipo_aplicacion==5) 4a Dosis @endif @if($ve->tipo_aplicacion==6) Refuerzo @endif  </small> </span> <span style="font-size:medium;" class="pull-right"> <span class="badge bg-white" style="color:#{{$ve->color_rgb}}">@if($ve->intervalo_inicio<=29)Nac @else  @if(($ve->intervalo_inicio/30)<=23){{($ve->intervalo_inicio/30)}}M @else {{round((($ve->intervalo_inicio/30)/12))}}A @endif @endif </span> </span></div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-12 text-center" style="background-color:#fff; font-size:x-large; color:#000;">
-                                        <i class="fa fa-calendar" style="color:#{{$ve->color_rgb}};"></i>                                          
-                                            @foreach($data->personasVacunasEsquemas as $index=>$valor)
-                                                @if($valor->vacunas_esquemas_id==$ve->id)
-                                                    <?php
-                                                    $fecha_ap = '';
-                                                    $fecha_ap = explode("-", trim(substr($valor->fecha_aplicacion, 0, -8))); 
-                                                    $fecha_ap = $fecha_ap[2].'-'.$fecha_ap[1].'-'.$fecha_ap[0];
-                                                    ?>
-                                                    {{ $fecha_ap }}
-                                                    <?php break; ?>
-                                                @endif
-                                            @endforeach
-                                        </div>
-                                    </div>
-                                </div>
+
+            <div class="col-xs-9 col-sm-10 col-md-11">
+                <!-- Tab panes -->
+                <div class="tab-content">
+                <div class="tab-pane active" id="home">   
+                    <!-- title row -->
+                    <div class="row">
+                        <div class="col-xs-12 invoice-header">
+                            <h1>
+                                <i class="fa fa-smile-o"></i> {{$data->nombre}} {{$data->apellido_paterno}} {{$data->apellido_materno}} <small> / {{$data->tipoParto->descripcion}}</small>
+                                <small class="pull-right">Nacimiento: {{$data->fecha_nacimiento}}</small>
+                            </h1>
+                        </div>        
+                    </div>
+                    <div class="clearfix"></div>
+                    <br>
+                    <div class="row">                        
+                        <div class="col-md-4">
+                            <div class="btn btn-default col-md-12" style="font-size:x-large;">
+                                <h2>@if($data->genero=='M') <i class="fa fa-male" style="color:#4d81bf; font-size:xx-large;"></i> @endif @if($data->genero=='F') <i class="fa fa-female" style="color:#ed1586; font-size:xx-large;"></i>  @endif  <i class="fa fa-qrcode "></i> {{$data->curp}}</h2>
                             </div>
-                            @if(count($vacunas_esquemas) - 1 > $key)
-                                @if($vacunas_esquemas[($key+1)]->fila != $ve->fila)
-                                    <div class="clearfix"></div>
-                                @endif
-                            @endif
-                        @endforeach
+                        </div>
+                        <div class="col-md-4">
+                            <div class="btn btn-success col-md-12" style="font-size:x-large;">
+                                <h2><i class="fa fa-calendar" style="font-size:xx-large;"></i> {{$data->edad}}</h2>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="btn btn-info col-md-12" style="font-size:x-large;">
+                                <h2><i class="fa fa-hospital-o" style="font-size:xx-large;"></i> {{$data->clue->clues}} </h2>
+                            </div>
                         </div>
                     </div>
-                @else
-                    <div class="col-md-12 text-center text-info"> <i class="fa fa-info-circle text-danger" style="font-size:x-large;"></i> <h3>Sin esquema</h3></div>
-                @endif
+                    <div class="clearfix"></div>
+                    <br>
+                    <div class="row invoice-info">
+                        <div class="col-sm-4 invoice-col">
+                            <strong>DETALLES DEL DOMICILIO</strong>
+                            <address>
+                                <br>Calle: {{ $data->calle }} 
+                                <br>Número: {{ $data->numero }} 
+                                <br>Colonia: @if($data->colonia){{ $data->colonia->nombre }}@endif 
+                                <br>Localidad: {{ $data->localidad->nombre }} 
+                                <br>Municipio: {{ $data->municipio->nombre }}
+                            </address>
+                        </div>
+                        <div class="col-sm-4 invoice-col">
+                            <strong>DATOS DEL TUTOR</strong>
+                            <address>
+                                <br>{{$data->tutor}}
+                                <br>{{$data->fecha_nacimiento_tutor}}
+                            </address>
+                        </div>
+                        <div class="col-sm-4 invoice-col">
+                            <strong>UNIDAD DE SALUD</strong>
+                            <address>
+                                <br>{{$data->clue->clues}} - {{$data->clue->nombre}}
+                            </address>
+                        </div>
+                    </div>
+                    <br>
+                    <!--@permission('update.personas')<a href="{{ route('persona.edit', $data->id) }}" class="btn btn-primary pull-right"><i class="fa fa-edit m-right-xs"></i> Hacer Cambios</a>@endpermission
+                    --><br>
+                </div>
+                <div class="tab-pane" id="profile">
+                    <h2 id="title-esquema"> Esquema</h2>
+                    <div class="x_content" id="content-esquema">
+                        <div class="col-md-12 text-center text-info"> <i class="fa fa-info-circle text-danger" style="font-size:x-large;"></i> <h3>Sin esquema</h3></div>
+                    </div>
+                </div>
+                <div class="tab-pane" id="messages">Construyendo...</div>
+                <div class="tab-pane" id="settings">Construyendo...</div>
+                </div>
+            </div>
+
+            <div class="clearfix"></div>
+
             </div>
         </div>
+    </div>
 
+    <!-- Modal detalles dosis -->
+    <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
 
+            <div class="modal-header alert">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                </button>
+                <h3 class="modal-title" id="myModalLabel" style="color:white !important;"> <i class="fa fa-exclamation-circle" style="padding-right:15px;"></i>  Información de <span id="dosis" ></span> </h3>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h2 class="text text-success" style="font-size:x-large; font-weight:bold;">Esquema ideal</h2>
+                        <h3 id="intervalos"></h3>
+                        <h3 id="fecha-ideal"></h3>
+                        <h3 id="dias-anticipacion"></h3>
+                    </div>
+                    <div class="col-md-6">
+                        <h2 class="text text-danger" style="font-size:x-large; font-weight:bold;">Esquema desfasado</h2>
+                        <h3 id="intervalos-ni"></h3>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-info btn-lg btn-detalle" data-dismiss="modal">Entendido!</button>
+                <!--<button type="button" class="btn btn-danger btn-lg btn-confirm-delete" data-dismiss="modal">Sí, eliminar</button>-->
+            </div>
 
-
-
-        <div class="x_content">
-            
+            </div>
         </div>
     </div>
 @endsection
@@ -140,6 +153,7 @@
     {!! Html::script('assets/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js') !!}
     {!! Html::script('assets/mine/js/dataTables/dataTables.responsive.min.js') !!}
     {!! Html::script('assets/mine/js/dataTables/responsive.bootstrap.js') !!}
+    {!! Html::script('assets/mine/js/personaShow.js') !!}
 
     <!-- Datatables -->
     <script type="text/javascript">
@@ -150,6 +164,19 @@
                 }
             });
         });
+
+        var esquema = $.parseJSON(escaparCharEspeciales('{{$esquema}}'));
+        var aplicaciones_dosis = $.parseJSON(escaparCharEspeciales('{{json_encode($data->personasVacunasEsquemas)}}'));
+        var persona = $.parseJSON(escaparCharEspeciales('{{$data}}'));
+        // GUARADARÁ EL ESQUEMA SELECCIONADO
+        var ultimo_esquema = ''; 
+        var ultima_fecha_nacimiento = '{{$data->fecha_nacimiento}}';
+        var original_fecha_nacimiento = '{{$data->fecha_nacimiento}}';
+        // CARGA EL ESQUEMA CON BASE A LA FECHA 01-01-AÑO ACTUAL
+        setTimeout(function() {  
+            var anio = original_fecha_nacimiento.split("-");       
+            conseguirEsquema(anio[2],ultima_fecha_nacimiento);
+        }, 500);
     </script>
     <!-- /Datatables -->
 @endsection
