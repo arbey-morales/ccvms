@@ -37,7 +37,7 @@ class PersonaController extends Controller
     /**
      * Consigue intervalos.
      *
-     * @return string
+     * @return string 
      */
     public function obtieneIntervaloCompleto($anio,$mes,$dia){
         if($anio==0){ 
