@@ -12,7 +12,7 @@
         "intervention/image": "^2.3",
         "edvinaskrucas/notification": "5.*",
 		"bican/roles": "2.1.*",        	
-        "barryvdh/laravel-dompdf": "0.6.*",
+        "barryvdh/laravel-dompdf": "^0.8",
         "nesbot/carbon": "~1.14"
     },
     "require-dev": {

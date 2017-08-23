@@ -100,7 +100,7 @@
                   <td>{{ $item->genero }}</td>
                   <td>{{ $item->curp }}</td>
                   <td> @if($item->tipoParto){{ $item->tipoParto->descripcion }} @endif </td>
-                  <td>{{ $item->calle }} {{ $item->numero }}, {{ $item->colonia }}, {{ $item->localidad->nombre }}, {{ $item->municipio->nombre }} </td>
+                  <td>{{ $item->calle }} {{ $item->numero }}, @if($item->colonia){{ $item->colonia->nombre }},@endif {{ $item->localidad->nombre }}, {{ $item->municipio->nombre }} </td>
                   <td><strong>{{$item->clue->clues}}</strong>, {{$item->clue->nombre}}</td>
                   <td>@if($item->ageb) {{ $item->ageb->id }} @endif</td>
                   <td>{{ $item->sector }}</td>

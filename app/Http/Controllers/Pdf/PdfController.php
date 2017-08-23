@@ -28,9 +28,9 @@ class PdfController extends Controller
     public function persona() 
     {
         if (Auth::user()->is('root|admin')) {
-            $data = Persona::where('deleted_at', NULL)->with('clue','municipio','localidad','ageb','afiliacion','codigo','tipoParto','personasVacunasEsquemas')->orderBy('id', 'DESC')->get();
+            $data = Persona::where('deleted_at', NULL)->with('clue','municipio','localidad','colonia','ageb','afiliacion','codigo','tipoParto','personasVacunasEsquemas')->orderBy('id', 'DESC')->get();
         } else { // Limitar por clues
-            $data = Persona::select('personas.*')->join('clues','clues.id','=','personas.clues_id')->where('clues.jurisdicciones_id', Auth::user()->idJurisdiccion)->where('personas.deleted_at', NULL)->with('clue','municipio','localidad','ageb','afiliacion','codigo','tipoParto','personasVacunasEsquemas')->orderBy('personas.id', 'DESC')->get();
+            $data = Persona::select('personas.*')->join('clues','clues.id','=','personas.clues_id')->where('clues.jurisdicciones_id', Auth::user()->idJurisdiccion)->where('personas.deleted_at', NULL)->with('clue','municipio','localidad','colonia','ageb','afiliacion','codigo','tipoParto','personasVacunasEsquemas')->orderBy('personas.id', 'DESC')->get();
         }
         
         $view =  \View::make('pdf.persona', compact('data'))->render();
@@ -53,7 +53,7 @@ class PdfController extends Controller
         if($parametros['edad']>1 && $parametros['edad']<=10){ // Edad especifica fecha actual menos x años atras
             $fecha_nacimiento_inferior = Carbon::create(($now->year - $parametros['edad']), $now->month, $now->day, 0, 0, 0); 
         } else { // Todas las edades desde el 2016-01-01 y tope superior fecha actual
-            $fecha_nacimiento_inferior = Carbon::create(2016, 1, 01, 0, 0, 0); 
+            $fecha_nacimiento_inferior = Carbon::create(2015, 1, 01, 0, 0, 0); 
         }
 
         if($parametros['genero']=="M" || $parametros['genero']=="F"){ // Género especifico
@@ -70,9 +70,9 @@ class PdfController extends Controller
         
 		if (Auth::user()->can('show.personas') && Auth::user()->activo==1) {
             if (Auth::user()->is('root|admin')) {
-                $data = Persona::where('deleted_at', NULL)->whereBetween('fecha_nacimiento', [$fecha_nacimiento_inferior, $now])->where('genero', $operador_genero, $parametros['genero'])->where('clues_id', $operador_clue, $parametros['clue_id'])->with('clue','municipio','localidad','ageb','afiliacion','codigo','tipoParto','aplicaciones')->orderBy('id', 'DESC')->get();
+                $data = Persona::where('deleted_at', NULL)->whereBetween('fecha_nacimiento', [$fecha_nacimiento_inferior, $now])->where('genero', $operador_genero, $parametros['genero'])->where('clues_id', $operador_clue, $parametros['clue_id'])->with('clue','municipio','localidad','colonia','ageb','afiliacion','codigo','tipoParto','aplicaciones')->orderBy('id', 'DESC')->get();
             } else { // Limitar por clues
-                $data = Persona::select('personas.*')->join('clues','clues.id','=','personas.clues_id')->where('clues.jurisdicciones_id', Auth::user()->idJurisdiccion)->where('personas.deleted_at', NULL)->whereBetween('personas.fecha_nacimiento', [$fecha_nacimiento_inferior, $now])->where('personas.genero', $operador_genero, $parametros['genero'])->where('personas.clues_id', $operador_clue, $parametros['clue_id'])->with('clue','municipio','localidad','ageb','afiliacion','codigo','tipoParto','aplicaciones')->orderBy('personas.id', 'DESC')->get();
+                $data = Persona::select('personas.*')->join('clues','clues.id','=','personas.clues_id')->where('clues.jurisdicciones_id', Auth::user()->idJurisdiccion)->where('personas.deleted_at', NULL)->whereBetween('personas.fecha_nacimiento', [$fecha_nacimiento_inferior, $now])->where('personas.genero', $operador_genero, $parametros['genero'])->where('personas.clues_id', $operador_clue, $parametros['clue_id'])->with('clue','municipio','localidad','colonia','ageb','afiliacion','codigo','tipoParto','aplicaciones')->orderBy('personas.id', 'DESC')->get();
             }
             
             $view =  \View::make('pdf.filtro', compact('data'))->render();
@@ -97,9 +97,9 @@ class PdfController extends Controller
 
 		if (Auth::user()->can('show.personas') && Auth::user()->activo==1) {
             if (Auth::user()->is('root|admin')) {
-                $data = Persona::where('deleted_at', NULL)->with('clue','municipio','localidad','ageb','afiliacion','codigo','tipoParto','personasVacunasEsquemas')->orderBy('id', 'DESC')->get();
+                $data = Persona::where('deleted_at', NULL)->with('clue','municipio','localidad','colonia','ageb','afiliacion','codigo','tipoParto','personasVacunasEsquemas')->orderBy('id', 'DESC')->get();
             } else { // Limitar por clues
-                $data = Persona::select('personas.*')->join('clues','clues.id','=','personas.clues_id')->where('clues.jurisdicciones_id', Auth::user()->idJurisdiccion)->where('personas.deleted_at', NULL)->with('clue','municipio','localidad','ageb','afiliacion','codigo','tipoParto','personasVacunasEsquemas')->orderBy('personas.id', 'DESC')->get();
+                $data = Persona::select('personas.*')->join('clues','clues.id','=','personas.clues_id')->where('clues.jurisdicciones_id', Auth::user()->idJurisdiccion)->where('personas.deleted_at', NULL)->with('clue','municipio','localidad','colonia','ageb','afiliacion','codigo','tipoParto','personasVacunasEsquemas')->orderBy('personas.id', 'DESC')->get();
             }
 
             foreach($data as $index=>$value) {

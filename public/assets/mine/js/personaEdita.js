@@ -47,7 +47,7 @@ function validaAplicacion(id_vacuna_esquema, index){ //id_esquema y key del arre
 // CADA QUE SE COLOCA UNA FECHA DE  NACIMIENTO DEL INFANTE SE ENVÍA A VALIDACIÓN
 $("#fecha_nacimiento").blur(function(){
     if (moment($(this).val(),'DD-MM-YYYY').isValid()) {
-        if(moment($(this).val(),'DD-MM-YYYY').format('YYYY')==ultimo_esquema.id){                    
+        if(moment($(this).val(),'DD-MM-YYYY').format('YYYY')==esquema.id){                    
             comprobarFecha($(this).val(), $(this).attr('placeholder'), 1, null);
         } else {
             $(this).val(ultima_fecha_nacimiento);
