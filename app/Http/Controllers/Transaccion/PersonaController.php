@@ -96,7 +96,7 @@ class PersonaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
         $parametros = Input::only('q');
         $q = "";
@@ -116,11 +116,6 @@ class PersonaController extends Controller
                     $personas = Persona::select('personas.*')->join('clues','clues.id','=','personas.clues_id')->where('clues.jurisdicciones_id', Auth::user()->idJurisdiccion)->where('personas.deleted_at', NULL)->with('municipio','localidad','clue','colonia')->orderBy('personas.id', 'DESC')->take(500)->get();
                  }
             }
-
-            if ($request->ajax()) {
-                return response()->json((['data' => $personas]));
-            }
-
             return view('persona.index')->with('data', $personas)->with('q', $q);
         } else {
             return response()->view('errors.allPagesError', ['icon' => 'user-secret', 'error' => '403', 'title' => 'Forbidden / Prohibido', 'message' => 'No tiene autorización para acceder al recurso. Se ha negado el acceso.'], 403);

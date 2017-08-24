@@ -16,8 +16,12 @@
              {!! Form::open([ 'route' => 'persona.index', 'class' => 'col-md-4', 'method' => 'GET']) !!}
                     {!! Form::text('q', $q, ['class' => 'form-control', 'id' => 'q', 'autocomplete' => 'off', 'placeholder' => 'Buscar por Nombre y CURP ' ]) !!}
              {!! Form::close() !!}
-             @if(count($data)>0)
-                <a target="_blank" class="btn btn-info col-md-1 col-md-offset-3" href="{{ url('persona-pdf') }}" class="button"> <i class="fa fa-file-pdf-o"></i> Ver .pdf </a>
+             @if(count($data)>0)                
+                <div class="col-md-2 col-md-offset-2">
+                    <a class="btn btn-info" href="#" onClick="verPdf()" class="button" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Vista previa"> <i class="fa fa-file-pdf-o"></i></a>
+                    <a class="btn btn-success" href="#" onClick="descargarPdf()" class="button" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Descargar"> <i class="fa fa-cloud-download"></i></a>
+                    <a class="btn btn-warning" href="#" onClick="imprimirPdf()" class="button" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Imprimir"> <i class="fa fa-print"></i></a>
+                </div>
              @endif
              @permission('create.personas')<a class="btn btn-default pull-right" href="{{ route('persona.create') }}" role="button">Agregar Persona</a>@endpermission
             <div class="clearfix"></div>
@@ -66,7 +70,7 @@
     <!-- Datatables -->
     <script>
     var registro_borrar = null;
-    var data = [];
+    var data = $.parseJSON(escaparCharEspeciales('{{$data}}'));
 
     $(document).ready(function() {
         $('#datatable-responsive').DataTable({
@@ -107,14 +111,48 @@
         });
     });
 
-    function descargarPdf() // titulo del doicumento y objeto a cargar
+    function verPdf()
+    {
+        console.log(data);
+    }
+
+    function imprimirPdf()
+    {
+        console.log(data);
+    }
+
+    function descargarPdf()
     {
         var documentoDefinicion = {
+            // a string or { width: number, height: number } OFICIO PIXELS: { width: 1285, height: 816 }
+            pageSize: 'LEGAL',
+
+            // by default we use portrait, you can change it to landscape if you wish
+            pageOrientation: 'landscape',
+
+            // [left, top, right, bottom] or [horizontal, vertical] or just a number for equal margins
+            pageMargins: [ 40, 60 ],
+            header: {
+                columns: [
+                    { text: 'CCVMS V1.0', alignment: 'left', bold: true, margin: [ 40, 30 ] },
+                    { text: 'Censo Nominal', alignment: 'right', bold: true, margin: [ 40, 30 ] }
+                ]
+            },
+            footer: {
+                columns: [
+                    { text: 'Leftt part', alignment: 'left' },
+                    { text: 'Right part', alignment: 'right' }
+                ]
+            },
             content: [
                 {
+                    layout: 'lightHorizontalLines', // optional
                     table: {
+                        // headers are automatically repeated if the table spans over multiple pages
+                        // you can declare how many rows should be treated as headers
                         headerRows: 1,
                         widths: [ '*', 'auto', 100, '*' ],
+
                         body: [
                             [ 'First', 'Second', 'Third', 'The last one' ],
                             [ 'Value 1', 'Value 2', 'Value 3', 'Value 4' ],
@@ -124,7 +162,20 @@
                 }
             ]
         }
-        pdfMake.createPdf(documentoDefinicion).open(titulo+' '+moment().format('DD-MM-YYYY')+'.pdf');
+        pdfMake.createPdf(documentoDefinicion).open('Censo Nominal '+moment().format('DD-MM-YYYY')+'.pdf');
+    }
+
+    function escaparCharEspeciales(str)
+    {
+        var map =
+        {
+            '&amp;': '&',
+            '&lt;': '<',
+            '&gt;': '>',
+            '&quot;': '"',
+            '&#039;': "'"
+        };
+        return str.replace(/&amp;|&lt;|&gt;|&quot;|&#039;/g, function(m) {return map[m];});
     }
         
     </script>
