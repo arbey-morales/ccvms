@@ -25,6 +25,7 @@
         <div class="x_content">
              @include('persona.list')
         </div>
+        <br>
     </div>
     <!-- Modal delete -->
     <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-hidden="true">
@@ -58,47 +59,73 @@
     {!! Html::script('assets/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js') !!}
     {!! Html::script('assets/mine/js/dataTables/dataTables.responsive.min.js') !!}
     {!! Html::script('assets/mine/js/dataTables/responsive.bootstrap.js') !!}
+    <!-- Pdfmake -->
+    {!! Html::script('assets/vendors/pdfmake/build/pdfmake.min.js') !!}
+    {!! Html::script('assets/vendors/pdfmake/build/vfs_fonts.js') !!}
 
     <!-- Datatables -->
-    <script type="text/javascript">
+    <script>
     var registro_borrar = null;
-        $(document).ready(function() {
-            $('#datatable-responsive').DataTable({
-                language: {
-                    url: '/assets/mine/js/dataTables/es-MX.json'
-                }
-            });
+    var data = [];
 
-            // Delete on Ajax 
-            $('.btn-delete').click(function(e){
-                e.preventDefault();
-                var row = $(this).parents('tr');
-                registro_borrar = row.data('id');
-                $("#modal-text").html(row.data('nombre'));
-            });
+    $(document).ready(function() {
+        $('#datatable-responsive').DataTable({
+            language: {
+                url: '/assets/mine/js/dataTables/es-MX.json'
+            }
         });
 
-        // Confirm delete on Ajax
-        $('.btn-confirm-delete').click(function(e){
-            var row = $("tr#"+registro_borrar);
-            var form = $("#form-delete");
-            var url_delete = form.attr('action').replace(":ITEM_ID", registro_borrar);
-            var data = $("#form-delete").serialize();
-            $.post(url_delete, data, function(response, status){
-                if (response.code==1) {
-                    notificar(response.title,response.text,response.type,3000);
-                    if(response.type=='success') {
-                        row.fadeOut();
+        // Delete on Ajax 
+        $('.btn-delete').click(function(e){
+            e.preventDefault();
+            var row = $(this).parents('tr');
+            registro_borrar = row.data('id');
+            $("#modal-text").html(row.data('nombre'));
+        });
+
+    });
+
+    // Confirm delete on Ajax
+    $('.btn-confirm-delete').click(function(e){
+        var row = $("tr#"+registro_borrar);
+        var form = $("#form-delete");
+        var url_delete = form.attr('action').replace(":ITEM_ID", registro_borrar);
+        var data = $("#form-delete").serialize();
+        $.post(url_delete, data, function(response, status){
+            if (response.code==1) {
+                notificar(response.title,response.text,response.type,3000);
+                if(response.type=='success') {
+                    row.fadeOut();
+                }
+            }
+            if (response.code==0) {
+                notificar('Error','Ocurrió un error al intentar borrar el registro, verifique!','error',3000);
+            }
+        }).fail(function(){
+            notificar('Error','No se procesó la eliminación del registro','error',3000);
+            row.fadeIn();
+        });
+    });
+
+    function descargarPdf() // titulo del doicumento y objeto a cargar
+    {
+        var documentoDefinicion = {
+            content: [
+                {
+                    table: {
+                        headerRows: 1,
+                        widths: [ '*', 'auto', 100, '*' ],
+                        body: [
+                            [ 'First', 'Second', 'Third', 'The last one' ],
+                            [ 'Value 1', 'Value 2', 'Value 3', 'Value 4' ],
+                            [ { text: 'Bold value', bold: true }, 'Val 2', 'Val 3', 'Val 4' ]
+                        ]
                     }
                 }
-                if (response.code==0) {
-                    notificar('Error','Ocurrió un error al intentar borrar el registro, verifique!','error',3000);
-                }
-            }).fail(function(){
-                notificar('Error','No se procesó la eliminación del registro','error',3000);
-                row.fadeIn();
-            });
-        });
+            ]
+        }
+        pdfMake.createPdf(documentoDefinicion).open(titulo+' '+moment().format('DD-MM-YYYY')+'.pdf');
+    }
         
     </script>
     <!-- /Datatables -->

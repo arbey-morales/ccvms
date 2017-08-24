@@ -8,7 +8,7 @@
             </li>
             @permission('show.personas')
             <li>
-                <a href="{{ route('persona.index') }}"><i class="fa fa-group"></i> Censo Nominal</a>
+                <a href="{{ url('persona') }}"><i class="fa fa-group"></i> Censo Nominal</a>
             </li>
             @endpermission
             <!--@permission('show.cuadro_distribucion_jurisdiccional')

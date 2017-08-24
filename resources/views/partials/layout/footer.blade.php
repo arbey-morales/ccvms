@@ -1,4 +1,4 @@
-<div class="pull-right">
-    ... <a href="#">...</a>
+<!--<div class="pull-right">
+     <a href="#"> 2017@ccvms</a>
 </div>
-<div class="clearfix"></div>
+<div class="clearfix"></div>-->
