@@ -13,6 +13,7 @@ use Carbon\Carbon;
 
 use Session;    
 use App\Transaccion\Persona;
+use App\User;
 use App\Catalogo\Clue;
 use App\Catalogo\Entidad;
 use App\Catalogo\Pais;
@@ -105,18 +106,19 @@ class PersonaController extends Controller
 		if (Auth::user()->can('show.personas') && Auth::user()->activo==1) {
             if (Auth::user()->is('root|admin')) {
                 if($parametros['q']){
-                    $personas = Persona::where('deleted_at', NULL)->where('curp','LIKE',"%".$parametros['q']."%")->orWhere(DB::raw("CONCAT(nombre,' ',apellido_paterno,' ',apellido_materno)"),'LIKE',"%".$parametros['q']."%")->with('municipio','localidad','clue','colonia')->orderBy('id', 'DESC')->take(500)->get();
+                    $personas = Persona::where('deleted_at', NULL)->where('curp','LIKE',"%".$parametros['q']."%")->orWhere(DB::raw("CONCAT(nombre,' ',apellido_paterno,' ',apellido_materno)"),'LIKE',"%".$parametros['q']."%")->with('municipio','localidad','clue','colonia','tipoParto','ageb','afiliacion','codigo')->orderBy('id', 'DESC')->take(500)->get();
                 } else {
-                    $personas = Persona::where('deleted_at', NULL)->with('municipio','localidad','clue','colonia')->orderBy('id', 'DESC')->take(500)->get();
+                    $personas = Persona::where('deleted_at', NULL)->with('municipio','localidad','clue','colonia','tipoParto','ageb','afiliacion','codigo')->orderBy('id', 'DESC')->take(500)->get();
                 }
             } else { // Limitar por clues
                  if($parametros['q']){
-                    $personas = Persona::select('personas.*')->join('clues','clues.id','=','personas.clues_id')->where('clues.jurisdicciones_id', Auth::user()->idJurisdiccion)->where('personas.deleted_at', NULL)->where('personas.curp','LIKE',"%".$parametros['q']."%")->orWhere(DB::raw("CONCAT(personas.nombre,' ',personas.apellido_paterno,' ',personas.apellido_materno)"),'LIKE',"%".$parametros['q']."%")->with('municipio','localidad','clue','colonia')->orderBy('personas.id', 'DESC')->take(500)->get();
+                    $personas = Persona::select('personas.*')->join('clues','clues.id','=','personas.clues_id')->where('clues.jurisdicciones_id', Auth::user()->idJurisdiccion)->where('personas.deleted_at', NULL)->where('personas.curp','LIKE',"%".$parametros['q']."%")->orWhere(DB::raw("CONCAT(personas.nombre,' ',personas.apellido_paterno,' ',personas.apellido_materno)"),'LIKE',"%".$parametros['q']."%")->with('municipio','localidad','clue','colonia','tipoParto','ageb','afiliacion','codigo')->orderBy('personas.id', 'DESC')->take(500)->get();
                  } else {
-                    $personas = Persona::select('personas.*')->join('clues','clues.id','=','personas.clues_id')->where('clues.jurisdicciones_id', Auth::user()->idJurisdiccion)->where('personas.deleted_at', NULL)->with('municipio','localidad','clue','colonia')->orderBy('personas.id', 'DESC')->take(500)->get();
+                    $personas = Persona::select('personas.*')->join('clues','clues.id','=','personas.clues_id')->where('clues.jurisdicciones_id', Auth::user()->idJurisdiccion)->where('personas.deleted_at', NULL)->with('municipio','localidad','clue','colonia','tipoParto','ageb','afiliacion','codigo')->orderBy('personas.id', 'DESC')->take(500)->get();
                  }
             }
-            return view('persona.index')->with('data', $personas)->with('q', $q);
+            $usuario = User::with('jurisdiccion')->find(Auth::user()->id);
+            return view('persona.index')->with(['data' => $personas, 'q' => $q, 'user' => $usuario]);
         } else {
             return response()->view('errors.allPagesError', ['icon' => 'user-secret', 'error' => '403', 'title' => 'Forbidden / Prohibido', 'message' => 'No tiene autorización para acceder al recurso. Se ha negado el acceso.'], 403);
         }
@@ -127,21 +129,66 @@ class PersonaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function report()
+    public function reporte()
     {
-        if (Auth::user()->can('show.personas') && Auth::user()->activo==1) {     
-			if (Auth::user()->is('root|admin')) {
-				$clues = Clue::where('deleted_at',NULL)->where('estatus_id', 1)->get();
-			} else {
-				$clues = Clue::where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->where('estatus_id', 1)->get();
-			}
+        if (Auth::user()->can('show.personas') && Auth::user()->activo==1) {
+            $edad = 0;
+            $clue_id = 0;
+            $genero = 'X';
+            $parametros = Input::only('clue_id','edad','genero');
+            $now = Carbon::now("America/Mexico_City");
+            $data = collect();
+            if (Auth::user()->is('root|admin')) {
+                $clues = Clue::select('id','nombre','clues')->where('deleted_at',NULL)->where('estatus_id', 1)->get();
+                $data = Persona::where('deleted_at', NULL);                    
+            } else { // Limitar por clues
+                $clues = Clue::select('id','nombre','clues')->where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->where('estatus_id', 1)->get();
+                $data = Persona::select('personas.*')
+                    ->join('clues','clues.id','=','personas.clues_id')
+                    ->where('clues.jurisdicciones_id', Auth::user()->idJurisdiccion)
+                    ->where('personas.deleted_at', NULL);
+            }
+            
+            if(isset($parametros['edad']) && $parametros['edad']>0 && $parametros['edad']<=10){ // Edad especifica fecha actual menos x años atras
+                $edad = $parametros['edad']; 
+                $data = $data->where('fecha_nacimiento', '>=', Carbon::now("America/Mexico_City")->subYears($parametros['edad']));
+            }
+            if(isset($parametros['genero']) && $parametros['genero']=="M" || $parametros['genero']=="F"){ // Género especifico
+                $genero = $parametros['genero'];
+                $data = $data->where('genero', $parametros['genero']);
+            }
 
-			$arrayclue[0] = 'Seleccionar Unidad de salud';
+            if(isset($parametros['clue_id']) && $parametros['clue_id']!=NULL && $parametros['clue_id']>0){ // Clue especifica
+                $clue_id = $parametros['clue_id'];
+                $data = $data->where('clues_id', $parametros['clue_id']); 
+            }
+
+            $data = $data->with('clue','municipio','localidad','colonia','ageb','afiliacion','codigo','tipoParto')
+            ->orderBy('id', 'DESC')->get();
+            foreach ($data as $key => $value) { // buscar todas las aplicaciones
+                $value->aplicaciones = DB::table('personas_vacunas_esquemas AS pve')
+                ->select('pve.*','ve.vacunas_id','v.clave','v.nombre','v.orden_esquema AS v_orden_esquema','v.color_rgb')
+                ->join('vacunas_esquemas AS ve','ve.id','=','pve.vacunas_esquemas_id')
+                ->join('vacunas AS v','v.id','=','ve.vacunas_id')
+                ->where('pve.personas_id', $value->id)
+                ->where('pve.deleted_at', NULL)
+                ->where('ve.deleted_at', NULL)
+                ->where('v.deleted_at', NULL)                
+                ->orderBy('v_orden_esquema')
+                ->orderBy('intervalo_inicio_anio', 'ASC')
+                ->orderBy('intervalo_inicio_mes', 'ASC')
+                ->orderBy('intervalo_inicio_dia', 'ASC')
+                ->orderBy('fila', 'ASC')
+                ->orderBy('columna', 'ASC')
+                ->get(); 
+            }
+
+            $arrayclue[0] = 'Todas las unidades de salud';
             foreach ($clues as $cont=>$clue) {
                 $arrayclue[$clue->id] = $clue->clues .' - '.$clue->nombre;
             }
-
-            return view('persona.reporte')->with(['clues' => $arrayclue]);
+            $usuario = User::with('jurisdiccion')->find(Auth::user()->id);
+            return view('persona.reporte')->with(['clues' => $arrayclue, 'data' => $data, 'user' => $usuario, 'clue_id' => $clue_id, 'edad' => $edad, 'genero' => $genero]);
         } else {
             return response()->view('errors.allPagesError', ['icon' => 'user-secret', 'error' => '403', 'title' => 'Forbidden / Prohibido', 'message' => 'No tiene autorización para acceder al recurso. Se ha negado el acceso.'], 403);
         }

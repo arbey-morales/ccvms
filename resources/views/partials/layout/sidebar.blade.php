@@ -11,15 +11,18 @@
                 <a href="{{ url('persona') }}"><i class="fa fa-group"></i> Censo Nominal</a>
             </li>
             @endpermission
-            <!--@permission('show.cuadro_distribucion_jurisdiccional')
-            <li>
-                <a href="{{ route('cuadro-dist-juris.index') }}"><i class="fa fa-share-alt-square"></i> Cuadro distribución</a>
-            </li>
-            @endpermission-->
+            @role('admin|root')
+                @permission('show.cuadro_distribucion_jurisdiccional')
+                <li>
+                    <a href="{{ route('cuadro-dist-juris.index') }}"><i class="fa fa-share-alt-square"></i> Cuadro distribución</a>
+                </li>
+                @endpermission
+            @endrole
             @permission('show.personas')
             <li><a><i class="fa fa-book"></i> Reportes <span class="fa fa-chevron-down"></span></a>
                 <ul class="nav child_menu">
-                    <li><a href="{{ url('persona/reporte') }}">Censo Nominal</a></li>
+                    <li><a href="{{ url('persona/reporte') }}">Aplicaciones</a></li>
+                    <li><a href="{{ url('persona/reporte') }}">Seguimiento</a></li>
                     <!--<li><a href="{{ url('cobertura/reporte') }}">Coberturas</a></li>-->
                 </ul>
             </li>
