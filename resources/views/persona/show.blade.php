@@ -24,7 +24,7 @@
                 <ul class="nav nav-tabs tabs-left">
                 <li class="active"><a href="#home" data-toggle="tab">General</a>
                 </li>
-                <li><a href="#profile" data-toggle="tab">Seguimientos</a>
+                <li><a href="#profile" data-toggle="tab">Esquema</a>
                 </li>
                 <li><a href="#messages" data-toggle="tab">Estadísticas</a>
                 </li>
@@ -41,7 +41,7 @@
                     <div class="row">
                         <div class="col-xs-12 invoice-header">
                             <h1>
-                                <i class="fa fa-smile-o"></i> {{$data->nombre}} {{$data->apellido_paterno}} {{$data->apellido_materno}} <small> / {{$data->tipoParto->descripcion}}</small>
+                                 </i> {{$data->nombre}} {{$data->apellido_paterno}} {{$data->apellido_materno}} <small> / {{$data->tipoParto->descripcion}}</small>
                                 <small class="pull-right">Nacimiento: {{$data->fecha_nacimiento}}</small>
                             </h1>
                         </div>        
@@ -56,7 +56,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="btn btn-success col-md-12" style="font-size:x-large;">
-                                <h2><i class="fa fa-calendar" style="font-size:xx-large;"></i> {{$data->edad}}</h2>
+                                <h2><i class="fa fa-birthday-cake" style="font-size:xx-large;"></i> {{$data->edad}}</h2>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -95,6 +95,9 @@
                     <br>
                     <!--@permission('update.personas')<a href="{{ route('persona.edit', $data->id) }}" class="btn btn-primary pull-right"><i class="fa fa-edit m-right-xs"></i> Hacer Cambios</a>@endpermission
                     --><br>
+                    <div class="col-md-5" id="esquema_ideal" style="height:350px;"></div>
+                    <div class="col-md-5" id="esquema_real" style="height:350px;"></div>
+                    <!--<div class="col-md-4" id="esquema_biologico" style="height:350px;"></div>-->
                 </div>
                 <div class="tab-pane" id="profile">
                     <h2 id="title-esquema"> Esquema</h2>
@@ -102,7 +105,9 @@
                         <div class="col-md-12 text-center text-info"> <i class="fa fa-info-circle text-danger" style="font-size:x-large;"></i> <h3>Sin esquema</h3></div>
                     </div>
                 </div>
-                <div class="tab-pane" id="messages">Construyendo...</div>
+                <div class="tab-pane" id="messages"> 
+                    Construyendo...
+                </div>
                 <div class="tab-pane" id="settings">Construyendo...</div>
                 </div>
             </div>
@@ -153,6 +158,14 @@
     {!! Html::script('assets/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js') !!}
     {!! Html::script('assets/mine/js/dataTables/dataTables.responsive.min.js') !!}
     {!! Html::script('assets/mine/js/dataTables/responsive.bootstrap.js') !!}
+    <!-- ECharts -->
+    {!! Html::script('assets/vendors/echarts/dist/echarts.min.js') !!}
+    {!! Html::script('assets/vendors/echarts/theme/macarons.js') !!}
+    {!! Html::script('assets/vendors/echarts/theme/roma.js') !!}
+    {!! Html::script('assets/vendors/echarts/theme/shine.js') !!}
+    {!! Html::script('assets/vendors/echarts/theme/vintage.js') !!}
+    {!! Html::script('assets/vendors/echarts/theme/infographic.js') !!}
+    <!-- Mine -->
     {!! Html::script('assets/mine/js/personaShow.js') !!}
 
     <!-- Datatables -->
@@ -167,6 +180,8 @@
 
         var esquema = $.parseJSON(escaparCharEspeciales('{{$esquema}}'));
         var aplicaciones_dosis = $.parseJSON(escaparCharEspeciales('{{json_encode($data->personasVacunasEsquemas)}}'));
+        var aplicaciones_reales = $.parseJSON(escaparCharEspeciales('{{json_encode($data->aplicaciones)}}'));
+        var esquema_detalle = $.parseJSON(escaparCharEspeciales('{{json_encode($data->esquema_detalle)}}'));
         var persona = $.parseJSON(escaparCharEspeciales('{{$data}}'));
         // GUARADARÁ EL ESQUEMA SELECCIONADO
         var ultimo_esquema = ''; 
@@ -177,6 +192,189 @@
             var anio = original_fecha_nacimiento.split("-");       
             conseguirEsquema(anio[2],ultima_fecha_nacimiento);
         }, 500);
+        
+        var esquemaIdeal = echarts.init(document.getElementById('esquema_ideal'), 'roma');
+        var optionIdeal = {
+            title : {
+                text: 'Esquema Ideal',
+                subtext: 'Seguimiento de aplicaciones',
+                x:'center'
+            },
+            tooltip : {
+                trigger: 'item',
+                formatter: "{a} <br/>{b} : {c} ({d}%)"
+            },
+            legend: {
+                orient : 'vertical',
+                x : 'left',
+                data:['Aplicadas','Faltantes']
+            },
+            toolbox: {
+                show : true,
+                feature : {
+                    mark : {show: true},
+                    dataView : {show: true, readOnly: false},
+                    magicType : {
+                        show: true, 
+                        type: ['pie', 'funnel'],
+                        option: {
+                            funnel: {
+                                x: '25%',
+                                width: '50%',
+                                funnelAlign: 'left',
+                                max: 1548
+                            }
+                        }
+                    },
+                    restore : {show: true},
+                    saveAsImage : {show: true}
+                }
+            },
+            calculable : true,
+            series : [
+                {
+                    name:'Esquema ideal '+esquema.id+' contiene '+esquema_detalle.length+' dosis',
+                    type:'pie',
+                    radius : '55%',
+                    center: ['50%', '60%'],
+                    data:[
+                        {value:aplicaciones_reales.length, name:'Aplicadas'},
+                        {value:(esquema_detalle.length - aplicaciones_reales.length), name:'Faltantes'}
+                    ]
+                }
+            ]
+        };
+        esquemaIdeal.setOption(optionIdeal);
+
+        var esquemaReal = echarts.init(document.getElementById('esquema_real'), 'macarons');
+        var optionReal = {
+            title : {
+                text: 'Esquema Real',
+                subtext: 'Seguimiento de aplicaciones',
+                x:'center'
+            },
+            tooltip : {
+                trigger: 'item',
+                formatter: "{a} <br/>{b} : {c} ({d}%)"
+            },
+            legend: {
+                orient : 'vertical',
+                x : 'left',
+                data:['Aplicadas','Faltantes']
+            },
+            toolbox: {
+                show : true,
+                feature : {
+                    mark : {show: true},
+                    dataView : {show: true, readOnly: false},
+                    magicType : {
+                        show: true, 
+                        type: ['pie', 'funnel'],
+                        option: {
+                            funnel: {
+                                x: '25%',
+                                width: '50%',
+                                funnelAlign: 'left',
+                                max: 1548
+                            }
+                        }
+                    },
+                    restore : {show: true},
+                    saveAsImage : {show: true}
+                }
+            },
+            calculable : true,
+            series : [
+                {
+                    name:'Esquema completo '+esquema.id+' contiene '+esquema.vacunas_esquemas.length+' dosis',
+                    type:'pie',
+                    radius : '55%',
+                    center: ['50%', '60%'],
+                    data:[
+                        {value:aplicaciones_reales.length, name:'Aplicadas'},
+                        {value:(esquema.vacunas_esquemas.length - aplicaciones_reales.length), name:'Faltantes'}
+                    ]
+                }
+            ]
+        };
+        esquemaReal.setOption(optionReal);
+
+        /*var aplicacionesBiologico = echarts.init(document.getElementById('esquema_biologico'), 'macarons');
+        var Biologico = [];
+        var dataBiologico = [];
+        console.log(esquema_detalle);
+        $.each(esquema_detalle, function( ins, apl ) {
+            if(ins==0){
+                var plus = 0;
+                $.each(aplicaciones_reales, function( ind, apli ) {
+                    if(apli.vacunas_id==apl.vacunas_id){
+                        plus++;
+                    }
+                });
+                Biologico.push(apl.clave);
+                dataBiologico.push({'value':plus,'name':apl.clave});
+            } else {
+                if(esquema_detalle[(ins-1)].vacunas_id!=apl.vacunas_id){
+                    var plus = 0;
+                    $.each(aplicaciones_reales, function( ind, apli ) {
+                        if(apli.vacunas_id==apl.vacunas_id){
+                            plus++;
+                        }
+                    });
+                    Biologico.push(apl.clave);
+                    dataBiologico.push({'value':plus,'name':apl.clave});
+                }
+            }
+        });
+        
+        var optionBiologico = {
+            title : {
+                text: 'Biológico',
+                subtext: 'Dosis aplicadas',
+                x:'center'
+            },
+            tooltip : {
+                trigger: 'item',
+                formatter: "{a} <br/>{b} : {c} ({d}%)"
+            },
+            legend: {
+                orient : 'vertical',
+                x : 'left',
+                data: dataBiologico
+            },
+            toolbox: {
+                show : true,
+                feature : {
+                    mark : {show: true},
+                    dataView : {show: true, readOnly: false},
+                    magicType : {
+                        show: true, 
+                        type: ['pie', 'funnel'],
+                        option: {
+                            funnel: {
+                                x: '25%',
+                                width: '50%',
+                                funnelAlign: 'left',
+                                max: 1548
+                            }
+                        }
+                    },
+                    restore : {show: true},
+                    saveAsImage : {show: true}
+                }
+            },
+            calculable : true,
+            series : [
+                {
+                    name:'Esquema completo '+esquema.id+' contiene '+esquema.vacunas_esquemas.length+' dosis',
+                    type:'pie',
+                    radius : '55%',
+                    center: ['50%', '60%'],
+                    data:dataBiologico
+                }
+            ]
+        };
+        aplicacionesBiologico.setOption(optionBiologico);*/
     </script>
     <!-- /Datatables -->
 @endsection

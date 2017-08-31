@@ -15,6 +15,7 @@ use App\User;
 use App\Role;
 use App\Catalogo\Jurisdiccion;
 
+
 class UserController extends Controller
 {
     /**
@@ -35,6 +36,7 @@ class UserController extends Controller
             return response()->view('errors.allPagesError', ['icon' => 'user-secret', 'error' => '403', 'title' => 'Forbidden / Prohibido', 'message' => 'No tiene autorización para acceder al recurso. Se ha negado el acceso.'], 403);
         }
     }
+
 
     /**
      * Show the form for creating a new resource.

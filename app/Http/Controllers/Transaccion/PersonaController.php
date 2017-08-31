@@ -106,15 +106,15 @@ class PersonaController extends Controller
 		if (Auth::user()->can('show.personas') && Auth::user()->activo==1) {
             if (Auth::user()->is('root|admin')) {
                 if($parametros['q']){
-                    $personas = Persona::where('deleted_at', NULL)->where('curp','LIKE',"%".$parametros['q']."%")->orWhere(DB::raw("CONCAT(nombre,' ',apellido_paterno,' ',apellido_materno)"),'LIKE',"%".$parametros['q']."%")->with('municipio','localidad','clue','colonia','tipoParto','ageb','afiliacion','codigo')->orderBy('id', 'DESC')->take(500)->get();
+                    $personas = Persona::where('deleted_at', NULL)->where('curp','LIKE',"%".$parametros['q']."%")->orWhere(DB::raw("CONCAT(nombre,' ',apellido_paterno,' ',apellido_materno)"),'LIKE',"%".$parametros['q']."%")->with('municipio','localidad','clue','colonia','tipoParto','ageb','afiliacion','codigo')->orderBy('id', 'DESC')->get();
                 } else {
-                    $personas = Persona::where('deleted_at', NULL)->with('municipio','localidad','clue','colonia','tipoParto','ageb','afiliacion','codigo')->orderBy('id', 'DESC')->take(500)->get();
+                    $personas = Persona::where('deleted_at', NULL)->with('municipio','localidad','clue','colonia','tipoParto','ageb','afiliacion','codigo')->orderBy('id', 'DESC')->get();
                 }
             } else { // Limitar por clues
                  if($parametros['q']){
-                    $personas = Persona::select('personas.*')->join('clues','clues.id','=','personas.clues_id')->where('clues.jurisdicciones_id', Auth::user()->idJurisdiccion)->where('personas.deleted_at', NULL)->where('personas.curp','LIKE',"%".$parametros['q']."%")->orWhere(DB::raw("CONCAT(personas.nombre,' ',personas.apellido_paterno,' ',personas.apellido_materno)"),'LIKE',"%".$parametros['q']."%")->with('municipio','localidad','clue','colonia','tipoParto','ageb','afiliacion','codigo')->orderBy('personas.id', 'DESC')->take(500)->get();
+                    $personas = Persona::select('personas.*')->join('clues','clues.id','=','personas.clues_id')->where('clues.jurisdicciones_id', Auth::user()->idJurisdiccion)->where('personas.deleted_at', NULL)->where('personas.curp','LIKE',"%".$parametros['q']."%")->orWhere(DB::raw("CONCAT(personas.nombre,' ',personas.apellido_paterno,' ',personas.apellido_materno)"),'LIKE',"%".$parametros['q']."%")->with('municipio','localidad','clue','colonia','tipoParto','ageb','afiliacion','codigo')->orderBy('personas.id', 'DESC')->get();
                  } else {
-                    $personas = Persona::select('personas.*')->join('clues','clues.id','=','personas.clues_id')->where('clues.jurisdicciones_id', Auth::user()->idJurisdiccion)->where('personas.deleted_at', NULL)->with('municipio','localidad','clue','colonia','tipoParto','ageb','afiliacion','codigo')->orderBy('personas.id', 'DESC')->take(500)->get();
+                    $personas = Persona::select('personas.*')->join('clues','clues.id','=','personas.clues_id')->where('clues.jurisdicciones_id', Auth::user()->idJurisdiccion)->where('personas.deleted_at', NULL)->with('municipio','localidad','clue','colonia','tipoParto','ageb','afiliacion','codigo')->orderBy('personas.id', 'DESC')->get();
                  }
             }
             $usuario = User::with('jurisdiccion')->find(Auth::user()->id);
@@ -123,6 +123,21 @@ class PersonaController extends Controller
             return response()->view('errors.allPagesError', ['icon' => 'user-secret', 'error' => '403', 'title' => 'Forbidden / Prohibido', 'message' => 'No tiene autorización para acceder al recurso. Se ha negado el acceso.'], 403);
         }
     }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+     public function dashboard(Request $request)
+     {
+         $today = Carbon::now("America/Mexico_City");
+         $ultima_semana = Carbon::now("America/Mexico_City")->subWeeks(1);
+         $capturas_por_semana = collect();
+         $capturas_por_semana = Persona::where('usuario_id', Auth::user()->email)->whereBetween('created_at', [$ultima_semana, $today])->where('deleted_at', NULL)->count();
+         
+         return response()->json([ 'capturas_por_semana'  => $capturas_por_semana,'us'  => $ultima_semana,'t'  => $today]);
+     }
 
     /**
      * Display a index of reports.
@@ -135,6 +150,9 @@ class PersonaController extends Controller
             $edad = 0;
             $clue_id = 0;
             $genero = 'X';
+            $titulo_edad = '';
+            $titulo_genero = '';
+            $titulo_clue = '';
             $parametros = Input::only('clue_id','edad','genero');
             $now = Carbon::now("America/Mexico_City");
             $data = collect();
@@ -151,23 +169,31 @@ class PersonaController extends Controller
             
             if(isset($parametros['edad']) && $parametros['edad']>0 && $parametros['edad']<=10){ // Edad especifica fecha actual menos x años atras
                 $edad = $parametros['edad']; 
+                $titulo_edad = 'hasta '.$edad.' a\u00f1os de edad';
                 $data = $data->where('fecha_nacimiento', '>=', Carbon::now("America/Mexico_City")->subYears($parametros['edad']));
             }
             if(isset($parametros['genero']) && $parametros['genero']=="M" || $parametros['genero']=="F"){ // Género especifico
                 $genero = $parametros['genero'];
+                $titulo_genero = 'Todas las ni\u00f1as ';
+                if($genero=="M")
+                    $titulo_edad = 'Todos los ni\u00f1os ';
                 $data = $data->where('genero', $parametros['genero']);
             }
 
             if(isset($parametros['clue_id']) && $parametros['clue_id']!=NULL && $parametros['clue_id']>0){ // Clue especifica
                 $clue_id = $parametros['clue_id'];
+                $clue_x = Clue::find($clue_id);
+                $titulo_clue = ' pertenecientes a '.$clue_x->clues.' - '.$clue_x->nombre.' ';
                 $data = $data->where('clues_id', $parametros['clue_id']); 
             }
+
+            $titulo = $titulo_genero.' '.$titulo_edad.' '.$titulo_clue;
 
             $data = $data->with('clue','municipio','localidad','colonia','ageb','afiliacion','codigo','tipoParto')
             ->orderBy('id', 'DESC')->get();
             foreach ($data as $key => $value) { // buscar todas las aplicaciones
                 $value->aplicaciones = DB::table('personas_vacunas_esquemas AS pve')
-                ->select('pve.*','ve.vacunas_id','v.clave','v.nombre','v.orden_esquema AS v_orden_esquema','v.color_rgb')
+                ->select('pve.*','ve.vacunas_id','ve.tipo_aplicacion','v.clave','v.nombre','v.orden_esquema AS v_orden_esquema','v.color_rgb')
                 ->join('vacunas_esquemas AS ve','ve.id','=','pve.vacunas_esquemas_id')
                 ->join('vacunas AS v','v.id','=','ve.vacunas_id')
                 ->where('pve.personas_id', $value->id)
@@ -188,7 +214,7 @@ class PersonaController extends Controller
                 $arrayclue[$clue->id] = $clue->clues .' - '.$clue->nombre;
             }
             $usuario = User::with('jurisdiccion')->find(Auth::user()->id);
-            return view('persona.reporte')->with(['clues' => $arrayclue, 'data' => $data, 'user' => $usuario, 'clue_id' => $clue_id, 'edad' => $edad, 'genero' => $genero]);
+            return view('persona.reporte')->with(['titulo' => $titulo, 'clues' => $arrayclue, 'data' => $data, 'user' => $usuario, 'clue_id' => $clue_id, 'edad' => $edad, 'genero' => $genero]);
         } else {
             return response()->view('errors.allPagesError', ['icon' => 'user-secret', 'error' => '403', 'title' => 'Forbidden / Prohibido', 'message' => 'No tiene autorización para acceder al recurso. Se ha negado el acceso.'], 403);
         }
@@ -487,8 +513,8 @@ class PersonaController extends Controller
 
             $rules = [
                 'nombre'                                 => 'required|min:3|max:30|string',
-                'paterno'                                => 'required|min:3|max:20|string',
-                'materno'                                => 'required|min:3|max:20|string',
+                'paterno'                                => 'required|min:2|max:20|string',
+                'materno'                                => 'required|min:2|max:20|string',
                 'clue_id'                                => 'required|min:1|numeric',
                 'fecha_nacimiento'                       => 'required|date|before:tomorrow',
                 'fecha_nacimiento_tutor'                 => 'required|date|before:fecha_nacimiento',
@@ -835,8 +861,88 @@ class PersonaController extends Controller
                     $persona = Persona::select('personas.*')->join('clues','clues.id','=','personas.clues_id')->where('personas.id', $id)->where('clues.jurisdicciones_id', Auth::user()->idJurisdiccion)->where('personas.deleted_at', NULL)->with('clue','pais','entidadNacimiento','entidadDomicilio','municipio','localidad','colonia','ageb','afiliacion','codigo','tipoParto','personasVacunasEsquemas')->first();
                 }
 
+                $persona->aplicaciones = DB::table('personas_vacunas_esquemas AS pve')
+                    ->select('pve.*','ve.vacunas_id','ve.tipo_aplicacion','v.clave','v.nombre','v.orden_esquema AS v_orden_esquema','v.color_rgb')
+                    ->join('vacunas_esquemas AS ve','ve.id','=','pve.vacunas_esquemas_id')
+                    ->join('vacunas AS v','v.id','=','ve.vacunas_id')
+                    ->where('pve.personas_id', $id)
+                    ->where('pve.deleted_at', NULL)
+                    ->where('ve.deleted_at', NULL)
+                    ->where('v.deleted_at', NULL)                
+                    ->orderBy('v_orden_esquema')
+                    ->orderBy('intervalo_inicio_anio', 'ASC')
+                    ->orderBy('intervalo_inicio_mes', 'ASC')
+                    ->orderBy('intervalo_inicio_dia', 'ASC')
+                    ->orderBy('fila', 'ASC')
+                    ->orderBy('columna', 'ASC')
+                    ->get(); 
+
                 $esquema_date = explode('-', $persona->fecha_nacimiento);
-                $esquema = Esquema::find($esquema_date[0]);               
+                $bd = explode('-', $persona->fecha_nacimiento);
+                $esquema = Esquema::with('vacunasEsquemas')->find($esquema_date[0]); 
+
+                /**************/   
+                $esquema_detalle = DB::table('vacunas_esquemas AS ve')
+                    ->select('ve.*','v.clave','v.nombre','v.orden_esquema AS v_orden_esquema','v.color_rgb')
+                    ->join('vacunas AS v','v.id','=','ve.vacunas_id')
+                    ->where('ve.esquemas_id', $bd[0])
+                    ->where('ve.deleted_at', NULL)
+                    ->where('v.deleted_at', NULL)                
+                    ->orderBy('v_orden_esquema')
+                    ->orderBy('intervalo_inicio_anio', 'ASC')
+                    ->orderBy('intervalo_inicio_mes', 'ASC')
+                    ->orderBy('intervalo_inicio_dia', 'ASC')
+                    ->orderBy('fila', 'ASC')
+                    ->orderBy('columna', 'ASC')
+                    ->get(); 
+                
+                $born_date = Carbon::parse($bd[2]."-".$bd[1]."-".$bd[0]." 00:00:00","America/Mexico_City");
+                $today     = Carbon::now("America/Mexico_City");
+
+                $collect_esquema_detalle = collect();
+                foreach ($esquema_detalle as $key => $value) {
+                    $fecha = Carbon::parse($bd[2]."-".$bd[1]."-".$bd[0]." 00:00:00","America/Mexico_City")->addYears($value->intervalo_inicio_anio)->addMonths($value->intervalo_inicio_mes)->addDays($value->intervalo_inicio_dia)->subDays($value->margen_anticipacion);
+                    if($fecha<=$today){                    
+                        $mayores = VacunaEsquema::where('vacunas_id', $value->vacunas_id)
+                        ->where('esquemas_id', $id)
+                        ->where('id', '!=', $value->id)
+                        ->where('deleted_at', NULL)
+                        ->orderBy('intervalo_inicio_anio','ASC')
+                        ->orderBy('intervalo_inicio_mes','ASC')
+                        ->orderBy('intervalo_inicio_dia','ASC')->get();
+
+                        $collect_mayores = collect();
+                        $collect_menores = collect();
+                        foreach ($mayores as $k_mayores => $v_mayores) { // dosis que son diferentes a la actual de menor a mayor
+                            $fecha_mayores = Carbon::parse($bd[2]."-".$bd[1]."-".$bd[0]." 00:00:00","America/Mexico_City")->addYears($v_mayores->intervalo_inicio_anio)->addMonths($v_mayores->intervalo_inicio_mes)->addDays($v_mayores->intervalo_inicio_dia)->subDays($v_mayores->margen_anticipacion);
+                            if($fecha_mayores>$fecha){ 
+                                $collect_mayores->push($v_mayores);
+                            }
+                        }
+
+                        $value->mayores = $collect_mayores;
+
+                        $menores = VacunaEsquema::where('vacunas_id', $value->vacunas_id)
+                        ->where('esquemas_id', $id)
+                        ->where('id', '!=', $value->id)
+                        ->where('deleted_at', NULL)
+                        ->orderBy('intervalo_inicio_anio','DESC')
+                        ->orderBy('intervalo_inicio_mes','DESC')
+                        ->orderBy('intervalo_inicio_dia','DESC')->get();
+
+                        foreach ($menores as $k_menores => $v_menores) {
+                            $fecha_menores = Carbon::parse($bd[2]."-".$bd[1]."-".$bd[0]." 00:00:00","America/Mexico_City")->addYears($v_menores->intervalo_inicio_anio)->addMonths($v_menores->intervalo_inicio_mes)->addDays($v_menores->intervalo_inicio_dia)->subDays($v_menores->margen_anticipacion);
+                            if($fecha_menores<$fecha){ 
+                                $collect_menores->push($v_menores);
+                            }
+                        }
+                        
+                        $value->menores = $collect_menores;
+                        $collect_esquema_detalle->push($value);
+                    }
+                } // End foreach principal
+                $persona->esquema_detalle = $collect_esquema_detalle;
+                /**************/
 
                 $ahora = Carbon::now("America/Mexico_City");
                 $manana = Carbon::tomorrow("America/Mexico_City");
@@ -1086,8 +1192,8 @@ class PersonaController extends Controller
 
             $rules = [   
                 'nombre'                                 => 'required|min:3|max:30|string',
-                'paterno'                                => 'required|min:3|max:20|string',
-                'materno'                                => 'required|min:3|max:20|string',
+                'paterno'                                => 'required|min:2|max:20|string',
+                'materno'                                => 'required|min:2|max:20|string',
                 'fecha_nacimiento'                       => 'required|date|before:tomorrow',
                 'curp'                                   => 'required|min:17|max:18', 
                 'genero'                                 => 'required|in:F,M',

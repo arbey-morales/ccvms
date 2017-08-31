@@ -1,0 +1,42 @@
+/* Quita el fondo al nav de actions en cada modulo */
+#actions-modulo[aria-expanded="true"] {
+    background: none !important;
+    padding: 1px !important;
+    margin: 0px !important;
+}
+#actions-modulo[aria-expanded="false"] {
+    background: none !important;
+    padding: 1px !important;
+    margin: 0px !important;
+}
+/* Quita el fondo al nav de actions en cada modulo */
+.spinner-xl {
+    font-size: x-large;
+}
+#services {
+    box-sizing: border-box;
+    max-height: 650px;
+    overflow-y: visible;
+    overflow-x: hidden;
+}
+.searchService {
+    border: 0px;
+    height: 45px;
+    max-width: 100px;
+    font-size: large;
+    color: mediumvioletred;
+    font-weight: 500;
+}
+div.x_c_wm {
+    box-sizing: border-box;
+    padding-left: 0px;
+    padding-right: 0px;
+}
+.monthselect, .yearselect {
+    font-size: 12px;
+    color: gray;
+    padding: 1px;
+    height: auto;
+    margin: 0;
+    cursor: default;
+}

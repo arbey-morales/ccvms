@@ -4,6 +4,8 @@
             <th class="text-left">#</th>
             <th class="text-left">Año</th>
             <th class="text-left">Descripción</th>
+            <th class="text-left">Creado al</th>
+            <th class="text-left">Actualizado</th>
             <th class="text-left"></th>
         </tr>
     </thead>
@@ -13,17 +15,11 @@
                 <td class="text-center"><strong> {{ ++$key }} </strong></td>
                 <td class="text-left">{{ $item->id }}</td>
                 <td class="text-left">{{ $item->descripcion }}</td>
+                <td class="text-left">{{ $item->created_at }}</td>
+                <td class="text-left">{{ $item->updated_at }}</td>
                 <td class="text-center col-md-1"> <a class="btn btn-primary" href="{{ url(Route::getCurrentRoute()->getPath().'/'.$item->id) }}" class="button"> <i class="fa fa-info"></i> </a> </td>
             </tr>
         @endforeach
     </tbody>
-    <tfoot>
-        <tr>
-            <th class="text-left">#</th>
-            <th class="text-left">Año</th>
-            <th class="text-left">Descripción</th>
-            <th class="text-left"></th>
-        </tr>
-    </tfoot>
 </table>
 

@@ -70,15 +70,15 @@
                         <div class="uk-width-1-2">
                             <div class="bt-flabels__wrapper">
                                 {!! Form::label('paterno', '* Apellido Paterno', ['for' => 'paterno'] ) !!}
-                                {!! Form::text('paterno', null , ['class' => 'form-control', 'data-parsley-required' => 'true', 'data-parsley-length' => '[3, 30]', 'id' => 'paterno', 'autocomplete' => 'off', 'placeholder' => '* Apellido Paterno' ]  ) !!}
-                                <span class="bt-flabels__error-desc">Requerido / Mín: 3 - Máx: 30 caracteres</span>                                
+                                {!! Form::text('paterno', null , ['class' => 'form-control', 'data-parsley-required' => 'true', 'data-parsley-length' => '[2, 30]', 'id' => 'paterno', 'autocomplete' => 'off', 'placeholder' => '* Apellido Paterno' ]  ) !!}
+                                <span class="bt-flabels__error-desc">Requerido / Mín: 2 - Máx: 30 caracteres</span>                                
                             </div>
                         </div>
                         <div class="uk-width-1-2">
                             <div class="bt-flabels__wrapper bt-flabels--right">
                                 {!! Form::label('materno', '* Apellido Materno', ['for' => 'materno'] ) !!}
-                                {!! Form::text('materno', null , ['class' => 'form-control', 'data-parsley-required' => 'true', 'data-parsley-length' => '[3, 30]', 'id' => 'materno', 'autocomplete' => 'off', 'placeholder' => '* Apellido Materno' ]  ) !!}
-                                <span class="bt-flabels__error-desc">Requerido / Mín: 3 - Máx: 30 caracteres</span>
+                                {!! Form::text('materno', null , ['class' => 'form-control', 'data-parsley-required' => 'true', 'data-parsley-length' => '[2, 30]', 'id' => 'materno', 'autocomplete' => 'off', 'placeholder' => '* Apellido Materno' ]  ) !!}
+                                <span class="bt-flabels__error-desc">Requerido / Mín: 2 - Máx: 30 caracteres</span>
                             </div>
                         </div>
                     </div>

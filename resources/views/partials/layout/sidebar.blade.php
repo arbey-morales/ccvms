@@ -21,8 +21,8 @@
             @permission('show.personas')
             <li><a><i class="fa fa-book"></i> Reportes <span class="fa fa-chevron-down"></span></a>
                 <ul class="nav child_menu">
-                    <li><a href="{{ url('persona/reporte') }}">Aplicaciones</a></li>
-                    <li><a href="{{ url('persona/reporte') }}">Seguimiento</a></li>
+                    <li><a href="{{ url('persona/reporte') }}">Seguimientos</a></li>
+                    <!--<li><a href="{{ url('persona/reporte') }}">Seguimiento</a></li>-->
                     <!--<li><a href="{{ url('cobertura/reporte') }}">Coberturas</a></li>-->
                 </ul>
             </li>

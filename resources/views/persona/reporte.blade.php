@@ -16,7 +16,7 @@
 @section('content')
     <div class="x_panel">
         <div class="x_title">
-            <h2><i class="fa fa-child"></i> Reporte <i class="fa fa-angle-right text-danger"></i><small> Generar</small></h2>
+            <h2><i class="fa fa-child"></i> Seguimiento de aplicaciones <i class="fa fa-angle-right text-danger"></i><small> Generar</small></h2>
             <div class="clearfix"></div>
         </div>
         <div class="x_content">
@@ -42,7 +42,13 @@
                             </div>
                         </div>
                     </div>
-                </div>  
+                </div> 
+
+                <div class="uk-text-center uk-margin-top pull-left">
+                @if(count($data)>0)              
+                    @include('partials.layout.export')   
+                @endif
+                </div>
                  
                 <div class="uk-text-center uk-margin-top pull-right">
                     @permission('show.personas')<button type="submit" class="btn btn-success btn-lg js-submit"> <i class="fa fa-search"></i> Buscar</button>@endpermission
@@ -52,12 +58,10 @@
         </div>
 
         <br>
-        @if(count($data)>0)              
-            @include('partials.layout.export')        
+        @if(count($data)>0)                      
             <table id="datatable-responsive" class="table table-striped table-bordered dt-responsive nowrap" cellspacing="0" width="100%">
                 <thead>
                     <tr>
-                        <th class="text-left">#</th>
                         <th class="text-left">Nombre</th>
                         <th class="text-left">CURP</th>
                         <th class="text-left">Nacimiento</th>
@@ -67,8 +71,7 @@
                 </thead>
                 <tbody>
                     @foreach($data as $key=>$item)
-                        <tr id="{{ $item->id }}" data-id="{{ $item->id }}" data-nombre="{{ $item->nombre }} {{ $item->apellido_paterno }} {{ $item->apellido_materno }}" data-toggle="tooltip" data-placement="top">
-                            <td class="text-center"><strong> {{ ++$key }} </strong></td>
+                        <tr>
                             <td class="text-left"> <strong> {{ $item->genero }} </strong> / {{ $item->nombre }} {{ $item->apellido_paterno }} {{ $item->apellido_materno }}</td>
                             <td class="text-left"><strong>{{ $item->curp }}</strong></td>
                             <td class="text-left">{{$item->fecha_nacimiento}}</td>
@@ -76,19 +79,45 @@
                             <td class="text-left"><strong>{{$item->clue->clues}}</strong>, {{$item->clue->nombre}}</td>
                         </tr>
                         <tr>
-                            <td class="text-center" colspan="6">
-                               <?php $vacunas = array();?>
+                            <td class="text-left" colspan="5">
                                 @if(count($item->aplicaciones)>0)
-                                    @foreach($item->aplicaciones as $key=>$value)  
-                                        @if(in_array($value->vacunas_id, $vacunas))
-                                            <!--Si ya tenemos esta vacuna-->
+                                    <?php $vac = array(); ?>
+                                    @foreach($item->aplicaciones as $k=>$v)
+                                        @if(in_array($v->vacunas_id, $vac))
+                                        <!--Si ya tenemos esta vacuna-->
                                         @else
-                                        <?php array_push($vacunas, $value->vacunas_id); ?> 
-                                        @endif                                       
-                                        {{$value->clave}} {{$value->nombre}}
+                                        <?php array_push($vac, $v->vacunas_id); ?> 
+                                        @endif
                                     @endforeach
+
+                                    <?php $vacunas = array(); $wt = count($vac) * 11; $width_piece = round(100/(count($vac) + 1), 0, PHP_ROUND_HALF_DOWN); ?>
+                                    <table width="{{$wt}}%">
+                                        <tr>
+                                        @foreach($item->aplicaciones as $key=>$value) 
+                                            @if(in_array($value->vacunas_id, $vacunas))
+                                            <!--Si ya tenemos esta vacuna-->
+                                            @else
+                                            <td style="vertical-align:top; width:11%;">
+                                                <div style="text-align:center; font-weight:normal; font-size:15px; color:#FFF; background-color:#{{$value->color_rgb}};">{{$value->clave}}</div>
+                                                <div style="text-align:center; color:#000">
+                                                @foreach($item->aplicaciones as $index=>$apli_vacuna) 
+                                                    @if($value->vacunas_id==$apli_vacuna->vacunas_id)
+                                                        @if($apli_vacuna->fecha_aplicacion!=NULL)
+                                                        <?php $fecha = explode("-", substr($apli_vacuna->fecha_aplicacion, 0, 10)); ?>
+                                                        <span>{{ $fecha[2].'-'.$fecha[1].'-'.$fecha[0] }}</span><br>
+                                                        @endif
+                                                    @endif
+                                                @endforeach
+                                                </div>
+                                                
+                                                <?php array_push($vacunas, $value->vacunas_id); ?>     
+                                            </td>                     
+                                            @endif
+                                        @endforeach
+                                        </tr>
+                                    </table>
                                 @else
-                                    Sin aplicaciones
+                                    Sin Aplicaciones
                                 @endif 
                             </td>
                         </tr>
@@ -104,21 +133,6 @@
     <!-- Select2 -->
     {!! Html::script('assets/vendors/select2-4.0.3/dist/js/select2.min.js') !!}
     {!! Html::script('assets/vendors/select2-4.0.3/dist/js/i18n/es.js') !!}
-    <!-- jQuery Tags Input -->
-    {!! Html::script('assets/vendors/jquery.tagsinput/src/jquery.tagsinput.js') !!}
-    <!-- bootstrap-daterangepicker -->
-    {!! Html::script('assets/app/js/moment/moment.min.js') !!}
-    {!! Html::script('assets/app/js/datepicker/daterangepicker.js') !!}
-    <!-- Bootstrap Colorpicker -->
-    {!! Html::script('assets/vendors/mjolnic-bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js') !!}
-    <!-- Switchery -->
-    {!! Html::script('assets/vendors/switchery/dist/switchery.min.js') !!}
-    <!-- File Input -->
-    {!! Html::script('assets/mine/js/bootstrap.file-input.js') !!}
-    <!-- Form Mine -->
-    {!! Html::script('assets/mine/js/parsleyjs/2.1.2/parsley.min.js') !!}
-    {!! Html::script('assets/mine/js/floating-labels.js') !!}
-    {!! Html::script('assets/mine/js/myMessage.js') !!}
     <!-- Pdfmake -->
     {!! Html::script('assets/vendors/pdfmake/build/pdfmake.min.js') !!}
     {!! Html::script('assets/vendors/pdfmake/build/vfs_fonts.js') !!}
@@ -130,6 +144,7 @@
         $(".js-data-clue,.js-data-genero,.js-data-edad").select2();   
         var data = $.parseJSON(escaparCharEspeciales('{{$data}}'));
         var usuario = $.parseJSON(escaparCharEspeciales('{{$user}}'));
+        var titulo = escaparCharEspeciales('{{$titulo}}');
         var documentoDefinicion = construirTabla(); 
         function verPdf()
         {
@@ -209,16 +224,53 @@
                 }
                 data_row.push({'text':afiliacion, 'style':'celda_body'});
                 body.push(data_row);
-                var apli_row = [];
-                var aplicaciones = 'S/A';
-                if(row.aplicaciones.length>0){
+                var apli_head_row = [];
+                var apli_row = []; 
+                var aplicaciones = [];             
+                if(row.aplicaciones.length>0){  
                     $.each(row.aplicaciones, function( index, apli ) { 
-                        aplicaciones= aplicaciones+' '+apli.clave;
+                        if(index==0){
+                            aplicaciones.push({'vacuna': apli.vacunas_id,'clave': apli.clave, 'color': apli.color_rgb});
+                        } else {
+                            if(row.aplicaciones[(index-1)].vacunas_id!=apli.vacunas_id){
+                                aplicaciones.push({'vacuna': apli.vacunas_id,'clave': apli.clave, 'color': apli.color_rgb});
+                            }
+                        }
                     });
-                    aplicaciones = 'Construyendo...';
+
+                    $.each(aplicaciones, function( index, apli ) {   
+                        var aplica = [];  
+                        aplicaciones[index].aplicaciones = [];                    
+                        $.each(row.aplicaciones, function( ind, ap ) { 
+                            var fa = ap.fecha_aplicacion;
+                            fa = fa.substr(0,10);
+                            fa = fa.split('-');
+                            if(apli.vacuna==ap.vacunas_id){
+                                aplica.push({'fecha_aplicacion':fa[2]+'-'+fa[1]+'-'+fa[0],'tipo_aplicacion':ap.tipo_aplicacion});
+                            }
+                        });
+                        aplicaciones[index].aplicaciones = aplica;
+                    });
                 }
                 
-                apli_row.push({'text':aplicaciones, 'colSpan':13, 'style':'celda_body'});
+                if(aplicaciones.length>0) { 
+                    var colspan = 13 - aplicaciones.length;
+                    $.each(aplicaciones, function( ind, ap ) { 
+                        var text = '';
+                        $.each(ap.aplicaciones, function( inda, apa ) {
+                            //tipoAplicacion(apa.tipo_aplicacion)
+                            text+= apa.fecha_aplicacion+'\n';
+                        });
+                        apli_head_row.push({'text': ap.clave, 'fillColor': '#'+ap.color, 'color': 'white', 'fontSize':9});
+                        apli_row.push({'text':text, 'fontSize':7});
+                    });
+                    apli_row.push({'text':' ', 'colSpan':colspan});
+                    apli_head_row.push({'text':' ', 'colSpan':colspan});
+                } else {
+                    apli_row.push({'text':'Sin aplicaciones', 'colSpan':13, 'style':'celda_body'});
+                    apli_head_row.push({'text':'', 'colSpan':13, 'style':'celda_body'});
+                }
+                body.push(apli_head_row);
                 body.push(apli_row);
                 
             });
@@ -232,7 +284,7 @@
                     margin: [ 40, 30, 40, 30 ],
                     columns: [
                         { image: logo_sm, width: 85 },
-                        { text: 'Censo Nominal \n Jurisdicción '+usuario.jurisdiccion.clave+' '+usuario.jurisdiccion.nombre, width: 790, alignment: 'center', bold: true },
+                        { text: 'Seguimientos de '+titulo+' \n Jurisdicción '+usuario.jurisdiccion.clave+' '+usuario.jurisdiccion.nombre, width: 790, alignment: 'center', bold: true },
                         { image: censia, width: 50 }
                     ]
                 },
@@ -266,5 +318,25 @@
             }
         }
 
+        function tipoAplicacion(tipo){
+            if(tipo==1) {
+                return 'Única';
+            } 
+            if(tipo==2) {
+                return '1a';
+            } 
+            if(tipo==3) {
+                return '2a';
+            }
+            if(tipo==4){ 
+                return '3a'; 
+            }
+            if(tipo==5){ 
+                return '4a'; 
+            }
+            if(tipo==6) {
+                return 'Ref. ';
+            }
+        }
     </script>
 @endsection
