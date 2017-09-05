@@ -45,6 +45,7 @@ Route::group(['prefix' => 'catalogo', 'namespace' => 'Catalogo', 'middleware' =>
     Route::resource('jurisdiccion',     'JurisdiccionController',    ['only' => ['index', 'show']]);
     Route::resource('localidad',        'LocalidadController',       ['only' => ['index', 'show']]);
     Route::resource('municipio',        'MunicipioController',       ['only' => ['index', 'show']]);
+    Route::resource('colonia',          'ColoniaController');
     Route::resource('pais',             'PaisController',            ['only' => ['index', 'show']]);
     Route::resource('tipo-parto',       'TipoPartoController',       ['only' => ['index', 'show']]);
 

@@ -313,7 +313,7 @@ function generarEsquema(aplicaciones){
     $.each(aplicaciones, function( key, ve ) {
         key_plus++;
         var placeholder = '';
-        if(ve.etiqueta_ideal<30){
+        if(ve.etiqueta_ideal_anio<0 && ve.etiqueta_ideal_mes<0 && ve.etiqueta_ideal_dia<30){
             placeholder = ultima_fecha_nacimiento;
         }
         var fecha_aplicada    = '<br>'; var es_aplicada = false;

@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Input;
 use \Validator,\Hash, \Response, \DB;
 use App\Http\Controllers\Controller;
 use App\Http\Requests;
-use App\Models\Catalogo\Jurisdiccion;
+use App\Catalogo\Jurisdiccion;
 
 class JurisdiccionController extends Controller
 {
@@ -38,12 +38,12 @@ class JurisdiccionController extends Controller
      */
     public function show($id)
     {
-        $data = Jurisdiccion::with('entidad')->find($id);        
+        $data = Jurisdiccion::with('entidad','municipios')->find($id);        
         
         if(!$data ){            
             return Response::json(['error' => "No se encuentra el recurso que esta buscando."], HttpResponse::HTTP_NOT_FOUND);
         }
 
-        return Response::json([ 'data' => $data ], HttpResponse::HTTP_OK);
+        return response()->json([ 'data' => $data]);
     }
 }

@@ -35,6 +35,7 @@
                     <li><a href="{{ route('catalogo.esquema.index') }}">Esquemas</a></li>
                     <li><a href="{{ route('catalogo.municipio.index') }}">Municipios</a></li>
                     <li><a href="{{ route('catalogo.localidad.index') }}">Localidades</a></li>
+                    <li><a href="{{ route('catalogo.colonia.index') }}">Colonias</a></li>
                 </ul>
             </li>
             @endpermission

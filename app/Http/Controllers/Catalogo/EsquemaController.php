@@ -136,12 +136,14 @@ class EsquemaController extends Controller
                 ->select('ve.*','v.clave','v.nombre','v.orden_esquema AS v_orden_esquema','v.color_rgb')
                 ->join('vacunas AS v','v.id','=','ve.vacunas_id')
                 ->where('ve.esquemas_id', $id)
+                ->where('ve.deleted_at', NULL)
+                ->where('v.deleted_at', NULL)                
                 ->orderBy('v_orden_esquema')
-                ->orderBy('intervalo_inicio_anio')
-                ->orderBy('intervalo_inicio_mes')
-                ->orderBy('intervalo_inicio_dia')
-                ->orderBy('fila')
-                ->orderBy('columna')
+                ->orderBy('intervalo_inicio_anio', 'ASC')
+                ->orderBy('intervalo_inicio_mes', 'ASC')
+                ->orderBy('intervalo_inicio_dia', 'ASC')
+                ->orderBy('fila', 'ASC')
+                ->orderBy('columna', 'ASC')
                 ->get(); 
         }
 
@@ -149,7 +151,7 @@ class EsquemaController extends Controller
             if ($esquema) {
                 return response()->json([ 'data' => $esquema_detalle, 'letra_edad' => $letra_edad, 'esquema' => $esquema ]);
             } else {
-            return response()->json([ 'data' => NULL, 'edad' => NULL, 'esquema' => NULL]);
+            return response()->json([ 'data' => NULL, 'edad' => NULL, 'esquema' => $esquema]);
             }    
         } else {
             return view('catalogo.esquema.show')->with(['data' => $esquema_detalle, 'letra_edad' => NULL, 'esquema' => $esquema]);

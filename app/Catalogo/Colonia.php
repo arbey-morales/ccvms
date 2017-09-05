@@ -18,5 +18,9 @@ class Colonia extends Model
 
     public function municipio(){
 		  return $this->belongsTo('App\Catalogo\Municipio', 'municipios_id', 'id')->select('id','nombre','clave');
-	}
+    }
+    
+    public function ciudad(){
+        return $this->belongsTo('App\Catalogo\Ciudad', 'ciudades_id', 'id')->select('id','descripcion');
+  }
 }

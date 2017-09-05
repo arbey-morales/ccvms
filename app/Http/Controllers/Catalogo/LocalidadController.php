@@ -61,13 +61,12 @@ class LocalidadController extends Controller
      */
     public function show($id)
     {
-        return redirect()->back();
-        /*$data = Localidad::with('municipio')->find($id);        
+        $data = Localidad::with('municipio')->find($id);        
         
         if(!$data ){            
             return Response::json(['error' => "No se encuentra el recurso que esta buscando."], HttpResponse::HTTP_NOT_FOUND);
         }
 
-        return Response::json([ 'data' => $data ], HttpResponse::HTTP_OK);*/
+        return response()->json([ 'data' => $data]);
     }
 }

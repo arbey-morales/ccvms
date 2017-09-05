@@ -14,5 +14,10 @@ class Jurisdiccion extends Model
 
     public function entidad(){
 		  return $this->belongsTo('App\Catalogo\Entidad', 'entidades_id', 'id');
-	}
+    }
+    
+    public function municipios()
+    {
+        return $this->hasMany('App\Catalogo\Municipio', 'jurisdicciones_id')->where('deleted_at', NULL)->select('id','clave','nombre','jurisdicciones_id');
+    }
 }

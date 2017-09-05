@@ -24,18 +24,28 @@ class MonitoreoController extends Controller
     public function index()
     {
         if (Auth::user()->can('show.usuarios') && Auth::user()->activo==1) {
-            $hoy    = Carbon::today('America/Mexico_City');
-            $manana = Carbon::tomorrow('America/Mexico_City');
-            $ayer   = Carbon::yesterday('America/Mexico_City');
+            $parametros = Input::only('fecha');
+            if($parametros['fecha'] && $parametros['fecha']!=NULL && $parametros['fecha']!=""){
+                $fecha_send = $parametros['fecha'];
+                $date = explode("-", $parametros['fecha']);
+                $fecha = Carbon::parse($date[2]."-".$date[1]."-".$date[0]." 00:00:00","America/Mexico_City");
+            } else {
+                $fecha = Carbon::today('America/Mexico_City');
+                $fecha_send = date('d-m-Y');
+            }
+
+            $hoy = Carbon::today('America/Mexico_City');
+            dd($fecha, $fecha->endOfDay());
             $ultima_semana = Carbon::today('America/Mexico_City')->subWeeks(1);
-            $data = User::where('borrado', 0)->where('asRoot', 0)->with('jurisdiccion')->get();
+            $data = User::where('borrado', 0)->where('asRoot', 0)->with('jurisdiccion')->orderBy('idJurisdiccion')->get();
             foreach ($data as $key => $value) { // obtiene registros agregado hoy, ayer y a la semana
 				$value->hoy = DB::select("select count(id) as hoy from personas where usuario_id='$value->email' and created_at between '$hoy' and '$manana' and deleted_at is null")[0]->hoy;
                 $value->ayer = DB::select("select count(id) as ayer from personas where usuario_id='$value->email' and created_at between '$ayer' and '$hoy' and deleted_at is null")[0]->ayer;
                 $value->ultima_semana = DB::select("select count(id) as ultima_semana from personas where usuario_id='$value->email' and created_at between '$ultima_semana' and '$manana' and deleted_at is null")[0]->ultima_semana;
-			}
+            }
+            $data2 = collect();
             
-            return view('monitoreo.index')->with('data', $data);
+            return view('monitoreo.index')->with(['data' => $data, 'data2' => $data2, 'fecha' => $fecha_send]);
         } else {
             return response()->view('errors.allPagesError', ['icon' => 'user-secret', 'error' => '403', 'title' => 'Forbidden / Prohibido', 'message' => 'No tiene autorización para acceder al recurso. Se ha negado el acceso.'], 403);
         }

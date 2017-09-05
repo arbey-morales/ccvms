@@ -12,7 +12,7 @@
     </thead>
     <tbody>
         @foreach($data as $key=>$item)
-            <tr id="{{ $item->id }}" data-id="{{ $item->id }}" data-nombre="{{ $item->nombre }} {{ $item->apellido_paterno }} {{ $item->apellido_materno }}" data-toggle="tooltip" data-placement="top">
+            <tr id="{{ $item->id }}" data-id="{{ $item->id }}" data-nombre="{{ $item->nombre }} {{ $item->apellido_paterno }} {{ $item->apellido_materno }}" data-toggle="tooltip" data-placement="top" data-original-title="{{$item->usuario_id}} / {{$item->created_at}}">
                 <td class="text-center"><strong> {{ ++$key }} </strong></td>
                 <td class="text-left"><a class="btn btn-default" href="{{ url(Route::getCurrentRoute()->getPath().'/'.$item->id) }}" class="button">@if($item->genero=='M') <i class="fa fa-male" style="color:#4d81bf; font-size:large;"></i> @endif @if($item->genero=='F') <i class="fa fa-female" style="color:#ed1586; font-size:large;"></i> @endif </a> {{ $item->nombre }} {{ $item->apellido_paterno }} {{ $item->apellido_materno }}</td>
                 <td class="text-left"><strong>{{ $item->curp }}</strong></td>

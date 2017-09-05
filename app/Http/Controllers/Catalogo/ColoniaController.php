@@ -11,17 +11,13 @@ use DB;
 use Input;
 
 use Session; 
-use App\Catalogo\Clue;
+use App\Catalogo\Colonia;
 use App\Catalogo\Municipio;
-use App\Catalogo\Institucion;
-use App\Catalogo\Localidad;
-use App\Catalogo\Jurisdiccion;
-use App\Catalogo\Tipologia;
-use App\Catalogo\TipoUnidad;
-use App\Catalogo\Estatus;
-use App\Catalogo\Servidor;
+use App\Catalogo\TipoZona;
+use App\Catalogo\TipoAsentamiento;
+use App\Catalogo\Ciudad;
 
-class ClueController extends Controller
+class ColoniaController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -34,18 +30,31 @@ class ClueController extends Controller
         if (Auth::user()->can('show.catalogos') && Auth::user()->activo==1) {
             if (Auth::user()->is('root|admin')) {
                 if ($parametros['q']) {
-                    $data =  Clue::where('clues','LIKE',"%".$parametros['q']."%")->orWhere('nombre','LIKE',"%".$parametros['q']."%")->with('municipio','localidad','jurisdiccion')->where('deleted_at',NULL)->get();
+                    $data =  Colonia::where('codigo_postal','LIKE',"%".$parametros['q']."%")->orWhere('nombre','LIKE',"%".$parametros['q']."%")->with('municipio','entidad','ciudad')->where('deleted_at',NULL)->get();
                 } else {
-                    $data =  Clue::with('municipio','localidad','jurisdiccion')->where('deleted_at',NULL)->get();
+                    $data =  Colonia::with('municipio','entidad','ciudad')->where('deleted_at',NULL)->get();
                 }
             } else {
-                if ($parametros['q']) {
-                    $data = Clue::where('clues','LIKE',"%".$parametros['q']."%")->orWhere('nombre','LIKE',"%".$parametros['q']."%")->where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->with('municipio','localidad','jurisdiccion')->get();
+                if ($parametros['q']) { // Limitar colonias de los municipios de la juris
+                    $data = Colonia::select('colonias.*')
+                    ->join('municipios as m','m.id','=','colonias.municipios_id')
+                    ->where('m.jurisdicciones_id',Auth::user()->idJurisdiccion)
+                    ->where('codigo_postal','LIKE',"%".$parametros['q']."%")
+                    ->orWhere('nombre','LIKE',"%".$parametros['q']."%")
+                    ->where('deleted_at',NULL)
+                    ->with('municipio','entidad','ciudad')
+                    ->get();
                 } else {
-                    $data = Clue::where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->with('municipio','localidad','jurisdiccion')->get();
+                    $data = Colonia::select('colonias.*')
+                    ->join('municipios as m','m.id','=','colonias.municipios_id')
+                    ->where('m.jurisdicciones_id',Auth::user()->idJurisdiccion)
+                    ->where('m.deleted_at',NULL)
+                    ->where('colonias.deleted_at',NULL)
+                    ->with('municipio','entidad','ciudad')
+                    ->get();
                 }
             }       
-            return view('catalogo.clue.index')->with('data', $data)->with('q', $parametros['q']);
+            return view('catalogo.colonia.index')->with('data', $data)->with('q', $parametros['q']);
         } else {
             return response()->view('errors.allPagesError', ['icon' => 'user-secret', 'error' => '403', 'title' => 'Forbidden / Prohibido', 'message' => 'No tiene autorización para acceder al recurso. Se ha negado el acceso.'], 403);
         }
@@ -59,33 +68,24 @@ class ClueController extends Controller
 	public function create()
     {
         if (Auth::user()->can('create.catalogos') && Auth::user()->is('root|admin') && Auth::user()->activo==1) {  
-            $municipio_selected = 101;
             $municipios = Municipio::where('deleted_at',NULL)->get();
-            $jurisdicciones = Jurisdiccion::where('deleted_at',NULL)->get();
-			$instituciones = Institucion::where('deleted_at',NULL)->get();
-            $tipologias = Tipologia::where('deleted_at',NULL)->get();
-            $estatuss = Estatus::where('deleted_at',NULL)->get();
-            $tiposunidad = TipoUnidad::where('deleted_at',NULL)->get();
-
-            foreach ($tiposunidad as $tipounidad) {
-                $arraytiposunidad[$tipounidad->id] = $tipounidad->clave.' - '.$tipounidad->nombre;
-            }
+            $asentamientos = TipoAsentamiento::where('deleted_at',NULL)->get();
+            $zonas = TipoZona::where('deleted_at',NULL)->get();
+            $ciudades = Ciudad::where('deleted_at',NULL)->get();
 			foreach ($municipios as $municipio) {
                 $arraymunicipio[$municipio->id] = $municipio->clave.' - '.$municipio->nombre;
             }
-            foreach ($jurisdicciones as $jurisdiccion) {
-                $arrayjurisdiccion[$jurisdiccion->id] = $jurisdiccion->clave.' - '.$jurisdiccion->nombre;
-            }	
-			foreach ($tipologias as $tipologia) {
-                $arraytipologia[$tipologia->id] = $tipologia->clave.' - '.$tipologia->tipo.' - '.$tipologia->descripcion.' - '.$tipologia->nombre;
+            foreach ($asentamientos as $asentamiento) {
+                $arrayasentamiento[$asentamiento->id] = $asentamiento->descripcion;
             }
-            foreach ($estatuss as $estatus) {
-                $arrayestatus[$estatus->id] = $estatus->clave.' - '.$estatus->descripcion;
+            foreach ($zonas as $zona) {
+                $arrayzona[$zona->id] = $zona->descripcion;
             }
-			foreach ($instituciones as $institucion) {
-                $arrayinstitucion[$institucion->id] = $institucion->clave .' - '.$institucion->nombre;
-            }  
-            return view('catalogo.clue.create')->with(['municipio_selected' => $municipio_selected, 'instituciones' => $arrayinstitucion, 'tipos_unidades' => $arraytiposunidad, 'jurisdicciones' => $arrayjurisdiccion, 'municipios' => $arraymunicipio, 'tipologias' => $arraytipologia, 'estatus' => $arrayestatus ]);
+            foreach ($ciudades as $ciudad) {
+                $arrayciudad[$ciudad->id] = $ciudad->descripcion;
+            }
+           
+            return view('catalogo.colonia.create')->with(['municipios' => $arraymunicipio, 'zonas' => $arrayzona, 'asentamientos' => $arrayasentamiento, 'ciudades' => $arrayciudad]);
         } else {
             return response()->view('errors.allPagesError', ['icon' => 'user-secret', 'error' => '403', 'title' => 'Forbidden / Prohibido', 'message' => 'No tiene autorización para acceder al recurso. Se ha negado el acceso.'], 403);
         }
@@ -113,57 +113,29 @@ class ClueController extends Controller
             ];
 
             $rules = [
-                'jurisdicciones_id'     => 'required|min:1|numeric',
                 'municipios_id'         => 'required|min:1|numeric',
-                'localidades_id'        => 'required|min:1|numeric',
-                'instituciones_id'      => 'required|min:1|numeric',
-                'tipologias_id'         => 'required|min:1|numeric',
-                'estatus_id'            => 'required|min:1|numeric',
-                'tipos_unidades_id'     => 'required|min:1|numeric',
-                'clues'                 => 'required|min:5|max:11 |string',
+                'ciudades_id'           => 'required|min:1|numeric',
+                'tipos_zona_id'         => 'required|min:1|numeric',
+                'tipos_asentamiento_id' => 'required|min:1|numeric',
                 'nombre'                => 'required|min:3|max:100|string',
-                'domicilio'             => 'required|min:5|max:200|string',
                 'codigo_postal'         => 'required|min:5|max:5|string'                
             ];
             
             $this->validate($request, $rules, $messages);
 
-            $clues = Clue::count();
-
-            $servidor_id = (str_pad(($clues+1), 4, "0", STR_PAD_LEFT));
-
-            $clue = new Clue;
-            $clue->jurisdicciones_id            = $request->jurisdicciones_id;
-            $clue->municipios_id                = $request->municipios_id;
-            $clue->localidades_id               = $request->localidades_id;
-            $clue->instituciones_id             = $request->instituciones_id;
-            $clue->tipologias_id                = $request->tipologias_id;
-            $clue->estatus_id                   = $request->estatus_id;
-            $clue->tipos_unidades_id            = $request->tipos_unidades_id;
-            $clue->servidor                     = $servidor_id;
-            $clue->clues                        = $request->clues;
-            $clue->nombre                       = $request->nombre;            
-            $clue->domicilio                    = $request->domicilio;
-            $clue->codigo_postal                = $request->codigo_postal;
-            $clue->numero_latitud               = $request->numero_latitud;
-            $clue->numero_longitud              = $request->numero_longitud;
-            $clue->consultorios                 = $request->consultorios;
-            $clue->camas                        = $request->camas;
-            $clue->fecha_construccion           = $request->fecha_construccion;
-            $clue->fecha_inicio_operacion       = $request->fecha_inicio_operacion;
-            $clue->telefono1                    = $request->telefono1;
-            $clue->telefono2                    = $request->telefono2;
-            $clue->created_at                   = date('Y-m-d H:m:s');
+            $colonia = new Colonia;
+            $colonia->municipios_id                = $request->municipios_id;
+            $colonia->ciudades_id                  = $request->ciudades_id;
+            $colonia->entidades_id                 = 7;
+            $colonia->tipos_zona_id                = $request->tipos_zona_id;
+            $colonia->tipos_asentamiento_id        = $request->tipos_asentamiento_id;
+            $colonia->nombre                       = $request->nombre;  
+            $colonia->codigo_postal                = $request->codigo_postal;
+            $colonia->created_at                   = date('Y-m-d H:m:s');
             
             try {
                 DB::beginTransaction();
-                if($clue->save()) {
-                    $servidor = new Servidor;
-                    $servidor->id                        = $servidor_id;
-                    $servidor->nombre                    = 'Servidor CLUE: '.$request->clues;
-                    $servidor->secret_key                = md5(microtime().rand());
-                    $servidor->created_at                = date('Y-m-d H:m:s');
-                    $servidor->save();
+                if($colonia->save()) {                    
                     DB::commit();
                     $msgGeneral = 'Perfecto! se gurdaron los datos';
                     $type       = 'flash_message_ok';
@@ -195,14 +167,10 @@ class ClueController extends Controller
      */
     public function show($id)
     {
-        $data = Clue::with('municipio','localidad','jurisdiccion')->find($id);        
-        
+        $data = Colonia::with('municipio','entidad','ciudad')->find($id);
         if(!$data ){            
-            //return Response::json(['error' => "No se encuentra el recurso que esta buscando."], HttpResponse::HTTP_NOT_FOUND);
             return response()->json(['error' => "No se encuentra el recurso que esta buscando."]);
         }
-
-       // return Response::json([ 'data' => $data ], HttpResponse::HTTP_OK);
         return response()->json([ 'data' => $data]);
     }
 
@@ -215,35 +183,26 @@ class ClueController extends Controller
      public function edit($id)
      {
          if (Auth::user()->is('admin|root') && Auth::user()->can('show.catalogos') && Auth::user()->activo==1) {
-            $data = Clue::findOrFail($id);
+            $data = Colonia::findOrFail($id);
             if($data) {                
-                $municipio_selected = $data->municipios_id;
                 $municipios = Municipio::where('deleted_at',NULL)->get();
-                $jurisdicciones = Jurisdiccion::where('deleted_at',NULL)->get();
-                $instituciones = Institucion::where('deleted_at',NULL)->get();
-                $tipologias = Tipologia::where('deleted_at',NULL)->get();
-                $estatuss = Estatus::where('deleted_at',NULL)->get();
-                $tiposunidad = TipoUnidad::where('deleted_at',NULL)->get();
-    
-                foreach ($tiposunidad as $tipounidad) {
-                    $arraytiposunidad[$tipounidad->id] = $tipounidad->clave.' - '.$tipounidad->nombre;
-                }
+                $asentamientos = TipoAsentamiento::where('deleted_at',NULL)->get();
+                $zonas = TipoZona::where('deleted_at',NULL)->get();
+                $ciudades = Ciudad::where('deleted_at',NULL)->get();
                 foreach ($municipios as $municipio) {
                     $arraymunicipio[$municipio->id] = $municipio->clave.' - '.$municipio->nombre;
                 }
-                foreach ($jurisdicciones as $jurisdiccion) {
-                    $arrayjurisdiccion[$jurisdiccion->id] = $jurisdiccion->clave.' - '.$jurisdiccion->nombre;
-                }	
-                foreach ($tipologias as $tipologia) {
-                    $arraytipologia[$tipologia->id] = $tipologia->clave.' - '.$tipologia->tipo.' - '.$tipologia->descripcion.' - '.$tipologia->nombre;
+                foreach ($asentamientos as $asentamiento) {
+                    $arrayasentamiento[$asentamiento->id] = $asentamiento->descripcion;
                 }
-                foreach ($estatuss as $estatus) {
-                    $arrayestatus[$estatus->id] = $estatus->clave.' - '.$estatus->descripcion;
+                foreach ($zonas as $zona) {
+                    $arrayzona[$zona->id] = $zona->descripcion;
                 }
-                foreach ($instituciones as $institucion) {
-                    $arrayinstitucion[$institucion->id] = $institucion->clave .' - '.$institucion->nombre;
-                }  
-                return view('catalogo.clue.edit')->with(['data' => $data,'municipio_selected' => $municipio_selected, 'instituciones' => $arrayinstitucion, 'tipos_unidades' => $arraytiposunidad, 'jurisdicciones' => $arrayjurisdiccion, 'municipios' => $arraymunicipio, 'tipologias' => $arraytipologia, 'estatus' => $arrayestatus ]);
+                foreach ($ciudades as $ciudad) {
+                    $arrayciudad[$ciudad->id] = $ciudad->descripcion;
+                }
+               
+                return view('catalogo.colonia.edit')->with(['data' => $data,'municipios' => $arraymunicipio, 'zonas' => $arrayzona, 'asentamientos' => $arrayasentamiento, 'ciudades' => $arrayciudad]); 
             } else {
                 return response()->view('errors.allPagesError', ['icon' => 'search-minus', 'error' => '404', 'title' => 'Not found / No se encuentra', 'message' => 'El servidor no puede encontrar el recurso solicitado y no es posible determinar si esta ausencia es temporal o permanente.'], 404);
             }
@@ -275,47 +234,28 @@ class ClueController extends Controller
             ];
 
             $rules = [
-                'jurisdicciones_id'     => 'required|min:1|numeric',
                 'municipios_id'         => 'required|min:1|numeric',
-                'localidades_id'        => 'required|min:1|numeric',
-                'instituciones_id'      => 'required|min:1|numeric',
-                'tipologias_id'         => 'required|min:1|numeric',
-                'estatus_id'            => 'required|min:1|numeric',
-                'tipos_unidades_id'     => 'required|min:1|numeric',
-                'clues'                 => 'required|min:5|max:11 |string',
+                'ciudades_id'           => 'required|min:1|numeric',
+                'tipos_zona_id'         => 'required|min:1|numeric',
+                'tipos_asentamiento_id' => 'required|min:1|numeric',
                 'nombre'                => 'required|min:3|max:100|string',
-                'domicilio'             => 'required|min:5|max:200|string',
                 'codigo_postal'         => 'required|min:5|max:5|string'                
             ];
             
             $this->validate($request, $rules, $messages);
 
-            $clue = Clue::find($id);
-            
-            $clue->jurisdicciones_id            = $request->jurisdicciones_id;
-            $clue->municipios_id                = $request->municipios_id;
-            $clue->localidades_id               = $request->localidades_id;
-            $clue->instituciones_id             = $request->instituciones_id;
-            $clue->tipologias_id                = $request->tipologias_id;
-            $clue->estatus_id                   = $request->estatus_id;
-            $clue->tipos_unidades_id            = $request->tipos_unidades_id;
-            $clue->clues                        = $request->clues;
-            $clue->nombre                       = $request->nombre;            
-            $clue->domicilio                    = $request->domicilio;
-            $clue->codigo_postal                = $request->codigo_postal;
-            $clue->numero_latitud               = $request->numero_latitud;
-            $clue->numero_longitud              = $request->numero_longitud;
-            $clue->consultorios                 = $request->consultorios;
-            $clue->camas                        = $request->camas;
-            $clue->fecha_construccion           = $request->fecha_construccion;
-            $clue->fecha_inicio_operacion       = $request->fecha_inicio_operacion;
-            $clue->telefono1                    = $request->telefono1;
-            $clue->telefono2                    = $request->telefono2;
-            $clue->updated_at                   = date('Y-m-d H:m:s');
+            $colonia = Colonia::find($id);
+            $colonia->municipios_id                = $request->municipios_id;
+            $colonia->ciudades_id                  = $request->ciudades_id;
+            $colonia->tipos_zona_id                = $request->tipos_zona_id;
+            $colonia->tipos_asentamiento_id        = $request->tipos_asentamiento_id;
+            $colonia->nombre                       = $request->nombre;  
+            $colonia->codigo_postal                = $request->codigo_postal;
+            $colonia->updated_at                   = date('Y-m-d H:m:s');
             
             try {
                 DB::beginTransaction();
-                if($clue->save()) {
+                if($colonia->save()) {                    
                     DB::commit();
                     $msgGeneral = 'Perfecto! se gurdaron los datos';
                     $type       = 'flash_message_ok';
@@ -350,12 +290,12 @@ class ClueController extends Controller
         $msgGeneral     = '';
         $type           = 'flash_message_info';
         $type2          = 'error';        
-        $clue = Clue::findOrFail($id);
+        $colonia = Colonia::findOrFail($id);
         if ($request->ajax()) {
             if (Auth::user()->is('root|admin') && Auth::user()->can('delete.catalogos') && Auth::user()->activo==1) {
                 try {                    
                     DB::beginTransaction();
-                    $updates = DB::table('clues')
+                    $updates = DB::table('colonias')
                             ->where('id', '=', $id)
                             ->update(['deleted_at' => date('Y-m-d H:m:s')]);
                     if ($updates>=0) {

@@ -170,14 +170,6 @@
 
     <!-- Datatables -->
     <script type="text/javascript">
-        $(document).ready(function() {
-            $('#datatable-responsive').DataTable({
-                language: {
-                    url: '/assets/mine/js/dataTables/es_MX.json'
-                }
-            });
-        });
-
         var esquema = $.parseJSON(escaparCharEspeciales('{{$esquema}}'));
         var aplicaciones_dosis = $.parseJSON(escaparCharEspeciales('{{json_encode($data->personasVacunasEsquemas)}}'));
         var aplicaciones_reales = $.parseJSON(escaparCharEspeciales('{{json_encode($data->aplicaciones)}}'));

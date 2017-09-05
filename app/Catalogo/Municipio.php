@@ -18,5 +18,10 @@ class Municipio extends Model
 
     public function jurisdiccion(){
 		  return $this->belongsTo('App\Catalogo\Jurisdiccion', 'jurisdicciones_id', 'id');
-	}
+    }
+
+    public function localidades()
+    {
+        return $this->hasMany('App\Catalogo\Localidad', 'municipios_id')->where('deleted_at', NULL)->select('id','clave','nombre','municipios_id');
+    }
 }
