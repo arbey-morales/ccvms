@@ -1,48 +1,44 @@
-
-@foreach($data as $key=>$item)
-    <div class="col-md-6 col-sm-6 col-xs-12 profile_details">
-        <div class="well profile_view">
-            <div class="col-sm-12">
-                <h4 class="brief">
-                    @foreach($item->rolesuser as $k=>$rol) 
-                        @if($rol->role->slug=='admin')
-                            <strong>OFICINA CENTRAL</strong> 
-                        @else
-                            <strong>CAPTURA:</strong> <i> {{ $item->jurisdiccion->clave }}</i> {{ $item->jurisdiccion->nombre }}
-                        @endif
-                    @endforeach 
-                </h4>
-                <div class="left col-xs-7">
-                    <h2>{{$item->nombre}} {{$item->paterno}} {{$item->materno}}</h2>
-                    <ul class="list-unstyled">
-                    <li><i class="fa fa-building"></i> Dirección: {{$item->direccion}}</li>
-                    <li><i class="fa fa-at"></i> Email: {{$item->email}}</li>
-                    </ul>
-                    <p><strong>Creación: </strong>{{$item->creadoAl}}</p>
-                    <p><strong>Actualización: </strong>{{$item->modificadoAl}}</p>
-                </div>
-                <div class="right col-xs-5 text-center">
-                    <img src="@if($item->foto) {{ url('storage/user/profile/'.$item->foto) }}  @else {{ url('storage/user/profile/user-default.png') }} @endif" alt="..." class="img-circle img-responsive" width="135px"/>
-                </div>
-            </div>
-            <div class="col-xs-12 bottom text-center">
-                <div class="col-xs-12 col-sm-6 emphasis">
-                    <p class="ratings">
-                    <a>  <span href="#" class="label label-success">Hoy: <strong style="font-size:xx-large;" class="text-primary">{{$item->hoy}}</strong></span> <span href="#" class="label label-warning">Ayer: <strong class="text-primary" style="font-size:xx-large;">{{$item->ayer}}</strong></span> <span href="#" class="label label-danger">Última. Semana: <strong class="text-primary" style="font-size:xx-large;">{{$item->ultima_semana}}</strong></span></a>
-                </div>
-            <div class="col-xs-12 col-sm-6 emphasis">
-                <!--<button type="button" class="btn btn-success btn-large">
-                    Otros filtros
-                </button>-->
-                <a href="{{ url('usuario/'.$item->id) }}" type="button" class="btn btn-info btn-large">
-                    <i class="fa fa-user"> </i> Ver perfil
+<ul class="list-unstyled timeline">
+    @foreach($data2 as $key=>$item)    
+        <li>
+            <div class="block">
+            <div class="tags">
+                <a href="" class="tag">
+                    <span>{{$item->nombre}}</span>
                 </a>
             </div>
+            <div class="block_content">
+                <div class="row">
+                    <div class="col-md-1" style="font-size:xx-large; color:tomato; text-align:center;">{{$item->captura_jurisdiccion}}</div>
+                    <div class="col-md-11"> 
+                        <table class="table">
+                            <thead>
+                                <tr scope="row">
+                                    <th>Usuarios:</th>
+                                    @foreach($item->usuarios as $k=>$i) 
+                                        <th>
+                                            {{$i->nombre}} {{$i->paterno}} {{$i->materno}}<br>
+                                            <i style="font-weight:normal;">{{$i->email}}</i>
+                                        </th>
+                                    @endforeach
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr scope="row">
+                                    <td>Capturas:</td>
+                                    @foreach($item->usuarios as $k=>$i) 
+                                        <td style="text-align:center; font-size:large; color:#000;">
+                                            {{$i->captura}}
+                                        </td>
+                                    @endforeach
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-    @if(($key%2)!=0)
-        <div class="clearfix"></div>
-    @endif
-@endforeach
+            </div>
+        </li>
+    @endforeach
+</ul>
 

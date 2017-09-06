@@ -26,7 +26,7 @@
                 {!! Form::close() !!}
             </div>
             @if(count($data)>0)
-                <a class="btn btn-primary btn-lg pull-right" href="#" onClick="descargarPdf()" role="button"> <i class="fa fa-cloud-download"></i> Descargar</a>
+                <!--<a class="btn btn-primary btn-lg pull-right" href="#" onClick="descargarPdf()" role="button"> <i class="fa fa-cloud-download"></i> Descargar</a>-->
             @endif
             <div class="clearfix"></div>
         </div>
@@ -49,26 +49,27 @@
     {!! Html::script('assets/mine/js/images.js') !!}
 
     <script>
-        var data = $.parseJSON(escaparCharEspeciales('{{json_encode($data)}}'));
+        var data    = $.parseJSON(escaparCharEspeciales('{{json_encode($data)}}'));
+        var data2   = $.parseJSON(escaparCharEspeciales('{{json_encode($data2)}}'));
+        var usuario = $.parseJSON(escaparCharEspeciales('{{json_encode($usuario)}}'));
         var documentoDefinicion = construirTabla();
 
         // MASCARA TIPO DD-MM-AAAA
         $("#fecha").mask("99-99-9999");
-        $("#fecha").focus();
 
         function verPdf()
         {
-            pdfMake.createPdf(documentoDefinicion).open('Censo Nominal '+moment().format('DD-MM-YYYY')+'.pdf');
+            pdfMake.createPdf(documentoDefinicion).open('Monitoreo '+moment().format('DD-MM-YYYY')+'.pdf');
         }
 
         function imprimirPdf()
         {
-            pdfMake.createPdf(documentoDefinicion).print('Censo Nominal '+moment().format('DD-MM-YYYY')+'.pdf');
+            pdfMake.createPdf(documentoDefinicion).print('Monitoreo '+moment().format('DD-MM-YYYY')+'.pdf');
         }
 
         function descargarPdf()
         {
-            pdfMake.createPdf(documentoDefinicion).download('Censo Nominal '+moment().format('DD-MM-YYYY')+'.pdf');
+            pdfMake.createPdf(documentoDefinicion).download('Monitoreo '+moment().format('DD-MM-YYYY')+'.pdf');
         }
 
         function escaparCharEspeciales(str)
@@ -86,73 +87,49 @@
         
         function construirTabla() {
             var body = [];
-            body.push([
-                        {'text':'Nombre', 'style':'celda_header'},
-                        {'text':'Nacimiento', 'style':'celda_header'},
-                        {'text':'Género', 'style':'celda_header'},
-                        {'text':'CURP', 'style':'celda_header'},
-                        {'text':'Tutor', 'style':'celda_header'},
-                        {'text':'Parto', 'style':'celda_header'},
-                        {'text':'Dirección', 'style':'celda_header'},
-                        {'text':'CLUE', 'style':'celda_header'},
-                        {'text':'AGEB', 'style':'celda_header'},
-                        {'text':'Sector', 'style':'celda_header'},
-                        {'text':'Mz', 'style':'celda_header'},
-                        {'text':'Código', 'style':'celda_header'},
-                        {'text':'Afiliación', 'style':'celda_header'}
-                    ]);
-            $.each(data, function( indice, row ) { 
-                var data_row = [];
-                data_row.push({'text':row.nombre+' '+row.apellido_paterno+' '+row.apellido_materno, 'style':'celda_body'});
-                data_row.push({'text':row.fecha_nacimiento, 'style':'celda_body'});
-                data_row.push({'text':row.genero, 'style':'celda_body'});
-                data_row.push({'text':row.curp, 'style':'celda_body'});
-                data_row.push({'text':row.tutor, 'style':'celda_body'});
-                data_row.push({'text':row.tipo_parto.descripcion, 'style':'celda_body'});
-                var colonia = '';
-                if(row.colonias_id!=null){
-                    colonia = row.colonia.nombre+', ';
+            var columns = 0;
+            $.each(data2, function( indice, row ) { 
+                if(row.usuarios.length>columns){
+                    columns = row.usuarios.length;
                 }
-                data_row.push({'text':row.calle+' '+row.numero+', '+colonia+' '+row.localidad.nombre+', '+row.municipio.nombre, 'style':'celda_body'});
-                data_row.push({'text':row.clue.clues+' '+row.clue.nombre, 'style':'celda_body'});
-                var ageb = '';
-                if(row.agebs_id!=null){
-                    ageb = row.ageb.id;
-                    ageb = ageb.substr(-4);
+            });
+
+            var porcent = Math.round(100 / (columns + 2));
+            console.log(porcent);
+            $.each(data2, function( indice, row ) { 
+                var data_row = [];    
+                var cj = parseInt(row.captura_jurisdiccion);            
+                data_row.push({'text':row.nombre, 'width': ''+porcent+'%', 'style':'celda_body'});
+                data_row.push({'text':''+row.captura_jurisdiccion+'', 'width': ''+porcent+'%', 'style':'celda_body'});
+                var col = 0;
+                $.each(row.usuarios, function( ind, row_usuarios ) {
+                    col++;
+                    data_row.push({'text':row_usuarios.email, 'width': ''+porcent+'%', 'style':'celda_body'});
+                });
+
+                for (var i = (col + 1); i < (columns + 1); i++) {
+                    data_row.push({'text':' ', 'width': ''+porcent+'%', 'style':'celda_body'});
                 }
-                data_row.push({'text':ageb, 'style':'celda_body'});
-                data_row.push({'text':row.sector, 'style':'celda_body'});
-                data_row.push({'text':row.manzana, 'style':'celda_body'});
-                var codigo = '';
-                if(row.codigos_id!=null){
-                    codigo = row.codigo.nombre;
-                }
-                data_row.push({'text':codigo, 'style':'celda_body'});
-                var afiliacion = '';
-                if(row.codigos_id!=null){
-                    afiliacion = row.afiliacion.nombre_corto;
-                }
-                data_row.push({'text':afiliacion, 'style':'celda_body'});
                 body.push(data_row);
             });
             return documentoDefinicion = {
                 // a string or { width: number, height: number } OFICIO PIXELS: { width: 1285, height: 816 }
-                pageSize: 'LEGAL',
+                pageSize: 'A4',
                 // by default we use portrait, you can change it to landscape if you wish
-                pageOrientation: 'landscape',
+                pageOrientation: 'portrait',
                 pageMargins: [ 40, 70, 40, 70 ],
                 header: {
                     margin: [ 40, 30, 40, 30 ],
                     columns: [
                         { image: logo_sm, width: 85 },
-                        { text: 'Censo Nominal \n Jurisdicción '+usuario.jurisdiccion.clave+' '+usuario.jurisdiccion.nombre, width: 790, alignment: 'center', bold: true },
+                        { text: 'Monitoreo de capturas', width: 370, alignment: 'center', bold: true },
                         { image: censia, width: 50 }
                     ]
                 },
                 footer: {
                     margin: [ 40, 30, 40, 30 ],                
                     columns: [
-                        { text: 'Generó: '+usuario.nombre+' '+usuario.paterno+' '+usuario.materno+' / '+usuario.email, alignment: 'left' },
+                        { text: usuario.email, alignment: 'left' },
                         { text: moment().format('LL'), alignment: 'right' }
                     ]
                 },
@@ -172,6 +149,7 @@
                     },
                     celda_body: {
                         fontSize: 7,
+                        width: porcent+'%',
                         italic: true,
                         alignment: 'left'
                     }
