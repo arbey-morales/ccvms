@@ -134,7 +134,7 @@
                             <div class="bt-flabels__wrapper"> 
                                 <span class="select-label">Tipología</span>                                                         
                                 {!! Form::label('tipologias_id', 'Tipología', ['for' => 'tipologias_id'] ) !!}
-                                {!! Form::select('tipologias_id', $tipologias, '1', ['class' => 'form-control js-data-tipologia select2', 'data-parsley-type' => 'number', 'data-parsley-min' => '0', 'id' => 'tipologias_id',  'data-placeholder' => '* Tipología', 'style' => 'width:100%'] ) !!}
+                                {!! Form::select('tipologias_id', $tipologias, $data->tipologias_id, ['class' => 'form-control js-data-tipologia select2', 'data-parsley-type' => 'number', 'data-parsley-min' => '0', 'id' => 'tipologias_id',  'data-placeholder' => '* Tipología', 'style' => 'width:100%'] ) !!}
                                 <span class="bt-flabels__error-desc">Requerido</span>
                             </div>
                         </div>
@@ -142,7 +142,7 @@
                             <div class="bt-flabels__wrapper bt-flabels--right">  
                             <span class="select-label">Estatus</span>                                                         
                                 {!! Form::label('estatus_id', 'Estatus', ['for' => 'tipologias_id'] ) !!}
-                                {!! Form::select('estatus_id', $estatus, 1, ['class' => 'form-control js-data-estatus select2', 'data-parsley-type' => 'number', 'data-parsley-min' => '0', 'id' => 'estatus_id',  'data-placeholder' => '* Estatus', 'style' => 'width:100%'] ) !!}
+                                {!! Form::select('estatus_id', $estatus, $data->estatus_id, ['class' => 'form-control js-data-estatus select2', 'data-parsley-type' => 'number', 'data-parsley-min' => '0', 'id' => 'estatus_id',  'data-placeholder' => '* Estatus', 'style' => 'width:100%'] ) !!}
                                 <span class="bt-flabels__error-desc">Requerido</span>
                             </div>
                         </div>
@@ -151,13 +151,13 @@
                         <div class="uk-width-1-2">
                             <div class="bt-flabels__wrapper">
                                 {!! Form::label('numero_longitud', 'Número longitud', ['for' => 'numero_longitud'] ) !!}
-                                {!! Form::text('numero_longitud', null , ['class' => 'form-control has-feedback-left', 'aria-describedby' => 'inputSuccess2Status', 'id' => 'numero_longitud', 'autocomplete' => 'off', 'placeholder' => 'Número longitud' ]  ) !!}
+                                {!! Form::text('numero_longitud', $data->numero_longitud, ['class' => 'form-control has-feedback-left', 'aria-describedby' => 'inputSuccess2Status', 'id' => 'numero_longitud', 'autocomplete' => 'off', 'placeholder' => 'Número longitud' ]  ) !!}
                             </div>
                         </div>
                         <div class="uk-width-1-2">
                             <div class="bt-flabels__wrapper">
                                 {!! Form::label('numero_latitud', 'Número latitud', ['for' => 'numero_latitud'] ) !!}
-                                {!! Form::text('numero_latitud', null , ['class' => 'form-control', 'id' => 'numero_latitud', 'autocomplete' => 'off', 'placeholder' => 'Número latitud' ]  ) !!}
+                                {!! Form::text('numero_latitud', $data->numero_latitud, ['class' => 'form-control', 'id' => 'numero_latitud', 'autocomplete' => 'off', 'placeholder' => 'Número latitud' ]  ) !!}
                             </div>
                         </div>
                     </div>
@@ -165,13 +165,13 @@
                         <div class="uk-width-1-2">
                             <div class="bt-flabels__wrapper">
                                 {!! Form::label('consultorios', 'No. de consultorios', ['for' => 'consultorios'] ) !!}
-                                {!! Form::text('consultorios', null , ['class' => 'form-control has-feedback-left', 'aria-describedby' => 'inputSuccess2Status', 'id' => 'consultorios', 'autocomplete' => 'off', 'placeholder' => 'No. de consultorios' ]  ) !!}
+                                {!! Form::text('consultorios', $data->consultorios, ['class' => 'form-control has-feedback-left', 'aria-describedby' => 'inputSuccess2Status', 'id' => 'consultorios', 'autocomplete' => 'off', 'placeholder' => 'No. de consultorios' ]  ) !!}
                             </div>
                         </div>
                         <div class="uk-width-1-2">
                             <div class="bt-flabels__wrapper">
                                 {!! Form::label('camas', 'No. de camas', ['for' => 'camas'] ) !!}
-                                {!! Form::number('camas', null , ['class' => 'form-control', 'id' => 'camas', 'autocomplete' => 'off', 'placeholder' => 'No. de camas' ]  ) !!}                                
+                                {!! Form::number('camas', $data->camas, ['class' => 'form-control', 'id' => 'camas', 'autocomplete' => 'off', 'placeholder' => 'No. de camas' ]  ) !!}                                
                             </div>
                         </div>
                     </div>
@@ -179,13 +179,13 @@
                         <div class="uk-width-1-2">
                             <div class="bt-flabels__wrapper">
                                 {!! Form::label('fecha_construccion', 'Fecha de construcción', ['for' => 'fecha_construccion'] ) !!}
-                                {!! Form::text('fecha_construccion', null , ['class' => 'form-control has-feedback-left', 'aria-describedby' => 'inputSuccess2Status', 'id' => 'fecha_construccion', 'autocomplete' => 'off', 'placeholder' => 'Fecha de construcción' ]  ) !!}
+                                {!! Form::text('fecha_construccion', $data->fecha_construccion, ['class' => 'form-control has-feedback-left', 'aria-describedby' => 'inputSuccess2Status', 'id' => 'fecha_construccion', 'autocomplete' => 'off', 'placeholder' => 'Fecha de construcción' ]  ) !!}
                             </div>
                         </div>
                         <div class="uk-width-1-2">
                             <div class="bt-flabels__wrapper bt-flabels--right">
                                 {!! Form::label('fecha_inicio_operacion', 'Fecha de incio de operación', ['for' => 'fecha_inicio_operacion'] ) !!}
-                                {!! Form::text('fecha_inicio_operacion', null , ['class' => 'form-control has-feedback-left', 'aria-describedby' => 'inputSuccess2Status', 'id' => 'fecha_inicio_operacion', 'autocomplete' => 'off', 'placeholder' => 'Fecha de incio de operación' ]  ) !!}
+                                {!! Form::text('fecha_inicio_operacion', $data->fecha_inicio_operacion, ['class' => 'form-control has-feedback-left', 'aria-describedby' => 'inputSuccess2Status', 'id' => 'fecha_inicio_operacion', 'autocomplete' => 'off', 'placeholder' => 'Fecha de incio de operación' ]  ) !!}
                             </div>
                         </div>
                     </div>
@@ -193,13 +193,13 @@
                         <div class="uk-width-1-2">
                             <div class="bt-flabels__wrapper">
                                 {!! Form::label('telefono1', 'Teléfono ', ['for' => 'telefono1'] ) !!}
-                                {!! Form::text('telefono1', null , ['class' => 'form-control has-feedback-left', 'aria-describedby' => 'inputSuccess2Status', 'id' => 'telefono1', 'autocomplete' => 'off', 'placeholder' => 'Teléfono ' ]  ) !!}
+                                {!! Form::text('telefono1', $data->telefono1, ['class' => 'form-control has-feedback-left', 'aria-describedby' => 'inputSuccess2Status', 'id' => 'telefono1', 'autocomplete' => 'off', 'placeholder' => 'Teléfono ' ]  ) !!}
                             </div>
                         </div>
                         <div class="uk-width-1-2">
                             <div class="bt-flabels__wrapper bt-flabels--right">
                                 {!! Form::label('telefono2', 'Otro teléfono', ['for' => 'telefono2'] ) !!}
-                                {!! Form::text('telefono2', null , ['class' => 'form-control has-feedback-left', 'aria-describedby' => 'inputSuccess2Status', 'id' => 'telefono2', 'autocomplete' => 'off', 'placeholder' => 'Otro teléfono' ]  ) !!}
+                                {!! Form::text('telefono2', $data->telefono2, ['class' => 'form-control has-feedback-left', 'aria-describedby' => 'inputSuccess2Status', 'id' => 'telefono2', 'autocomplete' => 'off', 'placeholder' => 'Otro teléfono' ]  ) !!}
                             </div>
                         </div>
                     </div>

@@ -8,9 +8,9 @@
     {!! Html::style('assets/mine/css/responsive.bootstrap.min.css') !!}
     <style>
         .search{
-            font-weight : bold;
+            font-weight : normal;
             color : #000; 
-            font-size: xx-large; 
+            font-size: x-large; 
             text-align: center ;
             height: 45px ;       
         }
@@ -25,8 +25,11 @@
                     {!! Form::text('fecha', $fecha, ['class' => 'form-control search', 'id' => 'fecha', 'autocomplete' => 'off', 'placeholder' => '01-02-2017' ]) !!}
                 {!! Form::close() !!}
             </div>
-            @if(count($data)>0)
-                <!--<a class="btn btn-primary btn-lg pull-right" href="#" onClick="descargarPdf()" role="button"> <i class="fa fa-cloud-download"></i> Descargar</a>-->
+            @if(count($data2)>0)
+                <div class="col-md-3 pull-right">
+                    <a class="btn btn-info btn-lg" href="#" onClick="verPdf()" class="button" data-toggle="tooltip" data-placement="bottom" title="" data-original-title=".Pdf"> <i class="fa fa-file-pdf-o"></i> Vista Previa </a>
+                    <a class="btn btn-warning btn-lg" href="#" onClick="imprimirPdf()" class="button" data-toggle="tooltip" data-placement="bottom" title="" data-original-title=".Pdf"> <i class="fa fa-print"></i> Imprimir</a>
+                </div>
             @endif
             <div class="clearfix"></div>
         </div>
@@ -49,7 +52,6 @@
     {!! Html::script('assets/mine/js/images.js') !!}
 
     <script>
-        var data    = $.parseJSON(escaparCharEspeciales('{{json_encode($data)}}'));
         var data2   = $.parseJSON(escaparCharEspeciales('{{json_encode($data2)}}'));
         var usuario = $.parseJSON(escaparCharEspeciales('{{json_encode($usuario)}}'));
         var documentoDefinicion = construirTabla();
@@ -94,42 +96,43 @@
                 }
             });
 
-            var porcent = Math.round(100 / (columns + 2));
-            console.log(porcent);
+            var porcent = Math.round(100 / (columns + 3));
             $.each(data2, function( indice, row ) { 
                 var data_row = [];    
                 var cj = parseInt(row.captura_jurisdiccion);            
-                data_row.push({'text':row.nombre, 'width': ''+porcent+'%', 'style':'celda_body'});
-                data_row.push({'text':''+row.captura_jurisdiccion+'', 'width': ''+porcent+'%', 'style':'celda_body'});
+                data_row.push({'text':row.nombre, 'style':'celda_body'});
+                data_row.push({'text':''+row.captura_jurisdiccion+'', 'style':'total_jur'});
+                data_row.push({'text':'Usuarios: \n \n Capturas:', 'style':'celda_body'});
                 var col = 0;
                 $.each(row.usuarios, function( ind, row_usuarios ) {
                     col++;
-                    data_row.push({'text':row_usuarios.email, 'width': ''+porcent+'%', 'style':'celda_body'});
+                    data_row.push({'text':row_usuarios.nombre+' '+row_usuarios.paterno+' '+row_usuarios.materno+' \n '+row_usuarios.email+' \n '+row_usuarios.captura, 'style':'celda_body'});
                 });
 
                 for (var i = (col + 1); i < (columns + 1); i++) {
-                    data_row.push({'text':' ', 'width': ''+porcent+'%', 'style':'celda_body'});
+                    data_row.push({'text':' ', 'style':'celda_body'});
                 }
                 body.push(data_row);
             });
+
             return documentoDefinicion = {
                 // a string or { width: number, height: number } OFICIO PIXELS: { width: 1285, height: 816 }
-                pageSize: 'A4',
+                pageSize: 'LEGAL',
                 // by default we use portrait, you can change it to landscape if you wish
-                pageOrientation: 'portrait',
+                pageOrientation: 'landscape',
                 pageMargins: [ 40, 70, 40, 70 ],
                 header: {
                     margin: [ 40, 30, 40, 30 ],
                     columns: [
                         { image: logo_sm, width: 85 },
-                        { text: 'Monitoreo de capturas', width: 370, alignment: 'center', bold: true },
+                        { text: 'Monitoreo de capturas del '+moment($("#fecha").val(),'DD-MM-YYYY').format('LL'), width: 770, alignment: 'center', bold: true },
                         { image: censia, width: 50 }
                     ]
                 },
                 footer: {
                     margin: [ 40, 30, 40, 30 ],                
                     columns: [
-                        { text: usuario.email, alignment: 'left' },
+                        { text: usuario.nombre+' '+usuario.paterno+' '+usuario.materno+' / '+usuario.email, alignment: 'left' },
                         { text: moment().format('LL'), alignment: 'right' }
                     ]
                 },
@@ -149,9 +152,15 @@
                     },
                     celda_body: {
                         fontSize: 7,
-                        width: porcent+'%',
+                        width: ''+porcent+'%',
                         italic: true,
                         alignment: 'left'
+                    },
+                    total_jur: {
+                        fontSize: 9,
+                        width: ''+porcent+'%',
+                        alignment: 'center',
+                        fontWeight: 'bold'
                     }
                 }
             }

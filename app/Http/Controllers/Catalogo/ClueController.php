@@ -332,7 +332,7 @@ class ClueController extends Controller
             }        
             
             Session::flash($type, $msgGeneral);
-            return redirect()->back()->withInput();
+            return redirect()->back();
 
         } else {
             return response()->view('errors.allPagesError', ['icon' => 'user-secret', 'error' => '403', 'title' => 'Forbidden / Prohibido', 'message' => 'No tiene autorización para acceder al recurso. Se ha negado el acceso.'], 403);
