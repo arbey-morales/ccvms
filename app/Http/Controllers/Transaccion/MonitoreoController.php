@@ -29,13 +29,13 @@ class MonitoreoController extends Controller
             if($parametros['fecha'] && $parametros['fecha']!=NULL && $parametros['fecha']!=""){
                 $fecha_send = $parametros['fecha'];
                 $date       = explode("-", $parametros['fecha']);
-                $fecha      = Carbon::parse($date[2]."-".$date[1]."-".$date[0]." 00:00:00","America/Mexico_City");
+                $fecha      = Carbon::parse($date[2]."-".$date[1]."-".$date[0]." 00:00:00","America/Mexico_City")->format('Y-m-d H:i:s');
                 $fecha_top  = Carbon::parse($date[2]."-".$date[1]."-".$date[0]." 00:00:00","America/Mexico_City");
-                $fecha_top  = $fecha_top->endOfDay();
+                $fecha_top  = $fecha_top->addDay()->format('Y-m-d H:i:s');
             } else {
-                $fecha      = Carbon::today('America/Mexico_City');
+                $fecha      = Carbon::today('America/Mexico_City')->format('Y-m-d H:i:s');
                 $fecha_top  = Carbon::today('America/Mexico_City');   
-                $fecha_top  = $fecha_top->endOfDay();             
+                $fecha_top  = $fecha_top->addDay()->format('Y-m-d H:i:s');             
                 $fecha_send = Carbon::today('America/Mexico_City')->format('d-m-Y');
             }
             
@@ -44,11 +44,12 @@ class MonitoreoController extends Controller
                 $data_users = User::select('idJurisdiccion','id','email','borrado','nombre','paterno','materno')->where('idJurisdiccion', $value2->id)->where('asRoot', 0)->where('borrado', 0)->orderBy('id')->get();
                 $usuarios = collect();
                 foreach ($data_users as $key_users => $value_users) {
-                    $value_users->captura = DB::select("select count(id) as captura from personas where usuario_id='$value_users->email' and created_at between '$fecha' and '$fecha_top' and deleted_at is null")[0]->captura;
+                    $value_users->captura = DB::select("select count(id) as captura from personas where usuario_id='$value_users->email' and created_at >= '$fecha' and created_at < '$fecha_top' and deleted_at is null")[0]->captura;
                     $value2->captura_jurisdiccion+= $value_users->captura;
                 }
                 $data2[$key2]->usuarios = $data_users;
             }
+            
             $usuario = User::with('jurisdiccion')->find(Auth::user()->id);
             return view('monitoreo.index')->with(['usuario' => $usuario, 'data2' => $data2, 'fecha' => $fecha_send]);
         } else {
