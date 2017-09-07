@@ -26,7 +26,7 @@
                 {!! Form::close() !!}
             </div>
             @if(count($data2)>0)
-                <div class="col-md-3 pull-right">
+                <div class="col-md-4 pull-right">
                     <a class="btn btn-info btn-lg" href="#" onClick="verPdf()" class="button" data-toggle="tooltip" data-placement="bottom" title="" data-original-title=".Pdf"> <i class="fa fa-file-pdf-o"></i> Vista Previa </a>
                     <a class="btn btn-warning btn-lg" href="#" onClick="imprimirPdf()" class="button" data-toggle="tooltip" data-placement="bottom" title="" data-original-title=".Pdf"> <i class="fa fa-print"></i> Imprimir</a>
                 </div>
@@ -96,23 +96,26 @@
                 }
             });
 
-            var porcent = Math.round(100 / (columns + 3));
+            var porcent = Math.round(100 / (columns + 2));
             $.each(data2, function( indice, row ) { 
-                var data_row = [];    
+                var data_row = [];  
+                var data_row2 = [];  
                 var cj = parseInt(row.captura_jurisdiccion);            
-                data_row.push({'text':row.nombre, 'style':'celda_body'});
-                data_row.push({'text':''+row.captura_jurisdiccion+'', 'style':'total_jur'});
-                data_row.push({'text':'Usuarios: \n \n Capturas:', 'style':'celda_body'});
+                data_row.push({'rowSpan':2, 'text':row.nombre, 'style':'jurisdiccion'},{'rowSpan':2, 'text':''+row.captura_jurisdiccion+'', 'style':'captura_jurisdiccion'});
+                data_row2.push({'text':' '},{'text':' '});
                 var col = 0;
                 $.each(row.usuarios, function( ind, row_usuarios ) {
                     col++;
-                    data_row.push({'text':row_usuarios.nombre+' '+row_usuarios.paterno+' '+row_usuarios.materno+' \n '+row_usuarios.email+' \n '+row_usuarios.captura, 'style':'celda_body'});
+                    data_row.push({'text':row_usuarios.nombre+' '+row_usuarios.paterno+' '+row_usuarios.materno+' \n '+row_usuarios.email, 'style':'normal'});
+                    data_row2.push({'text':''+row_usuarios.captura+'', 'style':'captura_usuario'});
                 });
 
                 for (var i = (col + 1); i < (columns + 1); i++) {
-                    data_row.push({'text':' ', 'style':'celda_body'});
+                    data_row.push({'text': ' -- ', 'style':'normal'});
+                    data_row2.push({'text': ' -- ', 'style':'captura_usuario'});
                 }
                 body.push(data_row);
+                body.push(data_row2);
             });
 
             return documentoDefinicion = {
@@ -145,20 +148,31 @@
                     }
                 ],
                 styles: {
-                    celda_header: {
-                        fontSize: 10,
-                        bold: true,
-                        aligment: 'center'
-                    },
-                    celda_body: {
-                        fontSize: 7,
-                        width: ''+porcent+'%',
-                        italic: true,
-                        alignment: 'left'
-                    },
-                    total_jur: {
+                    normal: {
                         fontSize: 9,
-                        width: ''+porcent+'%',
+                        italic: true,
+                        alignment: 'left',
+                        color: '#545454'
+                    },
+                    captura_jurisdiccion: {
+                        fontSize: 12,
+                        alignment: 'center',
+                        fontWeight: 'bolder',
+                        color: 'tomato',
+                        verticalAlign: 'middle'
+                    },
+                    captura_usuario: {
+                        fontSize: 11,
+                        alignment: 'center',
+                        fontWeight: 'bolder'
+                    },
+                    jurisdiccion: {
+                        fontSize: 12,
+                        alignment: 'center',
+                        fontWeight: 'bold'
+                    },
+                    usuario: {
+                        fontSize: 11,
                         alignment: 'center',
                         fontWeight: 'bold'
                     }

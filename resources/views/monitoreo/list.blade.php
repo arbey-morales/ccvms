@@ -1,4 +1,9 @@
 <ul class="list-unstyled timeline">
+    <?php $col = 0; ?>
+    @foreach($data2 as $key=>$item)
+        <?php if(count($item->usuarios)>$col){$col = count($item->usuarios);} ?>
+    @endforeach
+    <?php $cols = round(100 / ($col)); ?>
     @foreach($data2 as $key=>$item)    
         <li>
             <div class="block">
@@ -14,23 +19,29 @@
                         <table class="table">
                             <thead>
                                 <tr scope="row">
-                                    <th>Usuarios:</th>
                                     @foreach($item->usuarios as $k=>$i) 
-                                        <th>
+                                        <th width="{{$cols}}%">
                                             {{$i->nombre}} {{$i->paterno}} {{$i->materno}}<br>
                                             <i style="font-weight:normal;">{{$i->email}}</i>
                                         </th>
                                     @endforeach
+                                    @for($ii = (count($item->usuarios)+1); $ii < ($col + 1); $ii++) 
+                                        <th width="{{$cols}}%">---
+                                        </th>
+                                    @endfor
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr scope="row">
-                                    <td>Capturas:</td>
                                     @foreach($item->usuarios as $k=>$i) 
                                         <td style="text-align:center; font-size:large; color:#000;">
                                             {{$i->captura}}
                                         </td>
                                     @endforeach
+                                    @for($ii = (count($item->usuarios)+1); $ii < ($col + 1); $ii++) 
+                                        <th width="{{$cols}}%" style="text-align:center; font-size:large; color:#000;">---
+                                        </th>
+                                    @endfor
                                 </tr>
                             </tbody>
                         </table>
