@@ -61,7 +61,7 @@
 
                 <div class="bt-form__wrapper">
                     <div class="bt-flabels__wrapper">
-                        <span class="select-label">* Unidad de salud</span>
+                        <span class="select-label">* Unidad de salud </span>
                         {!! Form::label('clue_id', '* Unidad de salud', ['for' => 'clue_id'] ) !!}
                         {!! Form::select('clue_id', $clues,  $data->clues_id, ['class' => 'form-control js-data-clue select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'clue_id', 'data-placeholder' => '* Unidad de salud', 'style' => 'width:100%'] ) !!}
                         <span class="bt-flabels__error-desc">Requerido</span>

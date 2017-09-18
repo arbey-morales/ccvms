@@ -18,7 +18,7 @@
                 <td class="text-left"><strong>{{ $item->curp }}</strong></td>
                 <td class="text-left">{{$item->fecha_nacimiento}}</td>
                 <td class="text-left">{{ $item->calle }} {{ $item->numero }}, @if($item->colonia){{ $item->colonia->nombre }},@endif {{ $item->localidad->nombre }}, {{ $item->municipio->nombre }} </td>
-                <td class="text-left"><strong>{{$item->clue->clues}}</strong>, {{$item->clue->nombre}}</td>
+                <td class="text-left"> <strong>{{$item->clue->clues}}</strong>, {{$item->clue->nombre}}</td>
                 <td class="text-center col-md-1">
                     <!--<a class="btn btn-success" href="{{ url(Route::getCurrentRoute()->getPath().'/'.$item->id) }}" class="button"> <i class="fa fa-info-circle"></i> </a>-->
                     <a class="btn btn-primary" href="{{ url(Route::getCurrentRoute()->getPath().'/'.$item->id.'/edit') }}" class="button"> <i class="fa fa-edit"></i> </a>

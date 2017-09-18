@@ -24,7 +24,7 @@ class MonitoreoController extends Controller
      */
     public function index()
     {
-        if (Auth::user()->can('show.usuarios') && Auth::user()->activo==1) {
+        if (Auth::user()->is('root|admin') && Auth::user()->can('show.usuarios') && Auth::user()->activo==1) {
             $parametros = Input::only('fecha');
             if($parametros['fecha'] && $parametros['fecha']!=NULL && $parametros['fecha']!=""){
                 $fecha_send = $parametros['fecha'];
