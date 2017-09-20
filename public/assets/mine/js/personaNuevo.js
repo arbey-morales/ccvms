@@ -82,18 +82,20 @@ $(".js-data-clue").change(function(){
     if(clue_id==0){
         $(".js-data-municipio").val(0).trigger("change");
         $(".js-data-localidad").val(0).trigger("change");
+    } else {
+        $.get('../catalogo/clue/'+clue_id, function(response, status){ // Consulta        
+            $(".js-data-estado").val(response.data.entidades_id).trigger("change");
+            $(".js-data-municipio").val(response.data.municipios_id).trigger("change");
+            $(".js-data-localidad").val(response.data.localidades_id).trigger("change");
+        }).fail(function(){  // Calcula CURP
+            notificar('Información','No se consultaron los detalles de la unidad de salud','warning',2000);
+        });
     }
-    $.get('../catalogo/clue/'+clue_id, function(response, status){ // Consulta        
-        $(".js-data-estado").val(response.data.entidades_id).trigger("change");
-        $(".js-data-municipio").val(response.data.municipios_id).trigger("change");
-        $(".js-data-localidad").val(response.data.localidades_id).trigger("change");
-    }).fail(function(){  // Calcula CURP
-        notificar('Información','No se consultaron los detalles de la unidad de salud','warning',2000);
-    });
 });
 
 $(document).ready(function(){
-    verClue(clues[0]);
+    var clue_id = $(".js-data-clue").val();
+    verClue(clues[clue_id]);
 });
 
 function verClue(clue){
