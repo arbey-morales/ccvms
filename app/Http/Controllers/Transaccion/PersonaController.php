@@ -106,24 +106,24 @@ class PersonaController extends Controller
         $c_selected = "0";
         $today = Carbon::today("America/Mexico_City");
 
-		if (Auth::user()->can('show.personas') && Auth::user()->activo==1) {     
+		if (Auth::user()->can('show.personas') && Auth::user()->activo==1) {            
             if (Auth::user()->is('root|admin')) {
                 if($parametros['q']){
-                    $personas = Persona::where('deleted_at', NULL)->where('curp','LIKE',"%".$parametros['q']."%")->orWhere(DB::raw("CONCAT(nombre,' ',apellido_paterno,' ',apellido_materno)"),'LIKE',"%".$parametros['q']."%")->with('municipio','localidad','clue','colonia','tipoParto','ageb','afiliacion','codigo')->orderBy('id', 'DESC')->get();
+                    $personas = Persona::where('deleted_at', NULL)->where('curp','LIKE',"%".$parametros['q']."%")->orWhere(DB::raw("CONCAT(nombre,' ',apellido_paterno,' ',apellido_materno)"),'LIKE',"%".$parametros['q']."%")->with('municipio','localidad','clue','colonia','tipoParto','ageb','afiliacion','codigo')->orderBy('created_at', 'DESC')->get();
                 } else {
-                    $personas = Persona::where('deleted_at', NULL)->with('municipio','localidad','clue','colonia','tipoParto','ageb','afiliacion','codigo')->orderBy('id', 'DESC')->get();
+                    $personas = Persona::where('deleted_at', NULL)->with('municipio','localidad','clue','colonia','tipoParto','ageb','afiliacion','codigo')->orderBy('created_at', 'DESC')->get();
                 }
             } else { // Limitar por clues
                  if($parametros['q']){
-                    $personas = Persona::select('personas.*')->join('clues','clues.id','=','personas.clues_id')->where('clues.jurisdicciones_id', Auth::user()->idJurisdiccion)->where('personas.deleted_at', NULL)->where('personas.curp','LIKE',"%".$parametros['q']."%")->orWhere(DB::raw("CONCAT(personas.nombre,' ',personas.apellido_paterno,' ',personas.apellido_materno)"),'LIKE',"%".$parametros['q']."%")->with('municipio','localidad','clue','colonia','tipoParto','ageb','afiliacion','codigo')->orderBy('personas.id', 'DESC')->get();
+                    $personas = Persona::select('personas.*')->join('clues','clues.id','=','personas.clues_id')->where('clues.jurisdicciones_id', Auth::user()->idJurisdiccion)->where('personas.deleted_at', NULL)->where('personas.curp','LIKE',"%".$parametros['q']."%")->orWhere(DB::raw("CONCAT(personas.nombre,' ',personas.apellido_paterno,' ',personas.apellido_materno)"),'LIKE',"%".$parametros['q']."%")->with('municipio','localidad','clue','colonia','tipoParto','ageb','afiliacion','codigo')->orderBy('personas.created_at', 'DESC')->get();
                  } else {
-                    $personas = Persona::select('personas.*')->join('clues','clues.id','=','personas.clues_id')->where('clues.jurisdicciones_id', Auth::user()->idJurisdiccion)->where('personas.deleted_at', NULL)->with('municipio','localidad','clue','colonia','tipoParto','ageb','afiliacion','codigo')->orderBy('personas.id', 'DESC')->get();
+                    $personas = Persona::select('personas.*')->join('clues','clues.id','=','personas.clues_id')->where('clues.jurisdicciones_id', Auth::user()->idJurisdiccion)->where('personas.deleted_at', NULL)->with('municipio','localidad','clue','colonia','tipoParto','ageb','afiliacion','codigo')->orderBy('personas.created_at', 'DESC')->get();
                  }
             }
             $usuario = User::with('jurisdiccion')->find(Auth::user()->id);
             return view('persona.index')->with(['data' => $personas, 'q' => $q, 'user' => $usuario]);
-       
-            /*if (Auth::user()->is('root|admin')) {
+
+            /* if (Auth::user()->is('root|admin')) {
                 $municipios = Municipio::where('deleted_at', NULL)->get(); 
                 $clues = Clue::select('id','nombre','clues')->where('deleted_at',NULL)->where('estatus_id', 1)->get(); 
                 $m_selected = $municipios[0]->id;
@@ -152,11 +152,9 @@ class PersonaController extends Controller
                     ->where('personas.fecha_nacimiento', '>=', $fecha);
                 }
             } else { // Limitar por clues                
-                $clues = Clue::select('id','nombre','clues')->where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->where('estatus_id', 1);
-                if($parametros['municipios_id'] && $parametros['municipios_id']!=0)
-                    $clues = $clues->where('municipios_id', $parametros['municipios_id']);
-                $clues = $clues->get();
                 $municipios = Municipio::where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at', NULL)->get();
+                $clues = Clue::select('id','nombre','clues')->where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->where('estatus_id', 1);
+                                
                 $personas = Persona::select('personas.*')->join('clues','clues.id','=','personas.clues_id')->where('clues.jurisdicciones_id', Auth::user()->idJurisdiccion);
                 if($parametros['q']){
                     $q = $parametros['q'];
@@ -165,6 +163,7 @@ class PersonaController extends Controller
                     ->orWhere(DB::raw("CONCAT(personas.nombre,' ',personas.apellido_paterno,' ',personas.apellido_materno)"),'LIKE',"%".$parametros['q']."%");
                 }
                 if($parametros['municipios_id'] && $parametros['municipios_id']!=0){
+                    $clues = $clues->where('municipios_id', $parametros['municipios_id']);
                     $m_selected = $parametros['municipios_id'];
                     $personas = $personas
                     ->where('personas.municipios_id', $parametros['municipios_id']);
@@ -181,6 +180,8 @@ class PersonaController extends Controller
                     $personas = $personas
                     ->where('personas.fecha_nacimiento', '>=', $fecha);
                 }
+
+                $clues = $clues->get();
             }
 
             $data = $personas->where('personas.deleted_at', NULL)->with('municipio','localidad','clue','colonia','tipoParto','ageb','afiliacion','codigo','personasVacunasEsquemas')->orderBy('personas.id', 'DESC')->get();
@@ -235,7 +236,8 @@ class PersonaController extends Controller
             }
             $usuario = User::with('jurisdiccion')->find(Auth::user()->id);
             return view('persona.index')->with(['data' => $data, 'q' => $q, 'm_selected' => $m_selected, 'c_selected' => $c_selected, 'e_selected' => $e_selected, 'clues' => $arrayclue, 'municipios' => $arraymunicipio, 'user' => $usuario]);
-        */} else {
+        */
+        } else {
             return response()->view('errors.allPagesError', ['icon' => 'user-secret', 'error' => '403', 'title' => 'Forbidden / Prohibido', 'message' => 'No tiene autorización para acceder al recurso. Se ha negado el acceso.'], 403);
         }
     }
@@ -518,7 +520,7 @@ class PersonaController extends Controller
     {
         if (Auth::user()->can('create.personas') && Auth::user()->activo==1) {     
 			if (Auth::user()->is('root|admin')) {
-				$clues = Clue::select('id','clues','nombre','entidades_id','municipios_id','localidades_id')->where('deleted_at',NULL)->where('estatus_id', 1)->get();
+				$clues = Clue::select('id','clues','nombre','entidades_id','municipios_id','localidades_id')->where('instituciones_id',13)->where('deleted_at',NULL)->where('estatus_id', 1)->get();
 				$municipios = Municipio::select('id','clave','nombre')->where('deleted_at',NULL)->get();
                 $localidades = Localidad::select('id','clave','nombre')->where('deleted_at',NULL)->get();
                 $colonias = Colonia::select('id','nombre','municipios_id')->where('deleted_at',NULL)->with('municipio')->get();
@@ -527,7 +529,7 @@ class PersonaController extends Controller
                 $localidades = collect();
                 $colonias = collect();
                 $agebs = collect();
-				$clues = Clue::select('id','clues','nombre','entidades_id','municipios_id','localidades_id')->where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->where('estatus_id', 1)->get();
+				$clues = Clue::select('id','clues','nombre','entidades_id','municipios_id','localidades_id')->where('instituciones_id',13)->where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->where('estatus_id', 1)->get();
 				$municipios = Municipio::select('id','clave','nombre')->where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->get();
                 foreach($municipios as $key=> $mpio){
                     $localidades_temp = Localidad::select('id','clave','nombre')->where('municipios_id', $mpio->id)->where('deleted_at',NULL)->get(); 
@@ -550,13 +552,15 @@ class PersonaController extends Controller
 			$codigos = CodigoCenso::select('id','clave','nombre')->where('deleted_at',NULL)->get();
 			$tiposparto = TipoParto::select('id','clave','descripcion')->where('deleted_at',NULL)->get();
 
-			$clue_selected = [];
+            $clue_selected = 0;
+            $arrayclue[0] = 'Seleccionar unidad de salud';
             foreach ($clues as $cont=>$clue) {
                 $arrayclue[$clue->id] = $clue->clues .' - '.$clue->nombre;
                 if($cont==0)
                     $clue_selected = $clue;
             }
-			
+            
+            $arraymunicipio[0] = 'Seleccionar Municipio';
 			foreach ($municipios as $municipio) {
                 $arraymunicipio[$municipio->id] = $municipio->clave .' - '.$municipio->nombre;
             }
@@ -569,7 +573,7 @@ class PersonaController extends Controller
 			foreach ($estados as $estado) {
                 $arrayestado[$estado->id] = $estado->clave .' - '.$estado->nombre;
             }
-            
+            $arraylocalidad[0] = 'Seleccionar localidad';
             foreach ($localidades as $localidad) {
                 $arraylocalidad[$localidad->id] = $localidad->clave .' - '.$localidad->nombre;
             }

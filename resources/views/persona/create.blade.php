@@ -63,7 +63,8 @@
                     <div class="bt-flabels__wrapper">
                         <span class="select-label">* Unidad de salud</span>
                         {!! Form::label('clue_id', '* Unidad de salud', ['for' => 'clue_id'] ) !!}
-                        {!! Form::select('clue_id', $clues,  1, ['class' => 'form-control js-data-clue select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'clue_id', 'data-placeholder' => '* Unidad de salud', 'style' => 'width:100%'] ) !!}
+                        {!! Form::select('clue_id', $clues,  0, ['class' => 'form-control js-data-clue select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'clue_id', 'data-placeholder' => '* Unidad de salud', 'style' => 'width:100%'] ) !!}
+
                         <span class="bt-flabels__error-desc">Requerido</span>
                     </div>
                     <div class="uk-grid uk-grid-collapse">
@@ -156,7 +157,7 @@
                             <div class="bt-flabels__wrapper">
                                 <span class="select-label">* Municipio</span>
                                 {!! Form::label('municipio_id', '* Municipio', ['for' => 'municipio_id'] ) !!}
-                                {!! Form::select('municipio_id', $municipios,  $clue_selected->municipios_id, ['class' => 'form-control js-data-municipio select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'municipio_id',  'data-placeholder' => '* Municipio', 'style' => 'width:100%'] ) !!}
+                                {!! Form::select('municipio_id', $municipios,  0, ['class' => 'form-control js-data-municipio select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'municipio_id',  'data-placeholder' => '* Municipio', 'style' => 'width:100%'] ) !!}
                                 <span class="bt-flabels__error-desc">Requerido</span>
                             </div>
                         </div>
@@ -164,7 +165,7 @@
                             <div class="bt-flabels__wrapper bt-flabels--right">   
                                 <span class="select-label">* Localidad</span>
                                 {!! Form::label('localidad_id', '* Localidad', ['for' => 'localidad_id'] ) !!}
-                                {!! Form::select('localidad_id', $localidades, $clue_selected->localidades_id, ['class' => 'form-control js-data-localidad select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'localidad_id',  'data-placeholder' => '* Localidad', 'style' => 'width:100%'] ) !!}
+                                {!! Form::select('localidad_id', $localidades, 0, ['class' => 'form-control js-data-localidad select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'localidad_id',  'data-placeholder' => '* Localidad', 'style' => 'width:100%'] ) !!}
                                 <span class="bt-flabels__error-desc">Requerido</span>
                             </div>
                         </div>
@@ -266,6 +267,7 @@
                 </div>
 
                 <div class="uk-text-center uk-margin-top pull-right">
+                    <span  style="padding-right:30px; color:tomato; font-size:x-large;" id="clue-text"></span>
                     <button type="reset" class="btn btn-primary btn-lg"> <i class="fa fa-eraser"></i> Limpiar</button>
                     @permission('create.personas')<button type="submit" class="btn btn-success btn-lg js-submit"> <i class="fa fa-save"></i> Guardar</button>@endpermission
                 </div>
@@ -328,4 +330,8 @@
     {!! Html::script('assets/mine/js/myTags.js') !!}
     {!! Html::script('assets/mine/js/mx_CURP_RFC.js') !!}
     {!! Html::script('assets/mine/js/personaNuevo.js') !!}
+
+    <script>
+        var clues = $.parseJSON(escaparCharEspeciales('{{json_encode($clues)}}'));        
+    </script>
 @endsection

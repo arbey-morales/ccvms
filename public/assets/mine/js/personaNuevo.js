@@ -15,6 +15,8 @@ $("#personas-form").submit(function(e){
         if(status=='success'){
             notificar(response.titulo,response.texto,response.estatus,5000);
             if(response.estatus=='success'){
+                var clue_id = $(".js-data-clue").val();
+                verClue(clues[clue_id]);
                 $("#nombre,#paterno,#materno,#fecha_nacimiento,#curp,#sector,#manzana,#descripcion_domicilio,#calle,#numero,#codigo_postal,#fecha_nacimiento_tutor,#tutor").val('');
                 conseguirEsquema(moment().format('YYYY'),"01-01-"+moment().format('YYYY'));
                 $("#paterno").focus();
@@ -76,7 +78,12 @@ $("#fecha_nacimiento_tutor").blur(function(){
 // SI LA CLUE CAMBIA; SE SELECCIONAN SU LOCALIDAD Y MUNICIPIO
 $(".js-data-clue").change(function(){
     var clue_id = $(this).val();
-    $.get('../catalogo/clue/'+clue_id, function(response, status){ // Consulta CURP
+    verClue(clues[clue_id]);
+    if(clue_id==0){
+        $(".js-data-municipio").val(0).trigger("change");
+        $(".js-data-localidad").val(0).trigger("change");
+    }
+    $.get('../catalogo/clue/'+clue_id, function(response, status){ // Consulta        
         $(".js-data-estado").val(response.data.entidades_id).trigger("change");
         $(".js-data-municipio").val(response.data.municipios_id).trigger("change");
         $(".js-data-localidad").val(response.data.localidades_id).trigger("change");
@@ -84,6 +91,15 @@ $(".js-data-clue").change(function(){
         notificar('Información','No se consultaron los detalles de la unidad de salud','warning',2000);
     });
 });
+
+$(document).ready(function(){
+    verClue(clues[0]);
+});
+
+function verClue(clue){
+    $("#clue-text").empty().html(clue);
+    notificar('<strong>UNIDAD DE SALUD:</strong> \n ',clue,'info',6000);
+}
 
 // CADA QUE ESTOS ELEMENTOS PIERDEN EL FOCO, SE VALIDAN PARA CONSULTAR LA CURP
 $("#fecha_nacimiento,#paterno,#materno,#nombre").blur(function(){            
@@ -502,4 +518,17 @@ function existeFecha(fecha){
 // REEMPLAZA LO QUE SE LE PIDA EN UNA CADENA
 function reemplazarTodo(str, find, replace) {
     return str.replace(new RegExp(find, 'g'), replace);
-}      
+}    
+
+function escaparCharEspeciales(str)
+{
+    var map =
+    {
+        '&amp;': '&',
+        '&lt;': '<',
+        '&gt;': '>',
+        '&quot;': '"',
+        '&#039;': "'"
+    };
+    return str.replace(/&amp;|&lt;|&gt;|&quot;|&#039;/g, function(m) {return map[m];});
+}

@@ -312,11 +312,13 @@ function generarEsquema(aplicaciones){
                 var fa_temp = ve_ad.fecha_aplicacion;
                 var fa_split = fa_temp.substr(0,10);
                 var fa = fa_split.split("-");
+                //console.log(fa_temp);
                 fecha_aplicada = fa[2]+'-'+fa[1]+'-'+fa[0];
                 var fecha_ideal_con_dias  = moment(ultima_fecha_nacimiento,'DD-MM-YYYY').add(ve.edad_ideal_dia, 'days');
                 var fecha_ideal_con_meses = fecha_ideal_con_dias.add(ve.edad_ideal_mes, 'months');
                 var fecha_ideal_real      = fecha_ideal_con_meses.add(ve.edad_ideal_anio, 'years');
                 var f_aplicacion  = moment(fecha_aplicada,'DD-MM-YYYY');
+                //console.log(fecha_aplicada);
                 if(f_aplicacion < fecha_ideal_real){ // es ideal o no
                     ultimo_esquema[key].es_ideal = true; 
                 }                
