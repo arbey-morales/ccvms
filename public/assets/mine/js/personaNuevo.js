@@ -519,16 +519,3 @@ function existeFecha(fecha){
 function reemplazarTodo(str, find, replace) {
     return str.replace(new RegExp(find, 'g'), replace);
 }    
-
-function escaparCharEspeciales(str)
-{
-    var map =
-    {
-        '&amp;': '&',
-        '&lt;': '<',
-        '&gt;': '>',
-        '&quot;': '"',
-        '&#039;': "'"
-    };
-    return str.replace(/&amp;|&lt;|&gt;|&quot;|&#039;/g, function(m) {return map[m];});
-}

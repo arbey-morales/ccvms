@@ -157,7 +157,7 @@
                             <div class="bt-flabels__wrapper">
                                 <span class="select-label">* Municipio</span>
                                 {!! Form::label('municipio_id', '* Municipio', ['for' => 'municipio_id'] ) !!}
-                                {!! Form::select('municipio_id', $municipios,  0, ['class' => 'form-control js-data-municipio select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'municipio_id',  'data-placeholder' => '* Municipio', 'style' => 'width:100%'] ) !!}
+                                {!! Form::select('municipio_id', $municipios,  $clue_selected->municipios_id, ['class' => 'form-control js-data-municipio select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'municipio_id',  'data-placeholder' => '* Municipio', 'style' => 'width:100%'] ) !!}
                                 <span class="bt-flabels__error-desc">Requerido</span>
                             </div>
                         </div>
@@ -165,7 +165,7 @@
                             <div class="bt-flabels__wrapper bt-flabels--right">   
                                 <span class="select-label">* Localidad</span>
                                 {!! Form::label('localidad_id', '* Localidad', ['for' => 'localidad_id'] ) !!}
-                                {!! Form::select('localidad_id', $localidades, 0, ['class' => 'form-control js-data-localidad select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'localidad_id',  'data-placeholder' => '* Localidad', 'style' => 'width:100%'] ) !!}
+                                {!! Form::select('localidad_id', $localidades, $clue_selected->localidades_id, ['class' => 'form-control js-data-localidad select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'localidad_id',  'data-placeholder' => '* Localidad', 'style' => 'width:100%'] ) !!}
                                 <span class="bt-flabels__error-desc">Requerido</span>
                             </div>
                         </div>
@@ -332,6 +332,19 @@
     {!! Html::script('assets/mine/js/personaNuevo.js') !!}
 
     <script>
-        var clues = $.parseJSON(escaparCharEspeciales('{{json_encode($clues)}}'));        
+        var clues = $.parseJSON(escaparCharEspeciales('{{json_encode($clues)}}'));     
+        
+        function escaparCharEspeciales(str)
+        {
+            var map =
+            {
+                '&amp;': '&',
+                '&lt;': '<',
+                '&gt;': '>',
+                '&quot;': '"',
+                '&#039;': "'"
+            };
+            return str.replace(/&amp;|&lt;|&gt;|&quot;|&#039;/g, function(m) {return map[m];});
+        }
     </script>
 @endsection
