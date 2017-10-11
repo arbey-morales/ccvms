@@ -299,6 +299,8 @@ function generarEsquema(aplicaciones){
     ultimo_esquema = aplicaciones; // LAS VALIDACIONES DEL ESQUEMA ESTÁN AQUÍ
     var key_plus = 0;
     $.each(aplicaciones, function( key, ve ) {
+        console.log(ve);           
+        
         key_plus++;
         var placeholder = '';
         if(ve.etiqueta_ideal<30){
@@ -306,7 +308,8 @@ function generarEsquema(aplicaciones){
         }
         var fecha_aplicada    = ''; var es_aplicada = false;
         ultimo_esquema[key].es_ideal = false;
-        $.each(aplicaciones_dosis, function( key_ad, ve_ad ) {            
+        $.each(aplicaciones_dosis, function( key_ad, ve_ad ) { 
+            console.log(ve_ad);           
             if(ve.id==ve_ad.vacunas_esquemas_id){
                 es_aplicada = true;
                 var fa_temp = ve_ad.fecha_aplicacion;

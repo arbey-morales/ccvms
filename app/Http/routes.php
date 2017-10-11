@@ -26,12 +26,15 @@ Route::group(['namespace' => 'Transaccion', 'middleware' => 'auth'], function ()
     // Trancacciones
     Route::resource('usuario',                             'UserController');
     Route::resource('monitoreo',                           'MonitoreoController');
+    Route::get('persona/captura',                          'PersonaController@captura');
     Route::get('dashboard',                                'PersonaController@dashboard');
     Route::get('persona/curp',                             'PersonaController@curp');
     Route::get('persona/reporte',                          'PersonaController@reporte');
     Route::resource('persona',                             'PersonaController');
     Route::resource('cuadro-dist-juris',                   'CuadroDistribucionJurisdiccionalController');
-    Route::resource('cuadro_distribucion_clue',            'CuadroDistribucionClueController');    
+    Route::resource('cuadro_distribucion_clue',            'CuadroDistribucionClueController');   
+    
+    Route::resource('temperatura',                         'TemperaturaContenedorController');
 });  
 
 Route::group(['prefix' => 'catalogo', 'namespace' => 'Catalogo', 'middleware' => 'auth'], function () {
@@ -43,7 +46,7 @@ Route::group(['prefix' => 'catalogo', 'namespace' => 'Catalogo', 'middleware' =>
     Route::resource('esquema',          'EsquemaController',         ['only' => ['index', 'show']]);
     Route::resource('institucion',      'InstitucionController',     ['only' => ['index', 'show']]);
     Route::resource('jurisdiccion',     'JurisdiccionController',    ['only' => ['index', 'show']]);
-    Route::resource('localidad',        'LocalidadController',       ['only' => ['index', 'show']]);
+    Route::resource('localidad',        'LocalidadController');
     Route::resource('municipio',        'MunicipioController',       ['only' => ['index', 'show']]);
     Route::resource('colonia',          'ColoniaController');
     Route::resource('pais',             'PaisController',            ['only' => ['index', 'show']]);

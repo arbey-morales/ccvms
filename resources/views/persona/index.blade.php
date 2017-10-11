@@ -6,24 +6,86 @@
     <!-- Datatables -->
     {!! Html::style('assets/mine/css/datatable-bootstrap.css') !!}
     {!! Html::style('assets/mine/css/responsive.bootstrap.min.css') !!}
+    <!-- Select2 -->
+    {!! Html::style('assets/vendors/select2-4.0.3/dist/css/select2.css') !!}
+    <!-- Switchery -->
+    {!! Html::style('assets/vendors/switchery/dist/switchery.min.css') !!}
 @endsection
 @section('content') 
-    @include('errors.msgAll')
-    <div class="x_panel">
-        <div class="x_title">
-            <h2><i class="fa fa-group"></i> Censo nominal <i class="fa fa-angle-right text-danger"></i><small> Lista</small></h2>
-
-            {!! Form::open([ 'route' => 'persona.index', 'class' => 'col-md-4', 'method' => 'GET']) !!}
-                    {!! Form::text('q', $q, ['class' => 'form-control', 'id' => 'q', 'autocomplete' => 'off', 'placeholder' => 'Buscar por Nombre y CURP ' ]) !!}
-            {!! Form::close() !!}
-            @if(count($data)>0)                
-                @include('partials.layout.export')
+    <div class="row">
+        <div class="col-md-6">
+            @if($rep['seg']==true)
+                <a class="btn btn-primary btn-lg" href="#" onClick="descargarSeguimientos()" class="button" data-toggle="tooltip" data-placement="bottom" title="" data-original-title=".Pdf"> <i class="fa fa-comment"></i> Seguimientos</a>
             @endif
-            @permission('create.personas')<a class="btn btn-default pull-right" href="{{ route('persona.create') }}" role="button">Agregar Persona</a>@endpermission
-            <div class="clearfix"></div>
+            <!--
+            @if($rep['act']==true)
+                <a class="btn btn-warning btn-lg" href="#" onClick="descargarActividades()" class="button" data-toggle="tooltip" data-placement="bottom" title="" data-original-title=".Pdf"> <i class="fa fa-newspaper-o"></i> Actividades</a>
+            @endif
+            @if($rep['bio']==true)
+                <a class="btn btn-info btn-lg" href="#" onClick="descargarBiologicos()" class="button" data-toggle="tooltip" data-placement="bottom" title="" data-original-title=".Pdf"> <i class="fa fa-flask"></i> Biológicos</a>
+            @endif
+            -->
         </div>
+        <div class="col-md-6">
+            @permission('create.personas')<a class="btn btn-default btn-lg pull-right" href="{{ route('persona.create') }}" role="button">Agregar Persona</a>@endpermission
+        </div>
+    </div>
+    <div class="clearfix"></div>
+
+    @include('errors.msgAll')
+
+    {!! Form::open([ 'route' => 'persona.index', 'method' => 'GET']) !!}
+
+        
+            <div class="x_panel">
+                <div class="x_content">
+                    <div class="row">
+                        <div class="col-md-3">
+                            {!!Form::select('municipios_id', $municipios, $m_selected, ['class' => 'form-control js-data-municipio select2', 'style' => 'width:100%'])!!}
+                        </div>
+                        <div class="col-md-3">
+                            {!!Form::select('clues_id', $clues, $c_selected, ['class' => 'form-control js-data-clue select2', 'style' => 'width:100%'])!!}
+                        </div>
+                        <div class="col-md-3">
+                            {!!Form::select('edad', ['0-0-0' => 'Todos','0-0-7' => 'Nacimiento','0-2-0' => '2 meses','0-4-0' => '4 meses','0-6-0' => '6 meses','0-7-0' => '7 meses','1-0-0' => '1 año','1-6-0' => '1 año 6 meses','2-0-0' => '2 años','3-0-0' => '3 años','4-0-0' => '4 años','5-0-0' => '5 años','6-0-0' => '6 años'], $e_selected, ['class' => 'form-control js-data-edad select2', 'style' => 'width:100%'])!!}
+                        </div>
+                        <div class="col-md-3">
+                            {!! Form::text('q', $q, ['class' => 'form-control', 'id' => 'q', 'autocomplete' => 'off', 'placeholder' => 'Buscar por Nombre y CURP ' ]) !!}
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {!! Form::radio('rep', 'seg', $rep['seg'],['id' => 'seg', 'class' => 'flat']) !!}
+                            {!! Form::label('seg', 'De seguimiento', ['for' => 'seg', 'style' => 'font-size:large; padding-right:10px;'] ) !!}
+<!--
+                            {!! Form::radio('rep', 'act', $rep['act'],['id' => 'act', 'class' => 'flat']) !!}
+                            {!! Form::label('act', 'De actividades', ['for' => 'act', 'style' => 'font-size:large; padding-right:10px;'] ) !!}
+
+                            {!! Form::radio('rep', 'bio', $rep['bio'],['id' => 'bio', 'class' => 'flat']) !!}
+                            {!! Form::label('bio', 'De biológico', ['for' => 'bio', 'style' => 'font-size:large; padding-right:10px;'] ) !!}
+                            -->
+                        </div>
+                        <div class="col-md-2">
+                            <h3 class="text-info"> {{count($data)}} <small>Resultados</small></h3>
+                        </div>
+                        <div class="col-md-2">
+                            {!! Form::checkbox('todo', '1', false, ['class' => 'js-switch', 'id' => 'todo'] ) !!} 
+                            {!! Form::label('todo-todo', 'Ver todo sin filtros', ['for' => 'todo', 'style' => 'font-size:large; padding-right:10px;'] ) !!}
+                        </div>
+                        <div class="col-md-2 text-right">
+                            <button type="submit" class="btn btn-success btn-lg js-submit"> <i class="fa fa-search"></i> Buscar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+    {!! Form::close() !!}
+    <div class="x_panel">
         <div class="x_content">
-             @include('persona.list')
+            @if(count($data)>0)
+                @include('persona.list')
+            @endif
         </div>
         <br>
     </div>
@@ -59,6 +121,11 @@
     {!! Html::script('assets/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js') !!}
     {!! Html::script('assets/mine/js/dataTables/dataTables.responsive.min.js') !!}
     {!! Html::script('assets/mine/js/dataTables/responsive.bootstrap.js') !!}
+    <!-- Select2 -->
+    {!! Html::script('assets/vendors/select2-4.0.3/dist/js/select2.min.js') !!}
+    {!! Html::script('assets/vendors/select2-4.0.3/dist/js/i18n/es.js') !!}
+    <!-- Switchery -->
+    {!! Html::script('assets/vendors/switchery/dist/switchery.min.js') !!}
     <!-- Pdfmake -->
     {!! Html::script('assets/vendors/pdfmake/build/pdfmake.min.js') !!}
     {!! Html::script('assets/vendors/pdfmake/build/vfs_fonts.js') !!}
@@ -68,10 +135,14 @@
     <!-- Datatables -->
     <script>
     var registro_borrar = null;
-    var data = $.parseJSON(escaparCharEspeciales('{{$data}}'));
+    var data = $.parseJSON(escaparCharEspeciales('{{json_encode($data)}}'));
+    var rep = $.parseJSON(escaparCharEspeciales('{{json_encode($rep)}}'));
     var usuario = $.parseJSON(escaparCharEspeciales('{{$user}}'));
-    var documentoDefinicion = construirTabla();
-
+    var text = escaparCharEspeciales('{{$text}}');
+    var definicionSeguimientos = tablaSeguimientos();
+   // var definicionActividades = tablaActividades();
+   // var definicionBilogicos = tablaBiologicos();
+    
     $(document).ready(function() {
         $('#datatable-responsive').DataTable({
             language: {
@@ -85,8 +156,33 @@
             var row = $(this).parents('tr');
             registro_borrar = row.data('id');
             $("#modal-text").html(row.data('nombre'));
-        });      
+        });     
+        
+        $(".js-data-clue,.js-data-edad,.js-data-municipio").select2();
     });
+
+    $(".js-data-municipio").change(function(e){
+        /*if($(this).val()!=0){
+            municipio($(this).val());
+        }*/
+    });
+
+    function municipio(municipio){
+        /*$.get('../catalogo/municipio/'+municipio, {}, function(response, status){ // Consulta esquema
+            if(response.data==null){
+                notificar('Sin resultados','info',2000);
+            } else {                    
+                if(response.data.clues.length<=0){
+                    notificar('Información','No existes clues','info',2000);
+                } else {
+                    notificar('Información','Cargando clues','info',2000);
+                    console.log(response.data.clues);
+                }  
+            }
+        }).fail(function(){ 
+            notificar('Información','Falló carga de clues','info',2000);
+        });*/
+    }
 
     // Confirm delete on Ajax
     $('.btn-confirm-delete').click(function(e){
@@ -110,19 +206,17 @@
         });
     });
 
-    function verPdf()
+    function descargarSeguimientos()
     {
-        pdfMake.createPdf(documentoDefinicion).open('Censo Nominal '+moment().format('DD-MM-YYYY')+'.pdf');
+        pdfMake.createPdf(definicionSeguimientos).download('Reporte de Seguimientos '+moment().format('DD-MM-YYYY')+'.pdf');
     }
-
-    function imprimirPdf()
+    function descargarActividades()
     {
-        pdfMake.createPdf(documentoDefinicion).print('Censo Nominal '+moment().format('DD-MM-YYYY')+'.pdf');
+        //pdfMake.createPdf(definicionActividades).open('Reporte de Actividades '+moment().format('DD-MM-YYYY')+'.pdf');
     }
-
-    function descargarPdf()
+    function descargarBiologicos()
     {
-        pdfMake.createPdf(documentoDefinicion).download('Censo Nominal '+moment().format('DD-MM-YYYY')+'.pdf');
+        //pdfMake.createPdf(definicionBiologicos).open('Reporte de Biológicos '+moment().format('DD-MM-YYYY')+'.pdf');
     }
 
     function escaparCharEspeciales(str)
@@ -138,84 +232,158 @@
         return str.replace(/&amp;|&lt;|&gt;|&quot;|&#039;/g, function(m) {return map[m];});
     }
     
-    function construirTabla() {
-        var body = [];
-        body.push([
-                    {'text':'Nombre', 'style':'celda_header'},
-                    {'text':'Nacimiento', 'style':'celda_header'},
-                    {'text':'Género', 'style':'celda_header'},
-                    {'text':'CURP', 'style':'celda_header'},
-                    {'text':'Tutor', 'style':'celda_header'},
-                    {'text':'Parto', 'style':'celda_header'},
-                    {'text':'Dirección', 'style':'celda_header'},
-                    {'text':'CLUE', 'style':'celda_header'},
-                    {'text':'AGEB', 'style':'celda_header'},
-                    {'text':'Sector', 'style':'celda_header'},
-                    {'text':'Mz', 'style':'celda_header'},
-                    {'text':'Código', 'style':'celda_header'},
-                    {'text':'Afiliación', 'style':'celda_header'}
-                ]);
+
+    ///// Seguimientos    
+    function tablaSeguimientos() {
+        var dosiss   = [];
+        var dosis_extra   = [];
+        var vac = [];
+        var awd = [];
+        var wd = 0;
+        var body = [];       
+        if(data[0]){
+            wd = Math.round(100/data[0].seguimientos.length);
+            if(data[0].seguimientos.length>0){                 
+                $.each(data[0].seguimientos, function( index, seg ) {                     
+                    awd.push(wd+'%');
+                    dosiss.push({'text': ''+seg.tipo_aplicacion, 'color':'black', 'bold': true, 'alignment':'center', 'fontSize':'8'});                      
+                    if(index==0){         
+                        var tdv = 0; 
+                        $.each(data[0].seguimientos, function( ind, s ) {  
+                            if(s.vacunas_id==seg.vacunas_id){
+                                tdv++;
+                            }
+                        });
+                        if(tdv<=1){
+                            vac.push({'text':seg.clave, 'color':'black', 'bold': true, 'alignment':'center', 'fontSize':'8'});
+                        } else {
+                            vac.push({'text':seg.clave, 'colSpan':tdv, 'color':'black', 'bold': true, 'alignment':'center', 'fontSize':'8'});
+                        }
+                    } else {
+                        if(data[0].seguimientos[(index-1)].vacunas_id!=seg.vacunas_id){     
+                            var tdv = 0; 
+                            $.each(data[0].seguimientos, function( ind, s ) {  
+                                if(s.vacunas_id==seg.vacunas_id){
+                                    tdv++;
+                                }
+                            });
+                            if(tdv<=1){
+                                vac.push({'text':seg.clave, 'color':'black', 'bold': true, 'alignment':'center', 'fontSize':'8'});
+                            } else {
+                                vac.push({'text':seg.clave, 'colSpan':tdv, 'color':'black', 'bold': true, 'alignment':'center', 'fontSize':'8'});
+                            }
+                        } else {
+                            vac.push({'text':''});
+                        }
+                    }
+                });
+            }
+        }
+        var head_table = [
+            {text:'#', style:'celda_header'},
+            {text:'NOMBRE COMPLETO', style:'celda_header'},
+            {text:'CURP', style:'celda_header'},
+            {text:'NAC.', style:'celda_header'},
+            {text:'G', style:'celda_header'},
+            {paddingLeft: 25, text:'DOMICILIO', style:'celda_header'},
+            {paddingLeft: 25, layout: 'lightHorizontalLines',table: { widths: awd, body:
+                    [
+                        vac, //note the second object with empty string for 'text'
+                        dosiss
+                    ] 
+                } 
+            }
+        ];
+        body.push(head_table);
+
+        var total_mpio = 0;
+        var total_clue = 0;
         $.each(data, function( indice, row ) { 
-            var data_row = [];
-            data_row.push({'text':row.nombre+' '+row.apellido_paterno+' '+row.apellido_materno, 'style':'celda_body'});
+            var data_row = [];           
+            if(indice==0){
+                body.push([{'text': row.mun_nombre, 'color':'black','fillColor':'#E0E0E0', 'bold':true, 'colSpan':7}]);
+                body.push([{'text': row.clu_clues+' - '+row.clu_nombre, 'color':'black', 'fillColor': '#F0F0F0', 'marginLeft':10, 'colSpan':7}]);
+            } else {            
+                if(row.municipios_id!=data[indice - 1].municipios_id){ //  municipio diferente
+                    body.push([{'text': row.mun_nombre, 'color':'black','fillColor':'#E0E0E0', 'bold':true, 'colSpan':7}]);
+                }
+                if(row.clues_id!=data[indice - 1].clues_id){
+                    body.push([{'text': row.clu_clues+' - '+row.clu_nombre, 'color':'black', 'fillColor': '#F0F0F0', 'marginLeft':10, 'colSpan':7}]);
+                }
+            }
+            
+            
+            data_row.push({'text':''+(parseInt(indice) + 1)+'', 'style':'celda_body'});
+            data_row.push({'text':row.apellido_paterno+' '+row.apellido_materno+' '+row.nombre, 'style':'celda_body'});
+            data_row.push({'text':row.curp, 'style':'celda_body'});
             data_row.push({'text':row.fecha_nacimiento, 'style':'celda_body'});
             data_row.push({'text':row.genero, 'style':'celda_body'});
-            data_row.push({'text':row.curp, 'style':'celda_body'});
-            data_row.push({'text':row.tutor, 'style':'celda_body'});
-            data_row.push({'text':row.tipo_parto.descripcion, 'style':'celda_body'});
-            var colonia = '';
-            if(row.colonias_id!=null){
-                colonia = row.colonia.nombre+', ';
-            }
-            data_row.push({'text':row.calle+' '+row.numero+', '+colonia+' '+row.localidad.nombre+', '+row.municipio.nombre, 'style':'celda_body'});
-            data_row.push({'text':row.clue.clues+' '+row.clue.nombre, 'style':'celda_body'});
-            var ageb = '';
-            if(row.agebs_id!=null){
-                ageb = row.ageb.id;
-                ageb = ageb.substr(-4);
-            }
-            data_row.push({'text':ageb, 'style':'celda_body'});
-            data_row.push({'text':row.sector, 'style':'celda_body'});
-            data_row.push({'text':row.manzana, 'style':'celda_body'});
-            var codigo = '';
-            if(row.codigos_id!=null){
-                codigo = row.codigo.nombre;
-            }
-            data_row.push({'text':codigo, 'style':'celda_body'});
-            var afiliacion = '';
-            if(row.codigos_id!=null){
-                afiliacion = row.afiliacion.nombre_corto;
-            }
-            data_row.push({'text':afiliacion, 'style':'celda_body'});
+
+            data_row.push({'text':row.calle+' '+row.numero+', '+row.col_nombre+' '+row.loc_nombre+', '+row.mun_nombre, 'style':'celda_body'});
+            var seg_marca = [];   
+            var ws = [];
+                   
+            $.each(row.seguimientos, function( ind_dos, dos ) { 
+                ws.push(wd+'%');
+                seg_marca.push({'text': ''+dos.marca+'', 'bold':true, 'alignment':'center', 'color': 'black', 'fontSize':7, 'margin':0}); 
+            });
+            data_row.push({layout: 'lightHorizontalLines', table: { widths: ws,  body: [seg_marca] } });
             body.push(data_row);
         });
-        return documentoDefinicion = {
+
+        return definicionSeguimientos = {
             // a string or { width: number, height: number } OFICIO PIXELS: { width: 1285, height: 816 }
-            pageSize: 'LEGAL',
+            pageSize: 'A3',
             // by default we use portrait, you can change it to landscape if you wish
             pageOrientation: 'landscape',
             pageMargins: [ 40, 70, 40, 70 ],
             header: {
-                margin: [ 40, 30, 40, 30 ],
-                columns: [
+                margin: [40,30],
+                /*columns: [
                     { image: logo_sm, width: 85 },
-                    { text: 'Censo Nominal \n Jurisdicción '+usuario.jurisdiccion.clave+' '+usuario.jurisdiccion.nombre, width: 790, alignment: 'center', bold: true },
+                    { text: 'Reporte de seguimiento \n Jurisdicción '+usuario.jurisdiccion.clave+' '+usuario.jurisdiccion.nombre, width: 970, alignment: 'center', bold: true },
                     { image: censia, width: 50 }
+                ]*/
+                columns: [
+                    {
+                        layout: 'noBorders' ,
+                        table: {
+                            widths: [ '15%','70%','15%'], 
+                            body: [
+                                [
+                                    { image: logo_sm, width: 72 }, 
+                                    { text: 'Reporte de seguimiento \n Jurisdicción '+usuario.jurisdiccion.clave+' '+usuario.jurisdiccion.nombre, alignment: 'center', bold: true },
+                                    { image: censia, width: 50, alignment:'right'}
+                                ]
+                            ]
+                        }
+                    }
                 ]
             },
             footer: {
                 margin: [ 40, 30, 40, 30 ],                
                 columns: [
-                    { text: 'Generó: '+usuario.nombre+' '+usuario.paterno+' '+usuario.materno+' / '+usuario.email, alignment: 'left' },
+                    { text: text, alignment: 'left' },
                     { text: moment().format('LL'), alignment: 'right' }
                 ]
             },
             content: [
                 {
-                    layout: 'lightHorizontalLines', // optional
                     table: {
+                        widths: ['1%', '11%', '10%', '5%', '1%', '10%', '62%'],
+                        headerRows: 1,
                         body
                     }
+                },
+                {
+                    columns: [
+                        {
+                            'text': 'Total de resultados: ', alignment: 'right', width: '20%', fontSize:12, marginTop:20, marginRight:10
+                        },
+                        {
+                            'text': ''+data.length, alignment: 'left', width: '80%', bold:true, fontSize:12, color: 'black', marginTop:20
+                        }
+                    ]
                 }
             ],
             styles: {

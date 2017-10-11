@@ -12,10 +12,6 @@
     <div class="x_panel">
         <div class="x_title">
         <h2><i class="fa fa-globe"></i> Colonia <i class="fa fa-angle-right text-danger"></i><small> Lista</small></h2>
-        {!! Form::open([ 'route' => 'catalogo.colonia.index', 'class' => 'col-md-4', 'method' => 'GET']) !!}
-            {!! Form::text('q', $q, ['class' => 'form-control', 'id' => 'q', 'autocomplete' => 'off', 'placeholder' => 'Buscar por Nombre' ]) !!}
-        {!! Form::close() !!}
-
         @role('root|admin')@permission('create.catalogos')<a class="btn btn-default pull-right" href="{{ route('catalogo.colonia.create') }}" role="button">Nueva Colonia</a>@endpermission @endrole
         <div class="clearfix"></div>
         </div>

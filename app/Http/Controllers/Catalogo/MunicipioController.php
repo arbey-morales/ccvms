@@ -47,7 +47,7 @@ class MunicipioController extends Controller
      */
     public function show($id)
     {
-        $data = Municipio::with('localidades')->find($id);        
+        $data = Municipio::with('clues','localidades')->find($id);        
         
         if(!$data ){            
             return Response::json(['error' => "No se encuentra el recurso que esta buscando."], HttpResponse::HTTP_NOT_FOUND);

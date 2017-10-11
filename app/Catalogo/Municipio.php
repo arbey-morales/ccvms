@@ -24,4 +24,9 @@ class Municipio extends Model
     {
         return $this->hasMany('App\Catalogo\Localidad', 'municipios_id')->where('deleted_at', NULL)->select('id','clave','nombre','municipios_id');
     }
+
+    public function clues()
+    {
+        return $this->hasMany('App\Catalogo\Clue', 'municipios_id')->where('clues','like','CSSSA%')->where('deleted_at', NULL)->where('estatus_id', 1)->select('id','clues','nombre','municipios_id');
+    }
 }
