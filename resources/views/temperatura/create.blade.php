@@ -9,7 +9,6 @@
     {!! Html::style('assets/vendors/switchery/dist/switchery.min.css') !!}
     <!-- Form Mine -->
     {!! Html::style('assets/mine/css/uikit.almost-flat.min.css') !!}
-    {!! Html::style('assets/mine/css/form.css') !!}
 @endsection
 @section('content')
     <div class="x_panel">
@@ -29,22 +28,39 @@
             </ul>
             <div class="clearfix"></div>
         </div>
-        <div class="x_content">
-            {!! Form::open([ 'route' => 'temperatura.store', 'method' => 'POST', 'files' => 'true', 'class' => 'uk-form bt-flabels js-flabels', 'data-parsley-validate' => 'on', 'data-parsley-errors-messages-disabled' => 'on']) !!}
-                <div class="row">
-                    <div class="col-md-6">
-                        {!! Form::file('archivo', null , ['class' => 'form-control img-load', 'id' => 'foto', 'accept' => '.txt'] ) !!}
-                        <br>
-                        <p class="text-info">Descargue el archivo del DataLogger y cárguelo aquí</p>
-                    </div>
+        <div class="x_content">            
+            <div class="row">
+                <div class="col-md-6">
+                    {!! Form::open([ 'route' => 'temperatura.store','' => 'form-input', 'method' => 'POST', 'class' => 'uk-form bt-flabels js-flabels', 'data-parsley-validate' => 'on', 'data-parsley-errors-messages-disabled' => 'on']) !!}
+                        <h2>Agregar temperatura actual</h2>
+                        <div class="row">
+                            <div class="col-md-2">
+                                {!! Form::hidden('tipo_envio', 1, array('id' => 'tipo_envio')) !!}
+                                {!! Form::text('temperatura', null , ['class' => 'form-control', 'data-parsley-required' => 'true', 'id' => 'temperatura', 'autocomplete' => 'off', 'placeholder' => '4.0' ]  ) !!}
+                            </div>
+                            <div class="col-md-10">
+                                @permission('create.catalogos')<button type="submit" class="btn btn-success btn-large js-submit"> <i class="fa fa-save"></i> Guardar temperatura</button>@endpermission 
+                            </div>
+                        </div>
+                    {!! Form::close() !!}
                 </div>
-
-                @include('errors.msgAll')
-                <div class="ln_solid"></div>
-                <div class="uk-text-center uk-margin-top">
-                    @permission('create.catalogos')<button type="submit" class="btn btn-success btn-large js-submit"> <i class="fa fa-save"></i> Cargar</button>@endpermission
+                <div class="col-md-6">
+                    {!! Form::open([ 'route' => 'temperatura.store','' => 'form-file', 'method' => 'POST', 'files' => 'true', 'class' => 'uk-form bt-flabels js-flabels', 'data-parsley-validate' => 'on', 'data-parsley-errors-messages-disabled' => 'on']) !!}
+                        <h2>Agregar temperaturas desde archivo, <small>Descargue el archivo del DataLogger y cárguelo aquí</small> </h2>
+                        <div class="row">
+                            <div class="col-md-10">
+                                {!! Form::hidden('tipo_envio', 2, array('id' => 'tipo_envio')) !!}
+                                {!! Form::file('archivo', null , ['class' => 'form-control img-load', 'id' => 'foto', 'accept' => '.txt'] ) !!}
+                            </div>
+                            <div class="col-md-2">
+                                @permission('create.catalogos')<button type="submit" class="btn btn-primary btn-large js-submit"> <i class="fa fa-cloud-upload"></i> Subir archivo</button>@endpermission 
+                            </div>
+                        </div>
+                    {!! Form::close() !!}
                 </div>
-            {!! Form::close() !!}
+            </div>
+            <br>
+            @include('errors.msgAll')            
         </div>
     </div>
 @endsection

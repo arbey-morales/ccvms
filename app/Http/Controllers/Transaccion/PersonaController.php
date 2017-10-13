@@ -123,8 +123,8 @@ class PersonaController extends Controller
                 $clues = DB::table('clues')->select('id','nombre','clues'); 
                 $m_selected = $municipios[0]->id;
                 $personas = DB::table('personas')->select('personas.*','clu.clues AS clu_clues','clu.nombre AS clu_nombre','col.nombre AS col_nombre','loc.nombre AS loc_nombre','mun.nombre AS mun_nombre','tp.clave AS tp_clave','tp.descripcion AS tp_descripcion'); 
-                if (!isset($_GET['q']) && !isset($_GET['municipios_id']) && !isset($_GET['edad']) && !isset($_GET['clues_id'])){
-                    if($parametros['todo']==1){ 
+                if (!isset($parametros['q']) && !isset($parametros['municipios_id']) && !isset($parametros['edad']) && !isset($parametros['clues_id'])){
+                    if(isset($parametros['todo']) && $parametros['todo']==1){ 
                         $text = 'Todo, sin filtros';
                     } else {
                         $text = 'Todo, del día';
@@ -132,7 +132,7 @@ class PersonaController extends Controller
                             ->where('personas.created_at', '>=', $today);
                     }
                 } else {
-                    if($parametros['todo']==1){ } else {
+                    if(isset($parametros['todo'])  && $parametros['todo']==1){ } else {                        
                         if($parametros['q']){
                             $q = $parametros['q'];
                             $personas = $personas
@@ -153,8 +153,10 @@ class PersonaController extends Controller
                             $e_selected = $parametros['edad'];
                             $edad_explode = explode("-", $parametros['edad']);
                             $fecha = $today->subDays($edad_explode[2])->subMonths($edad_explode[1])->subYears($edad_explode[0])->format('Y-m-d');
-                            $personas = $personas
-                            ->where('personas.fecha_nacimiento', '>=', $fecha);
+                            if($parametros['edad']!='0-0-0'){
+                                $personas = $personas
+                                ->where('personas.fecha_nacimiento', '>=', $fecha);
+                            }
                         }
                     }
                 }
@@ -162,8 +164,8 @@ class PersonaController extends Controller
                 $municipios = Municipio::where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at', NULL)->get();
                 $clues = DB::table('clues')->select('id','nombre','clues')->where('jurisdicciones_id', Auth::user()->idJurisdiccion);
                 $personas = DB::table('personas')->select('personas.*','clu.clues AS clu_clues','clu.nombre AS clu_nombre','col.nombre AS col_nombre','loc.nombre AS loc_nombre','mun.nombre AS mun_nombre','tp.clave AS tp_clave','tp.descripcion AS tp_descripcion')->join('clues','clues.id','=','personas.clues_id')->where('clues.jurisdicciones_id', Auth::user()->idJurisdiccion);
-                if (!isset($_GET['q']) && !isset($_GET['municipios_id']) && !isset($_GET['edad']) && !isset($_GET['clues_id'])){
-                    if($parametros['todo']==1){ 
+                if (!isset($parametros['q']) && !isset($parametros['municipios_id']) && !isset($parametros['edad']) && !isset($parametros['clues_id'])){
+                    if(isset($parametros['todo'])  && $parametros['todo']==1){ 
                         $text = 'Todo, sin filtros';
                     } else {    
                         $text = 'Todo, del día';
@@ -171,7 +173,7 @@ class PersonaController extends Controller
                             ->where('personas.created_at', '>=', $today);
                     }
                 } else { 
-                    if($parametros['todo']==1){ } else {
+                    if(isset($parametros['todo'])  && $parametros['todo']==1){ } else {
                         if($parametros['q']){
                             $q = $parametros['q'];
                             $personas = $personas
@@ -279,29 +281,6 @@ class PersonaController extends Controller
          
          return response()->json([ 'capturas_por_semana'  => $capturas_por_semana,'us'  => $ultima_semana,'t'  => $today]);
      }
-
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-     public function captura(Request $request)
-     {
-        $total = 0;
-        if (Auth::user()->is('root|admin') && Auth::user()->can('show.personas') && Auth::user()->activo==1) {
-            $data = Jurisdiccion::select('id','clave','nombre')->where('deleted_at', NULL)->get();
-            foreach ($data as $key => $value) {
-                $value->total = DB::table('personas as per')
-                ->leftJoin('clues as clu','clu.id','=','per.clues_id')
-                ->leftJoin('jurisdicciones as jur','jur.id','=','clu.jurisdicciones_id')
-                ->where('jur.id',$value->id)
-                ->where('per.deleted_at', NULL)
-                ->count();
-                $total = $total + $value->total;
-            }     
-        }
-        return response()->json(['data'  => $data, 'total'  => $total]);
-    }
 
     /**
      * Display a index of reports.

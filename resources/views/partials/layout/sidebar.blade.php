@@ -27,11 +27,13 @@
                 </ul>
             </li>
             @endpermission
-            @permission('show.catalogos')
-            <li>
-                <a href="{{ url('temperatura') }}"><i class="fa fa-share-alt-square"></i> Registro de temperaturas</a>
-            </li>
-            @endpermission
+            @role('admin|root')
+                @permission('show.catalogos')
+                <li>
+                    <a href="{{ url('temperatura') }}"><i class="fa fa-share-alt-square"></i> Registro de temperaturas</a>
+                </li>
+                @endpermission
+            @endrole
             @permission('show.catalogos')
             <li><a><i class="fa fa-archive"></i> Catálogos <span class="fa fa-chevron-down"></span></a>
                 <ul class="nav child_menu">

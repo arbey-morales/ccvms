@@ -14,7 +14,7 @@
             </div>
             <div class="block_content">
                 <div class="row">
-                    <div class="col-md-1" style="font-size:xx-large; color:tomato; text-align:center;">{{$item->captura_jurisdiccion}}</div>
+                    <div class="col-md-1" style="font-size:xx-large; color:tomato; text-align:center;">{{number_format($item->captura_jurisdiccion)}}</div>
                     <div class="col-md-11"> 
                         <table class="table">
                             <thead>
@@ -35,7 +35,7 @@
                                 <tr scope="row">
                                     @foreach($item->usuarios as $k=>$i) 
                                         <td style="text-align:center; font-size:large; color:#000;">
-                                            {{$i->captura}}
+                                            {{number_format($i->captura)}}
                                         </td>
                                     @endforeach
                                     @for($ii = (count($item->usuarios)+1); $ii < ($col + 1); $ii++) 

@@ -6,6 +6,8 @@
     <!-- Datatables -->
     {!! Html::style('assets/mine/css/datatable-bootstrap.css') !!}
     {!! Html::style('assets/mine/css/responsive.bootstrap.min.css') !!}
+    <!-- Switchery -->
+    {!! Html::style('assets/vendors/switchery/dist/switchery.min.css') !!}
     <style>
         .search{
             font-weight : normal;
@@ -20,20 +22,21 @@
     @include('errors.msgAll')
     <div class="x_panel">
         <div class="x_title">
-                <div class="col-md-2">
-                    {!! Form::open([ 'route' => 'monitoreo.index', 'method' => 'GET']) !!}
-                        {!! Form::text('fecha', $fecha, ['class' => 'form-control search', 'id' => 'fecha', 'autocomplete' => 'off', 'placeholder' => '01-02-2017' ]) !!}
-                    {!! Form::close() !!}
+            {!! Form::open([ 'route' => 'monitoreo.index', 'id' => 'form', 'method' => 'GET']) !!}
+                <div class="col-md-2">                    
+                    {!! Form::text('fecha', $fecha, ['class' => 'form-control search', 'id' => 'fecha', 'autocomplete' => 'off', 'placeholder' => '01-02-2017' ]) !!}
                 </div>
-                <div class="col-md-2">
-                    <a class="btn btn-success btn-lg" href="#" onClick="totalCapturas()" class="button" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Descargar"> <i class="fa fa-download"></i> Resumén de capturas </a>
-                </div>
+                <div class="col-md-5">
+                    {!! Form::checkbox('todo', 'SI', $todo, ['class' => 'js-switch', 'id' => 'todo'] ) !!} 
+                    {!! Form::label('todo-todo', 'Desde inicio de operaciones, sin filtro', ['for' => 'todo', 'style' => 'font-size:large; padding-right:10px;'] ) !!}
+                </div>            
                 @if(count($data2)>0)
-                    <div class="col-md-8" style="text-align:right;">
+                    <div class="col-md-5" style="text-align:right;">
                         <a class="btn btn-info btn-lg" href="#" onClick="verPdf()" class="button" data-toggle="tooltip" data-placement="bottom" title="" data-original-title=".Pdf"> <i class="fa fa-file-pdf-o"></i> Vista Previa </a>
                         <a class="btn btn-warning btn-lg" href="#" onClick="imprimirPdf()" class="button" data-toggle="tooltip" data-placement="bottom" title="" data-original-title=".Pdf"> <i class="fa fa-print"></i> Imprimir</a>
                     </div>
                 @endif
+            {!! Form::close() !!}
             <div class="clearfix"></div>
         </div>
         <div class="x_content">
@@ -51,6 +54,8 @@
     <!-- Pdfmake -->
     {!! Html::script('assets/vendors/pdfmake/build/pdfmake.min.js') !!}
     {!! Html::script('assets/vendors/pdfmake/build/vfs_fonts.js') !!}
+    <!-- Switchery -->
+    {!! Html::script('assets/vendors/switchery/dist/switchery.min.js') !!}
     <!-- Mine -->
     {!! Html::script('assets/mine/js/images.js') !!}
 
@@ -62,7 +67,7 @@
         // MASCARA TIPO DD-MM-AAAA
         $("#fecha").mask("99-99-9999");
 
-        function totalCapturas() {
+        /*function totalCapturas() {
             $.get('persona/captura', {}, function(response, status){ // Consulta esquema
                 if(response.data==null){
                     notificar('Error','Sin datos','error',2000);
@@ -144,7 +149,7 @@
                 }
             }
             pdfMake.createPdf(documentoCapturas).open('Avance global de capturas '+moment().format('DD-MM-YYYY')+'.pdf');
-        }
+        }*/
 
         function verPdf()
         {
@@ -173,9 +178,23 @@
             };
             return str.replace(/&amp;|&lt;|&gt;|&quot;|&#039;/g, function(m) {return map[m];});
         }
-        
+
+        function numberWithCommas(x) {
+            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        $('#todo').change(function() {
+            if ($(this).is(':checked')){
+                $("#form").submit();
+            } else {
+                $("#fecha").focus();
+            }
+        });
+        var texto = '';
+
         function construirTabla() {
             var body = [];
+            var todo_captura = 0;
             var columns = 0;
             $.each(data2, function( indice, row ) { 
                 if(row.usuarios.length>columns){
@@ -183,18 +202,25 @@
                 }
             });
 
+            if ($('#todo').is(':checked')){
+                texto = 'desde el inicio de opearaciones';
+            } else {
+                var pf = moment($("#fecha").val(), 'DD-MM-YYYY').format('LL');
+                texto = 'de  la fecha: '+pf;
+            }
+
             var porcent = Math.round(100 / (columns + 2));
             $.each(data2, function( indice, row ) { 
                 var data_row = [];  
-                var data_row2 = [];  
-                var cj = parseInt(row.captura_jurisdiccion);            
-                data_row.push({'rowSpan':2, 'text':row.nombre, 'style':'jurisdiccion'},{'rowSpan':2, 'text':''+row.captura_jurisdiccion+'', 'style':'captura_jurisdiccion'});
+                var data_row2 = []; 
+                todo_captura = todo_captura + parseInt(row.captura_jurisdiccion);             
+                data_row.push({'rowSpan':2, 'text':row.clave+' - '+row.nombre, 'style':'jurisdiccion'},{'rowSpan':2, 'text':''+numberWithCommas(parseInt(row.captura_jurisdiccion))+'', 'style':'captura_jurisdiccion'});
                 data_row2.push({'text':' '},{'text':' '});
                 var col = 0;
                 $.each(row.usuarios, function( ind, row_usuarios ) {
                     col++;
                     data_row.push({'text':row_usuarios.nombre+' '+row_usuarios.paterno+' '+row_usuarios.materno+' \n '+row_usuarios.email, 'style':'normal'});
-                    data_row2.push({'text':''+row_usuarios.captura+'', 'style':'captura_usuario'});
+                    data_row2.push({'text':''+numberWithCommas(parseInt(row_usuarios.captura))+'', 'style':'captura_usuario'});
                 });
 
                 for (var i = (col + 1); i < (columns + 1); i++) {
@@ -215,7 +241,7 @@
                     margin: [ 40, 30, 40, 30 ],
                     columns: [
                         { image: logo_sm, width: 85 },
-                        { text: 'Monitoreo de capturas del '+moment($("#fecha").val(),'DD-MM-YYYY').format('LL'), width: 770, alignment: 'center', bold: true },
+                        { text: 'Monitoreo de capturas '+texto, width: 770, alignment: 'center', bold: true },
                         { image: censia, width: 50 }
                     ]
                 },
@@ -232,34 +258,44 @@
                         table: {
                             body
                         }
+                    },
+                    {
+                        columns: [
+                            {
+                                'text': 'Capturas totales: ', alignment: 'right', width: '80%', fontSize:13, marginTop:20, marginRight:10
+                            },
+                            {
+                                'text': ''+numberWithCommas(parseInt(todo_captura)), alignment: 'left', width: '20%', bold:true, fontSize:15, marginTop:20
+                            }
+                        ]
                     }
                 ],
                 styles: {
                     normal: {
-                        fontSize: 9,
+                        fontSize: 8,
                         italic: true,
                         alignment: 'left',
                         color: '#545454'
                     },
                     captura_jurisdiccion: {
-                        fontSize: 12,
+                        fontSize: 10,
                         alignment: 'center',
                         fontWeight: 'bolder',
-                        color: 'tomato',
+                        color: '#3c00ff',
                         verticalAlign: 'middle'
                     },
                     captura_usuario: {
-                        fontSize: 11,
+                        fontSize: 10,
                         alignment: 'center',
                         fontWeight: 'bolder'
                     },
                     jurisdiccion: {
-                        fontSize: 12,
-                        alignment: 'center',
+                        fontSize: 10,
+                        alignment: 'left',
                         fontWeight: 'bold'
                     },
                     usuario: {
-                        fontSize: 11,
+                        fontSize: 10,
                         alignment: 'center',
                         fontWeight: 'bold'
                     }

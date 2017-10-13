@@ -26,7 +26,6 @@ Route::group(['namespace' => 'Transaccion', 'middleware' => 'auth'], function ()
     // Trancacciones
     Route::resource('usuario',                             'UserController');
     Route::resource('monitoreo',                           'MonitoreoController');
-    Route::get('persona/captura',                          'PersonaController@captura');
     Route::get('dashboard',                                'PersonaController@dashboard');
     Route::get('persona/curp',                             'PersonaController@curp');
     Route::get('persona/reporte',                          'PersonaController@reporte');
