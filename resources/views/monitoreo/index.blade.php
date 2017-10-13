@@ -233,7 +233,7 @@
 
             return documentoDefinicion = {
                 // a string or { width: number, height: number } OFICIO PIXELS: { width: 1285, height: 816 }
-                pageSize: 'LEGAL',
+                pageSize: 'A3',
                 // by default we use portrait, you can change it to landscape if you wish
                 pageOrientation: 'landscape',
                 pageMargins: [ 40, 70, 40, 70 ],
@@ -241,7 +241,7 @@
                     margin: [ 40, 30, 40, 30 ],
                     columns: [
                         { image: logo_sm, width: 85 },
-                        { text: 'Monitoreo de capturas '+texto, width: 770, alignment: 'center', bold: true },
+                        { text: 'Monitoreo de capturas '+texto, width: 980, alignment: 'center', bold: true },
                         { image: censia, width: 50 }
                     ]
                 },
