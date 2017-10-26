@@ -405,7 +405,8 @@ class PersonaController extends Controller
             if(isset($parametros['filtro']) && $parametros['filtro']==2){ // buscar por cadena de texto
                 $text = 'Nombre o CURP: '.$parametros['q'];
                 $personas = $personas->where('personas.curp','LIKE',"%".$parametros['q']."%")
-                ->orWhere(DB::raw("CONCAT(personas.nombre,' ',personas.apellido_paterno,' ',personas.apellido_materno)"),'LIKE',"%".$parametros['q']."%");
+                ->orWhere(DB::raw("CONCAT(personas.nombre,' ',personas.apellido_paterno,' ',personas.apellido_materno)"),'LIKE',"%".$parametros['q']."%")
+                ->orWhere('personas.tutor','LIKE',"%".$parametros['q']."%");
             }
             
             $data = $personas->where('personas.deleted_at', NULL)
