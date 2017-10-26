@@ -20,37 +20,31 @@ class LocalidadController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $parametros = Input::only('q');
-       
-        if (Auth::user()->is('root|admin')) {
+        if (Auth::user()->can('show.catalogos') && Auth::user()->activo==1) {
+            $parametros = Input::only('q','municipios_id');
+            $data =  DB::table('localidades as l')->select('l.*','m.nombre as municipio')->where('l.deleted_at',NULL);
+            if (Auth::user()->is('root|admin')) { } else {
+                $data = $data->leftJoin('municipios as m','m.id','=','l.municipios_id')
+                ->where('m.jurisdicciones_id', Auth::user()->idJurisdiccion);
+            }  
             if ($parametros['q']) {
-                $data =  Localidad::where('clave','LIKE',"%".$parametros['q']."%")->orWhere('nombre','LIKE',"%".$parametros['q']."%")->with('municipio')->where('deleted_at',NULL)->get();
-            } else {
-                $data =  Localidad::with('municipio')->where('deleted_at',NULL)->get();
+                $data = $data->where('l.clave','LIKE',"%".$parametros['q']."%")->orWhere('l.nombre','LIKE',"%".$parametros['q']."%");
             }
+            if ($parametros['municipios_id']) {
+                $data = $data->where('l.municipios_id', $parametros['municipios_id']);
+            }
+
+            $data = $data->orderBy('municipio', 'ASC')->orderBy('l.nombre', 'ASC')->get();
+            if ($request->ajax()) {
+                return response()->json([ 'data' => $data]);
+            } else {       
+                return view('catalogo.localidad.index')->with('localidades', $data);  
+            }  
         } else {
-            $data = collect();
-            if ($parametros['q']) {
-                $municipios = Municipio::where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->get();
-                foreach($municipios as $key=> $mpio){
-                    $localidades_temp = Localidad::where('municipios_id', $mpio->id)->where('deleted_at',NULL)->where('clave','LIKE',"%".$parametros['q']."%")->orWhere('nombre','LIKE',"%".$parametros['q']."%")->with('municipio')->get(); 
-                    foreach($localidades_temp as $id=> $item){
-                        $data->push($item);
-                    }
-                }
-            } else {
-                $municipios = Municipio::where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->get();
-                foreach($municipios as $key=> $mpio){
-                    $localidades_temp = Localidad::where('municipios_id', $mpio->id)->where('deleted_at',NULL)->with('municipio')->get(); 
-                    foreach($localidades_temp as $id=> $item){
-                        $data->push($item);
-                    }
-                }
-            }
-        }       
-        return view('catalogo.localidad.index')->with('localidades', $data);    
+            return response()->view('errors.allPagesError', ['icon' => 'user-secret', 'error' => '403', 'title' => 'Forbidden / Prohibido', 'message' => 'No tiene autorización para acceder al recurso. Se ha negado el acceso.'], 403);
+        }
     }
 
     /**

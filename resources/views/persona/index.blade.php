@@ -14,9 +14,6 @@
 @section('content') 
     <div class="row">
         <div class="col-md-6">
-            @if($rep['seg']==true)
-                <a class="btn btn-primary btn-lg" href="#" onClick="descargarSeguimientos()" class="button" data-toggle="tooltip" data-placement="bottom" title="" data-original-title=".Pdf"> <i class="fa fa-comment"></i> Seguimientos</a>
-            @endif
             <!--
             @if($rep['act']==true)
                 <a class="btn btn-warning btn-lg" href="#" onClick="descargarActividades()" class="button" data-toggle="tooltip" data-placement="bottom" title="" data-original-title=".Pdf"> <i class="fa fa-newspaper-o"></i> Actividades</a>
@@ -34,26 +31,59 @@
 
     @include('errors.msgAll')
 
-    {!! Form::open([ 'route' => 'persona.index', 'method' => 'GET']) !!}
-
-        
+        {!! Form::open(['id' => 'form']) !!}
             <div class="x_panel">
                 <div class="x_content">
-                    <div class="row">
-                        <div class="col-md-3">
-                            {!!Form::select('municipios_id', $municipios, $m_selected, ['class' => 'form-control js-data-municipio select2', 'style' => 'width:100%'])!!}
+
+                    <div class="row tile_count">
+                        <div class="col-md-7 col-sm-8 col-xs-12 tile_stats_count">
+                            <span class="count_top"><i class="fa fa-filter"></i> Filtros</span><br>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {!! Form::hidden('filtro', 1, ['class' => 'form-control', 'id' => 'filtro', 'autocomplete' => 'off' ]) !!}
+                                    {!!Form::select('municipios_id', [], 0, ['class' => 'form-control js-data-municipio select2', 'style' => 'width:100%'])!!}
+                                </div>
+                                <div class="col-md-6">
+                                    {!!Form::select('clues_id', [], 0, ['class' => 'form-control js-data-clue select2', 'style' => 'width:100%'])!!}
+                                </div>
+                            </div>
+                            <br>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {!!Form::select('localidades_id', [], 0, ['class' => 'form-control js-data-localidad select2', 'style' => 'width:100%'])!!}
+                                </div>
+                                <div class="col-md-6">
+                                    {!!Form::select('agebs_id', [], 0, ['class' => 'form-control js-data-ageb select2', 'style' => 'width:100%'])!!}
+                                </div>
+                            </div>
+                            <br>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {!! Form::text('sector', '', ['class' => 'form-control', 'id' => 'sector', 'autocomplete' => 'off', 'placeholder' => '# Sector' ]) !!}
+                                </div>
+                                <div class="col-md-6">
+                                    {!! Form::text('manzana', '', ['class' => 'form-control', 'id' => 'manzana', 'autocomplete' => 'off', 'placeholder' => '# manzana' ]) !!}
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-3">
-                            {!!Form::select('clues_id', $clues, $c_selected, ['class' => 'form-control js-data-clue select2', 'style' => 'width:100%'])!!}
+                        <div class="col-md-3 col-sm-2 col-xs-12 tile_stats_count">
+                            <span class="count_top"><i class="fa fa-male"></i> Nombre o CURP</span>
+                            <div class="row">
+                                <div class="col-md-12"> 
+                                {!! Form::text('q', '', ['class' => 'form-control', 'id' => 'q', 'autocomplete' => 'off', 'placeholder' => 'MOTC880220...' ]) !!}
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-3">
-                            {!!Form::select('edad', ['0-0-0' => 'Todos','0-0-7' => 'Nacimiento','0-2-0' => '2 meses','0-4-0' => '4 meses','0-6-0' => '6 meses','0-7-0' => '7 meses','1-0-0' => '1 año','1-6-0' => '1 año 6 meses','2-0-0' => '2 años','3-0-0' => '3 años','4-0-0' => '4 años','5-0-0' => '5 años','6-0-0' => '6 años'], $e_selected, ['class' => 'form-control js-data-edad select2', 'style' => 'width:100%'])!!}
-                        </div>
-                        <div class="col-md-3">
-                            {!! Form::text('q', $q, ['class' => 'form-control', 'id' => 'q', 'autocomplete' => 'off', 'placeholder' => 'Buscar por Nombre y CURP ' ]) !!}
+                        <div class="col-md-2 col-sm-1 col-xs-12 tile_stats_count">
+                            <span class="count_top"><i class="fa fa-magic"></i> Todo, sin filtros</span>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    {!! Form::checkbox('todo', '1', false, ['class' => 'js-switch', 'id' => 'todo'] ) !!} 
+                                    {!! Form::label('todo-todo', ' ', ['for' => 'todo', 'style' => 'font-size:large; padding-right:10px;'] ) !!}
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <br>
                     <div class="row">
                         <div class="col-md-6">
                             {!! Form::radio('rep', 'seg', $rep['seg'],['id' => 'seg', 'class' => 'flat']) !!}
@@ -66,15 +96,10 @@
                             {!! Form::label('bio', 'De biológico', ['for' => 'bio', 'style' => 'font-size:large; padding-right:10px;'] ) !!}
                             -->
                         </div>
-                        <div class="col-md-2">
-                            <h3 class="text-info"> {{count($data)}} <small>Resultados</small></h3>
-                        </div>
-                        <div class="col-md-2">
-                            {!! Form::checkbox('todo', '1', false, ['class' => 'js-switch', 'id' => 'todo'] ) !!} 
-                            {!! Form::label('todo-todo', 'Ver todo sin filtros', ['for' => 'todo', 'style' => 'font-size:large; padding-right:10px;'] ) !!}
+                        <div class="col-md-2 no-resultados">
                         </div>
                         <div class="col-md-2 text-right">
-                            <button type="submit" class="btn btn-success btn-lg js-submit"> <i class="fa fa-search"></i> Buscar</button>
+                            <button type="button" class="btn btn-success btn-lg js-ajax"> <i class="fa fa-search"></i> Buscar</button>
                         </div>
                     </div>
                 </div>
@@ -82,10 +107,8 @@
 
     {!! Form::close() !!}
     <div class="x_panel">
-        <div class="x_content">
-            @if(count($data)>0)
-                @include('persona.list')
-            @endif
+        <div class="x_content" id="contenido">
+             
         </div>
         <br>
     </div>
@@ -135,13 +158,14 @@
     <!-- Datatables -->
     <script>
     var registro_borrar = null;
-    var data = $.parseJSON(escaparCharEspeciales('{{json_encode($data)}}'));
-    var rep = $.parseJSON(escaparCharEspeciales('{{json_encode($rep)}}'));
-    var usuario = $.parseJSON(escaparCharEspeciales('{{$user}}'));
-    var text = escaparCharEspeciales('{{$text}}');
+    var data = [];
+    var usuario = { jurisdiccion:{ clave:'', nombre:'' } };
+    var text = '';
     var definicionSeguimientos = tablaSeguimientos();
-   // var definicionActividades = tablaActividades();
-   // var definicionBilogicos = tablaBiologicos();
+    var municipios = [{ 'id': 0, 'text': 'Seleccionar un municipio' }];
+    var localidades = [{ 'id': 0, 'text': 'Seleccionar una localidad' }];
+    var clues = [{ 'id': 0, 'text': 'Seleccionar una unidad de salud' }];
+    var agebs = [{ 'id': 0, 'text': 'Seleccionar una ageb' }];
     
     $(document).ready(function() {
         $('#datatable-responsive').DataTable({
@@ -156,33 +180,255 @@
             var row = $(this).parents('tr');
             registro_borrar = row.data('id');
             $("#modal-text").html(row.data('nombre'));
-        });     
+        });
         
-        $(".js-data-clue,.js-data-edad,.js-data-municipio").select2();
+        $(".js-data-clue").select2({
+            language: "es",
+            data: clues
+        });
+        $(".js-data-municipio").select2({
+            language: "es",
+            data: municipios
+        });
+        $(".js-data-localidad").select2({
+            language: "es",
+            data: localidades
+        });
+        $(".js-data-ageb").select2({
+            language: "es",
+            data: agebs
+        });
+        iniciarMunicipio();
     });
 
-    $(".js-data-municipio").change(function(e){
-        /*if($(this).val()!=0){
-            municipio($(this).val());
-        }*/
-    });
-
-    function municipio(municipio){
-        /*$.get('../catalogo/municipio/'+municipio, {}, function(response, status){ // Consulta esquema
+    /*** BUSCAR */
+    $(".js-ajax").click(function(e){
+        e.preventDefault();
+        $("#contenido").empty();
+        var dato = $("#form").serialize();
+        $(".no-resultados").empty().html('<i class="fa fa-spinner fa-spin"></i> Buscando');
+        $.get('persona/buscar', dato, function(response, status){            
             if(response.data==null){
-                notificar('Sin resultados','info',2000);
-            } else {                    
-                if(response.data.clues.length<=0){
-                    notificar('Información','No existes clues','info',2000);
+                notificar('Sin resultados','warning',2000);
+                $(".no-resultados").empty();
+            } else { 
+                $(".no-resultados").empty();                  
+                if(response.data.length<=0){
+                    notificar('Información','No existen resultados','warning',2000);
+                    $(".no-resultados").html('Sin resultados');
                 } else {
-                    notificar('Información','Cargando clues','info',2000);
-                    console.log(response.data.clues);
+                    notificar('Información','Cargando '+response.data.length+' resultados','info',2000);
+                    $(".no-resultados").html('<a class="btn btn-primary btn-lg" href="#" onClick="descargarSeguimientos()" class="button" data-toggle="tooltip" data-placement="bottom" title="" data-original-title=".Pdf"> <i class="fa fa-comment"></i> Seguimientos</a>');
+                    data = response.data;
+                    usuario = response.usuario;
+                    text = response.text;
+                    $("#contenido").empty();
+                    //$("#contenido").empty().html('<table id="data-table" class="table" cellspacing="0" width="100%"><tbody>');
+                    //$("#contenido").append('<ul class="list-unstyled top_profiles scroll-view">');
+                    $.each(response.data, function( i, cont ) {
+                        var icono = '';
+                        if(cont.genero=='M'){
+                            icono = '<i class="fa fa-male" style="color:#4d81bf; font-size:x-large;"></i>';
+                        }
+                        if(cont.genero=='F'){
+                            icono = '<i class="fa fa-female" style="color:#ed1586; font-size:x-large;"></i>';
+                        }
+                        var url_edit = '{{ Route::getCurrentRoute()->getPath() }}';
+                        //var con = '<li class="media event"> <a class="pull-left border-aero profile_thumb"> <i class="fa fa-user aero"></i> </a> <div class="media-body"> <a class="title" href="#">Ms. Mary Jane</a> <p><strong>$2300. </strong> Agent Avarage Sales </p> <p> <small>12 Sales Today</small> </p> </div> </li>';
+                        //$("#contenido").append(con);
+                        $("#contenido").append('<div class="row"><div class="col-md-1"><button type="button" class="btn btn-danger btn-delete" style="font-size:large;" data-toggle="modal" data-target=".bs-example-modal-lg"> <i class="fa fa-trash"></i></button></div> <div class="col-md-11"><a href="'+url_edit+'/'+cont.id+'"> <div class="mail_list"> <div class="right">  <h3> '+icono+' - '+cont.apellido_paterno+' '+cont.apellido_materno+' '+cont.nombre+'<small>'+cont.fecha_nacimiento+'</small></h3> <p>'+cont.calle+' '+cont.numero+', '+cont.col_nombre+', '+cont.loc_nombre+', '+cont.mun_nombre+' </p>  </div> </div> </a></div></div>');
+                        //$("#contenido").append('<tr><td class="text-left">'+(i + 1)+'</td><td class="text-left"><a class="btn btn-default" href="'+url_edit+'/'+cont.id+'" class="button"> '+icono+' </a> '+cont.apellido_paterno+' '+cont.apellido_materno+' '+cont.nombre+'</td><td class="text-left">'+cont.curp+'</td><td class="text-left">'+cont.fecha_nacimiento+'</td><td class="text-left">'+cont.calle+' '+cont.numero+', '+cont.col_nombre+', '+cont.loc_nombre+', '+cont.mun_nombre+'</td><td class="text-left"><strong>'+cont.clu_clues+'</strong>, '+cont.clu_nombre+'</td><td class="text-left"><a class="btn btn-primary" href="'+url_edit+'/'+cont.id+'/edit" class="button"> <i class="fa fa-edit"></i> </a><button type="button" class="btn btn-danger btn-delete" data-toggle="modal" data-target=".bs-example-modal-lg"> <i class="fa fa-trash"></i></button></td></tr>');
+                    });
+                    //$("#contenido").append('</ul>');
+                    //$("#contenido").append('</tbody></table>');
                 }  
             }
         }).fail(function(){ 
-            notificar('Información','Falló carga de clues','info',2000);
-        });*/
+            notificar('Información','Falló la búsqueda','danger',2000);
+            $(".no-resultados").empty();
+        });
+    });
+    /*** Si cambia o tiene el foco */
+    $(".js-data-clue,.js-data-localidad,.js-data-municipio,.js-data-ageb,#sector,#manzana").change(function(){
+        $("#q").val('');
+        $("#filtro").val(1);
+    });
+    $(".js-data-clue,.js-data-localidad,.js-data-municipio,.js-data-ageb,#sector,#manzana").focus(function(){
+        $("#q").val('');
+        $("#filtro").val(1);
+    });
+    /*** Si cambia o tiene el foco */
+    $("#q").change(function(){
+        resetFiltro();
+        iniciarMunicipio();
+    });
+    $("#q").focus(function(){
+        resetFiltro();
+        iniciarMunicipio();
+    });
+
+    function resetFiltro(){
+        $("#filtro").val(2);
+        $(".js-data-clue,.js-data-localidad,.js-data-municipio,.js-data-ageb").empty();
+        $("#sector,#manzana").val('');
+        municipios = [{ 'id': 0, 'text': 'Seleccionar un municipio' }];
+        localidades = [{ 'id': 0, 'text': 'Seleccionar una localidad' }];
+        clues = [{ 'id': 0, 'text': 'Seleccionar una unidad de salud' }];
+        agebs = [{ 'id': 0, 'text': 'Seleccionar una ageb' }];
+        $(".js-data-clue").select2({
+            language: "es",
+            data: clues
+        });
+        $(".js-data-municipio").select2({
+            language: "es",
+            data: municipios
+        });
+        $(".js-data-localidad").select2({
+            language: "es",
+            data: localidades
+        });
+        $(".js-data-ageb").select2({
+            language: "es",
+            data: agebs
+        });
     }
+
+    function iniciarMunicipio(){
+        $.get('../catalogo/municipio', {}, function(response, status){
+            if(response.data==null){
+                notificar('Sin resultados','warning',2000);
+            } else {         
+                while (municipios.length) { municipios.pop(); }                
+                municipios.push({ 'id': 0, 'text': 'Seleccionar un municipio' });           
+                if(response.data.length<=0){
+                    notificar('Información','No existen municipios','warning',2000);
+                } else {
+                    notificar('Información','Cargando municipios','info',2000);
+                    $('.js-data-municipio').empty();                      
+                    $.each(response.data, function( i, cont ) {
+                        municipios.push({ 'id': cont.id, 'text': cont.nombre });
+                    });  
+                }  
+                $(".js-data-municipio").select2({
+                    language: "es",
+                    data: municipios
+                });
+            }
+        }).fail(function(){ 
+            notificar('Información','Falló carga de municipios','danger',2000);
+        });
+    }
+
+    $(".js-data-municipio").change(function(e){
+        $('.js-data-localidad,.js-data-clue').empty();
+        localidades = [{ 'id': 0, 'text': 'Seleccionar una localidad' }];
+        clues = [{ 'id': 0, 'text': 'Seleccionar una unidad de salud' }];
+        if($(this).val()!=0){ 
+            /** CLUES */            
+            $.get('../catalogo/clue?municipios_id='+$(this).val(), {}, function(response, status){
+                while (clues.length) { clues.pop(); }                
+                clues.push({ 'id': 0, 'text': 'Seleccionar una unidad de salud' });
+                if(response.data==null){
+                    notificar('Sin resultados','warning',2000);
+                } else {                                        
+                    if(response.data.length<=0){
+                        notificar('Información','No existen unidad de salud','warning',2000);
+                    } else {
+                        notificar('Información','Cargando unidad de salud','info',2000);
+                        $.each(response.data, function( i, cont ) {
+                            clues.push({ 'id': cont.id, 'text': ''+cont.clues+' - '+cont.nombre });
+                        }); 
+                    }
+                }
+                $(".js-data-clue").select2({
+                    language: "es",
+                    data:clues
+                }); 
+            }).fail(function(){ 
+                notificar('Información','Falló carga de unidad de salud','danger',2000);
+                $(".js-data-clue").select2({
+                    language: "es",
+                    data:clues
+                }); 
+            });
+
+            /** LOCALIDADES */
+            $.get('../catalogo/localidad?municipios_id='+$(this).val(), {}, function(response, status){
+                while (localidades.length) { localidades.pop(); }                
+                localidades.push({ 'id': 0, 'text': 'Seleccionar una localidad' });
+                if(response.data==null){
+                    notificar('Sin resultados','warning',2000);
+                } else {                                        
+                    if(response.data.length<=0){
+                        notificar('Información','No existen localidades','warning',2000);
+                    } else {
+                        notificar('Información','Cargando localidades','info',2000);
+                        $.each(response.data, function( i, cont ) {
+                            localidades.push({ 'id': cont.id, 'text': ''+cont.nombre });
+                        }); 
+                    } 
+                } 
+                $(".js-data-localidad").select2({
+                    language: "es",
+                    data:localidades
+                });
+            }).fail(function(){ 
+                notificar('Información','Falló carga de localidades','danger',2000);
+                $(".js-data-localidad").select2({
+                    language: "es",
+                    data:localidades
+                });
+            });
+        } else {
+            $(".js-data-clue").select2({
+                language: "es",
+                data:clues
+            }); 
+            $(".js-data-localidad").select2({
+                language: "es",
+                data:localidades
+            });
+        }       
+    });
+
+    $(".js-data-localidad").change(function(e){
+        /** AGEBS */
+        $('.js-data-ageb').empty();
+        agebs = [{ 'id': 0, 'text': 'Seleccionar una ageb' }];
+        if($(this).val()!=0){        
+            $.get('../catalogo/ageb?localidades_id='+$(this).val(), {}, function(response, status){
+                while (agebs.length) { agebs.pop(); }                
+                agebs.push({ 'id': 0, 'text': 'Seleccionar una ageb' });
+                if(response.data==null){
+                    notificar('Sin resultados','warning',2000);
+                } else {                    
+                    if(response.data.length<=0){
+                        notificar('Información','No existen agebs','warning',2000);
+                    } else {
+                        notificar('Información','Cargando agebs','info',2000); 
+                        $.each(response.data, function( i, cont ) {
+                            agebs.push({ 'id': cont.id, 'text': ''+cont.id });
+                        });
+                    }                      
+                }
+                $(".js-data-ageb").select2({
+                    language: "es",
+                    data:agebs
+                });
+            }).fail(function(){ 
+                notificar('Información','Falló carga de agebs','danger',2000);
+                $(".js-data-ageb").select2({
+                    language: "es",
+                    data:agebs
+                });
+            });
+        } else {
+            $(".js-data-ageb").select2({
+                language: "es",
+                data:agebs
+            });
+        }
+    });
 
     // Confirm delete on Ajax
     $('.btn-confirm-delete').click(function(e){

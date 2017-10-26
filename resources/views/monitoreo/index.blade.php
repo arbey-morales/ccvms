@@ -203,7 +203,7 @@
             });
 
             if ($('#todo').is(':checked')){
-                texto = 'desde el inicio de opearaciones';
+                texto = 'desde el inicio de operaciones';
             } else {
                 var pf = moment($("#fecha").val(), 'DD-MM-YYYY').format('LL');
                 texto = 'de  la fecha: '+pf;

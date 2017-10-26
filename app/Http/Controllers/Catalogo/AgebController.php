@@ -21,37 +21,32 @@ class AgebController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $parametros = Input::only('q');
-        
-        if (Auth::user()->is('root|admin')) {
+        if (Auth::user()->can('show.catalogos') && Auth::user()->activo==1) {
+            $parametros = Input::only('q','localidades_id'); 
+            $data = DB::table('agebs as a')->select('a.*','l.nombre as localidad','m.nombre as municipio')->where('a.deleted_at',NULL);
+            if (Auth::user()->is('root|admin')) { } else {
+                $data = $data->leftJoin('localidades as l','l.id','=','a.localidades_id')
+                ->leftJoin('municipios as m','m.id','=','l.municipios_id')
+                ->where('m.jurisdicciones_id', Auth::user()->idJurisdiccion);
+            }  
             if ($parametros['q']) {
-                $data =  Ageb::where('id','LIKE',"%".$parametros['q']."%")->with('municipio','localidad')->get();
-            } else {
-                $data =  Ageb::with('municipio','localidad')->get();
+                $data = $data->where('a.id','LIKE',"%".$parametros['q']."%");
+            }
+            if ($parametros['localidades_id']) {
+                $data = $data->where('a.localidades_id', $parametros['localidades_id']);
+            }
+
+            $data = $data->orderBy('localidad', 'ASC')->orderBy('a.id', 'ASC')->get();  
+            if ($request->ajax()) {
+                return response()->json([ 'data' => $data]);
+            } else {      
+                return view('catalogo.ageb.index')->with('agebs', $data);
             }
         } else {
-            $data = collect();
-            if ($parametros['q']) {
-                $municipios = Municipio::where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->get();
-                foreach($municipios as $key=> $mpio){
-                    $agebs_temp = Ageb::where('id','LIKE',"%".$parametros['q']."%")->where('municipios_id', $mpio->id)->where('deleted_at',NULL)->with('municipio','localidad')->get(); 
-                    foreach($agebs_temp as $k=> $i){
-                        $data->push($i);
-                    }
-                }
-            } else {
-                $municipios = Municipio::where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->get();
-                foreach($municipios as $key=> $mpio){
-                    $agebs_temp = Ageb::where('municipios_id', $mpio->id)->where('deleted_at',NULL)->with('municipio','localidad')->get(); 
-                    foreach($agebs_temp as $k=> $i){
-                        $data->push($i);
-                    }
-                }
-            }
-        }       
-        return view('catalogo.ageb.index')->with('agebs', $data);
+            return response()->view('errors.allPagesError', ['icon' => 'user-secret', 'error' => '403', 'title' => 'Forbidden / Prohibido', 'message' => 'No tiene autorización para acceder al recurso. Se ha negado el acceso.'], 403);
+        }
     }
 
     /**

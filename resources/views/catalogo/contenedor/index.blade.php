@@ -1,6 +1,6 @@
 @extends('app')
 @section('title')
-    Modelos
+    Contenedores de biológico
 @endsection
 @section('my_styles')
     <!-- Datatables -->
@@ -11,16 +11,16 @@
     @include('errors.msgAll')
     <div class="x_panel">
         <div class="x_title">
-        <h2>Modelos  <i class="fa fa-angle-right text-danger"></i><small> Lista</small></h2>
+        <h2><i class="fa fa fa-cube"></i> Contenedor de biológico <i class="fa fa-angle-right text-danger"></i><small> Lista</small></h2>
         @role('root|red-frio')
             @permission('create.catalogos')
-                <a class="btn btn-default pull-right" href="{{ route('catalogo.modelo.create') }}" role="button">Nuevo modelo</a>
+                <a class="btn btn-default pull-right" href="{{ route('catalogo.contenedor-biologico.create') }}" role="button">Nuevo contenedor</a>
             @endpermission 
         @endrole
         <div class="clearfix"></div>
         </div>
         <div class="x_content">
-             @include('catalogo.modelo.list')
+             @include('catalogo.contenedor.list')
         </div>
     </div>
     <!-- Modal delete -->
@@ -34,7 +34,7 @@
                 <h3 class="modal-title" id="myModalLabel"> <i class="fa fa-question" style="padding-right:15px;"></i>  Confirmación </h3>
             </div>
             <div class="modal-body">
-                <h3>Seguro que quiere eliminar el modelo: <span id="modal-text" class="text text-danger"></span>?</h3>
+                <h3>Seguro que quiere eliminar lo datos del contenedor: <span id="modal-text" class="text text-danger"></span>?</h3>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-warning" data-dismiss="modal">Cancelar</button>
@@ -48,7 +48,7 @@
             </div>
         </div>
     </div>
-    {!! Form::open(['route' => ['catalogo.modelo.destroy', ':ITEM_ID'], 'method' => 'DELETE', 'id' => 'form-delete']) !!}
+    {!! Form::open(['route' => ['catalogo.contenedor-biologico.destroy', ':ITEM_ID'], 'method' => 'DELETE', 'id' => 'form-delete']) !!}
     {!! Form::close() !!}
 @endsection
 @section('my_scripts')
@@ -60,7 +60,7 @@
     {!! Html::script('assets/mine/js/dataTables/responsive.bootstrap.js') !!}
 
     <!-- Datatables -->
-    <script>
+    <script type="text/javascript">
         var registro_borrar = null;
         $(document).ready(function() {
             $('#datatable-responsive').DataTable({

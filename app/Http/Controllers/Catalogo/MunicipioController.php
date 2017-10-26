@@ -19,7 +19,7 @@ class MunicipioController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         $parametros = Input::only('q');
 
@@ -35,8 +35,13 @@ class MunicipioController extends Controller
             } else {
                 $data = Municipio::where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->with('jurisdiccion')->get();
             }
-        }       
-        return view('catalogo.municipio.index')->with('municipios', $data);    
+        }  
+        
+        if ($request->ajax()) {
+            return response()->json([ 'data' => $data]);
+        } else {
+            return view('catalogo.municipio.index')->with('municipios', $data);   
+        } 
     }
 
     /**

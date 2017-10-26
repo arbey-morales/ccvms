@@ -4,9 +4,9 @@ namespace App\Catalogo;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Contenedor extends Model
-{
-    protected $table = 'contenedores';
-
+class Modelo extends Model
+{    
+    protected $table = 'modelos';
+    
     public $timestamps = false;
 }

@@ -1,51 +1,60 @@
 @if(Auth::user()->activo==1)
 <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
     <div class="menu_section">
-        <h3> @role('admin|root') CENTRAL @endrole @role('captura'){{Auth::user()->jurisdiccion->nombre}}@endrole</h3>
+        <h3> 
+            @role('root') Acceso total @endrole 
+            @role('admin') CENTRAL @endrole 
+            @role('red-frio') Red de frío @endrole 
+            @role('captura'){{Auth::user()->jurisdiccion->nombre}}@endrole
+        </h3>
         <ul class="nav side-menu">
             <li>
                 <a href="{{ url('/') }}"><i class="fa fa-dashboard"></i> Tablero </a>
             </li>
-            @permission('show.personas')
-            <li>
-                <a href="{{ url('persona') }}"><i class="fa fa-group"></i> Censo Nominal</a>
-            </li>
-            @endpermission
-            @role('admin|root')
+            @role('admin|root|captura')
+                @permission('show.personas')
+                    <li>
+                        <a href="{{ url('persona') }}"><i class="fa fa-group"></i> Censo Nominal</a>
+                    </li>
+                @endpermission
                 @permission('show.cuadro_distribucion_jurisdiccional')
-                <li>
-                    <a href="{{ route('cuadro-dist-juris.index') }}"><i class="fa fa-share-alt-square"></i> Cuadro distribución</a>
-                </li>
+                    <li>
+                        <a href="{{ route('cuadro-dist-juris.index') }}"><i class="fa fa-share-alt-square"></i> Cuadro distribución</a>
+                    </li>
                 @endpermission
             @endrole
-            @permission('show.personas')
-            <li><a><i class="fa fa-book"></i> Reportes <span class="fa fa-chevron-down"></span></a>
-                <ul class="nav child_menu">
-                    <li><a href="{{ url('persona/reporte') }}">Seguimientos</a></li>
-                    <!--<li><a href="{{ url('persona/reporte') }}">Seguimiento</a></li>-->
-                    <!--<li><a href="{{ url('cobertura/reporte') }}">Coberturas</a></li>-->
-                </ul>
-            </li>
-            @endpermission
-            @role('admin|root')
+            @role('red-frio|root')
                 @permission('show.catalogos')
                 <li>
                     <a href="{{ url('temperatura') }}"><i class="fa fa-share-alt-square"></i> Registro de temperaturas</a>
                 </li>
+                <li>
+                    <a href="{{ url('mantenimiento') }}"><i class="fa fa-wrench"></i> Mantenimiento de equipos</a>
+                </li>
                 @endpermission
             @endrole
-            @permission('show.catalogos')
+            
             <li><a><i class="fa fa-archive"></i> Catálogos <span class="fa fa-chevron-down"></span></a>
                 <ul class="nav child_menu">
-                    <li><a href="{{ route('catalogo.ageb.index') }}">Ageb</a></li>
-                    <li><a href="{{ route('catalogo.clue.index') }}">Clues</a></li>
-                    <li><a href="{{ route('catalogo.esquema.index') }}">Esquemas</a></li>
-                    <li><a href="{{ route('catalogo.municipio.index') }}">Municipios</a></li>
-                    <li><a href="{{ route('catalogo.localidad.index') }}">Localidades</a></li>
-                    <li><a href="{{ route('catalogo.colonia.index') }}">Colonias</a></li>
-                </ul>
+                @permission('show.catalogos')
+                    @role('admin|captura|root')                    
+                        <li><a href="{{ route('catalogo.ageb.index') }}">Ageb</a></li>
+                        <li><a href="{{ route('catalogo.clue.index') }}">Clues</a></li>
+                        <li><a href="{{ route('catalogo.esquema.index') }}">Esquemas</a></li>
+                        <li><a href="{{ route('catalogo.municipio.index') }}">Municipios</a></li>
+                        <li><a href="{{ route('catalogo.localidad.index') }}">Localidades</a></li>
+                        <li><a href="{{ route('catalogo.colonia.index') }}">Colonias</a></li>
+                    @endrole
+                    @role('red-frio|root')        
+                        <li><a href="{{ route('catalogo.marca.index') }}">Marca</a></li>
+                        <li><a href="{{ route('catalogo.modelo.index') }}">Modelo</a></li>            
+                        <li><a href="{{ route('catalogo.contenedor-biologico.index') }}">Contenedores de biológico</a></li>
+                        <li><a href="{{ route('catalogo.estatus-contenedor.index') }}">Estatus contenedores</a></li>
+                    @endrole 
+                @endpermission  
+                </ul>                
             </li>
-            @endpermission
+            
         </ul>
     </div>
     @role('admin|root')

@@ -28,37 +28,36 @@
             </ul>
             <div class="clearfix"></div>
         </div>
-        <div class="x_content">            
+        <div class="x_content"> 
+        {!! Form::open([ 'route' => 'temperatura.store', 'method' => 'POST', 'files' => 'true', 'class' => 'uk-form bt-flabels js-flabels', 'data-parsley-validate' => 'on']) !!}
             <div class="row">
                 <div class="col-md-6">
-                    {!! Form::open([ 'route' => 'temperatura.store','' => 'form-input', 'method' => 'POST', 'class' => 'uk-form bt-flabels js-flabels', 'data-parsley-validate' => 'on', 'data-parsley-errors-messages-disabled' => 'on']) !!}
-                        <h2>Agregar temperatura actual</h2>
-                        <div class="row">
-                            <div class="col-md-2">
-                                {!! Form::hidden('tipo_envio', 1, array('id' => 'tipo_envio')) !!}
-                                {!! Form::text('temperatura', null , ['class' => 'form-control', 'data-parsley-required' => 'true', 'id' => 'temperatura', 'autocomplete' => 'off', 'placeholder' => '4.0' ]  ) !!}
-                            </div>
-                            <div class="col-md-10">
-                                @permission('create.catalogos')<button type="submit" class="btn btn-success btn-large js-submit"> <i class="fa fa-save"></i> Guardar temperatura</button>@endpermission 
-                            </div>
-                        </div>
-                    {!! Form::close() !!}
+                    {!! Form::label('clues_id', '* Unidad de salud', ['for' => 'clues_id'] ) !!}
+                    {!! Form::select('clues_id', $clues,  0, ['class' => 'form-control js-data-clues select2', 'data-parsley-required' => 'true', 'id' => 'clues_id', 'data-placeholder' => '* Unidad de salud', 'style' => 'width:100%'] ) !!}
                 </div>
                 <div class="col-md-6">
-                    {!! Form::open([ 'route' => 'temperatura.store','' => 'form-file', 'method' => 'POST', 'files' => 'true', 'class' => 'uk-form bt-flabels js-flabels', 'data-parsley-validate' => 'on', 'data-parsley-errors-messages-disabled' => 'on']) !!}
-                        <h2>Agregar temperaturas desde archivo, <small>Descargue el archivo del DataLogger y cárguelo aquí</small> </h2>
-                        <div class="row">
-                            <div class="col-md-10">
-                                {!! Form::hidden('tipo_envio', 2, array('id' => 'tipo_envio')) !!}
-                                {!! Form::file('archivo', null , ['class' => 'form-control img-load', 'id' => 'foto', 'accept' => '.txt'] ) !!}
-                            </div>
-                            <div class="col-md-2">
-                                @permission('create.catalogos')<button type="submit" class="btn btn-primary btn-large js-submit"> <i class="fa fa-cloud-upload"></i> Subir archivo</button>@endpermission 
-                            </div>
-                        </div>
-                    {!! Form::close() !!}
-                </div>
+                    {!! Form::label('contenedores_id', '* Contenedor de biológico', ['for' => 'contenedores_id'] ) !!}
+                    {!! Form::select('contenedores_id', [],  null, ['class' => 'form-control js-data-contenedores select2', 'data-parsley-required' => 'true', 'id' => 'contenedores_id', 'data-placeholder' => '* Contenedor de biológico', 'style' => 'width:100%'] ) !!}
+                </div>                
             </div>
+            <div class="row">
+                <div class="col-md-2"><br>
+                    {!! Form::checkbox('desde_archivo', 'SI', false, ['class' => 'js-switch', 'id' => 'desde_archivo'] ) !!} 
+                    {!! Form::label('desde_archivo', 'Cargar un archivo', ['for' => 'desde_archivo', 'style' => 'font-size:large; padding-right:10px;'] ) !!}
+                </div>
+                <div id="manual" class="col-md-5 show">
+                    {!! Form::label('temperatura', '* Temperatura', ['for' => 'temperatura'] ) !!}
+                    {!! Form::text('temperatura', null , ['class' => 'form-control', 'style' => 'width:200px', 'id' => 'temperatura', 'autocomplete' => 'off', 'placeholder' => '4.0' ]  ) !!}
+                </div>
+                <div id="archivo" class="col-md-5 hidden">
+                    {!! Form::label('archivo', 'Archivo de temperaturas', ['for' => 'archivo'] ) !!}
+                    {!! Form::file('archivo', null , ['class' => 'form-control', 'id' => 'archivo', 'accept' => '.txt'] ) !!}
+                </div>
+                <div class="col-md-4"><br>
+                    @permission('create.catalogos')<button type="submit" class="btn btn-primary btn-lg js-submit pull-right"> <i class="fa fa-save"></i> Guardar! </button>@endpermission
+                </div>
+            </div> 
+            {!! Form::close() !!}            
             <br>
             @include('errors.msgAll')            
         </div>
@@ -79,100 +78,59 @@
     {!! Html::script('assets/mine/js/floating-labels.js') !!}
     {!! Html::script('assets/mine/js/myCheckBox.js') !!}
     {!! Html::script('assets/mine/js/myMessage.js') !!}
-    {!! Html::script('assets/mine/js/myfileImage.js') !!}
     {!! Html::script('assets/mine/js/myTags.js') !!}
 
     <script>
-        $(document).ready(function(e){
-            $("#password").prop('placeholder','Escribir un password');
-            $("#password_confirmation").prop('placeholder','Repetir password');
+        $(document).ready(function(){
+            setTimeout(function(){ $(".js-data-clues").change(); }, 1000);
         });
-    </script>
-    <!--<script>
-        $(document).ready(function(e){
-            $('.swRole').change(function(e){
-                e.preventDefault();
-                var row = $(this).parents('h4');
-                var id = row.data('id');
-                if($(this).is(':checked')) {
-                    $("input[id*='role-"+id+"-permiso-']").prop('checked',true);
-                    console.log(1);
-                } else {
-                    console.log(0);
-                    $("input[id*='role-"+id+"-permiso-']").prop('checked',false);
-                }
+        var contenedores = [{ 'id': 0, 'text': 'Seleccionar contenedor' }];
+        $(".js-data-clues,.js-data-contenedores").select2();
+        $('#desde_archivo').change(function() {
+            if ($(this).is(':checked')){
+                $("#archivo").removeClass("hidden");
+                $("#manual").removeClass("show");
+                $("#manual").addClass("hidden");
+                $("#archivo").addClass("show");
+
+                $("#temperatura").val("");
+
+            } else {
+                $("#archivo").removeClass("show");
+                $("#manual").removeClass("hidden");
+                $("#manual").addClass("show");
+                $("#archivo").addClass("hidden");
+
+                $("#temperatura").focus();
+                $("#archivo").val("") ;
+            }
+        });
+
+        $(".js-data-clues").change(function(){
+            var clue_id = $(this).val();
+            $.get('../catalogo/contenedor-biologico/',{clues_id:clue_id}, function(response, status){ // Consulta        
+                $('.js-data-contenedores').empty();
+                while (contenedores.length) { contenedores.pop(); }                
+                contenedores.push({ 'id': 0, 'text': 'Seleccionar contenedor' });  
+                $.each(response.data, function( i, cont ) {
+                    contenedores.push({ 'id': cont.id, 'text': cont.tipo_contenedor.nombre+': '+cont.marca.nombre+'/'+cont.modelo.nombre+'. Serie: '+cont.serie });
+                });
+                $(".js-data-contenedores").select2({
+                    language: "es",
+                    data: contenedores
+                });  
+                notificar('Información','Se cargaron '+(contenedores.length - 1)+' contenedores','success',1000); 
+                           
+            }).fail(function(){  // Calcula CURP
+                notificar('Información','No se consultaron los contenedores de la unidad seleccionada','warning',2000);
             });
-
-            $("#password").prop('placeholder','Escribir un password');
-            $("#password_confirmation").prop('placeholder','Repetir password');
         });
-    </script>-->
 
-    <!-- Select2 personalizado -->
-    <script>
-        //var localidad = { 'id':null, 'nombre':'Seleccionar una localidad', 'municipio':'','estado':'' };
-        $(".js-data-jurisdiccion").select2();
-        /*$(".js-data-localidad-ajax").select2({
-            ajax: {
-                url: "/catalogo/localidad/search",
-                dataType: 'json',
-                delay: 250,
-                data: function (params) {
-                return {
-                    q: params.term, // search term
-                    page: params.page
-                };
-                },
-                processResults: function (data, params) {
-                // parse the results into the format expected by Select2
-                // since we are using custom formatting functions we do not need to
-                // alter the remote JSON data, except to indicate that infinite
-                // scrolling can be used
-                params.page = params.page || 1;
-
-                return {
-                    results: $.map(data, function (item) {  // hace un  mapeo de la respuesta JSON para presentarlo en el select
-                        return {
-                            id:        item.id,
-                            nombre: item.nombre,
-                            municipio: item.municipio.nombre,
-                            estado: item.municipio.estado.abreviatura
-                        }
-                    }),
-                    pagination: {
-                    more: (params.page * 30) < data.total_count
-                    }
-                };
-                },
-                cache: true
-            },
-            escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
-            minimumInputLength: 5,
+        $(".js-data-contenedores").select2({
             language: "es",
-            placeholder: {
-                id: localidad.id, 
-                nombre: localidad.nombre,
-                municipio: localidad.municipio,
-                estado: localidad.estado
-            },
-            cache: true,
-            templateResult: formatRepo, // omitted for brevity, see the source of this page
-            templateSelection: formatRepoSelection // omitted for brevity, see the source of this page
+            data: contenedores
         });
 
-        function formatRepo (localidad) {
-            if (!localidad.id) { return localidad.nombre; }
-            var $localidad = $(
-                '<span class=""><strong><i class="fa fa-globe"></i> ' + localidad.nombre + '</strong>, '+ localidad.municipio +', '+ localidad.estado +'</span>'
-            );
-            return $localidad;
-        };
-        function formatRepoSelection (localidad) {
-            if (!localidad.id) { return localidad.nombre; }
-            var $localidad = $(
-                '<span class="results-select2"><strong><i class="fa fa-globe"></i> ' + localidad.nombre + '</strong>, '+ localidad.municipio +', '+ localidad.estado +'</span>'
-            );
-            return $localidad;
-        };*/
+
     </script>
 @endsection

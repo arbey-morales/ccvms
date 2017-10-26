@@ -64,7 +64,6 @@
                         <span class="select-label">* Unidad de salud</span>
                         {!! Form::label('clue_id', '* Unidad de salud', ['for' => 'clue_id'] ) !!}
                         {!! Form::select('clue_id', $clues,  0, ['class' => 'form-control js-data-clue select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'clue_id', 'data-placeholder' => '* Unidad de salud', 'style' => 'width:100%'] ) !!}
-
                         <span class="bt-flabels__error-desc">Requerido</span>
                     </div>
                     <div class="uk-grid uk-grid-collapse">
@@ -139,16 +138,16 @@
                         <div class="uk-width-1-2">
                             <div class="bt-flabels__wrapper">
                                 {!! Form::label('tutor', '* Nombre del tutor', ['for' => 'tutor'] ) !!}
-                                {!! Form::text('tutor', null , ['class' => 'form-control', 'data-parsley-required' => 'true', 'data-parsley-length' => '[10, 100]', 'id' => 'tutor', 'autocomplete' => 'off', 'placeholder' => '* Nombre del tutor' ]  ) !!}
-                                <span class="bt-flabels__error-desc">Requerido / Mín: 10 - Máx: 100 caracteres</span>
+                                {!! Form::text('tutor', null , ['class' => 'form-control', 'id' => 'tutor', 'autocomplete' => 'off', 'placeholder' => '* Nombre del tutor' ]  ) !!}
+                                <!--<span class="bt-flabels__error-desc">Requerido / Mín: 10 - Máx: 100 caracteres</span>-->
                             </div>
                         </div>
                         <div class="uk-width-1-2">
                             <div class="bt-flabels__wrapper bt-flabels--right">
                                 {!! Form::label('fecha_nacimiento_tutor', '* Fecha de nacimiento tutor', ['for' => 'fecha_nacimiento_tutor'] ) !!}
-                                {!! Form::text('fecha_nacimiento_tutor', null , ['class' => 'form-control has-feedback-left', 'aria-describedby' => 'inputSuccess2Status', 'data-parsley-required' => 'true', 'id' => 'fecha_nacimiento_tutor', 'autocomplete' => 'off', 'placeholder' => '* Fecha de nacimiento tutor' ]  ) !!}
+                                {!! Form::text('fecha_nacimiento_tutor', null , ['class' => 'form-control has-feedback-left', 'aria-describedby' => 'inputSuccess2Status', 'id' => 'fecha_nacimiento_tutor', 'autocomplete' => 'off', 'placeholder' => '* Fecha de nacimiento tutor' ]  ) !!}
                                 <span id="inputSuccess2Status" class="sr-only">(success)</span>
-                                <span class="bt-flabels__error-desc">Requerido</span>
+                                <!--<span class="bt-flabels__error-desc">Requerido</span>-->
                             </div>
                         </div>
                     </div>

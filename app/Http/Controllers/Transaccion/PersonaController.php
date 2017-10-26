@@ -363,6 +363,103 @@ class PersonaController extends Controller
         }
     }
 
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function buscar(Request $request)
+    {
+        $parametros = Input::only(['q','municipios_id','localidades_id','clues_id','agebs_id','sector','manzana','filtro','todo']);
+        $ta_abreviatura = $this->ta_abreviatura;
+        $q = "";
+        $text = '';
+        $today = Carbon::today("America/Mexico_City");
+		if (Auth::user()->can('show.personas') && Auth::user()->activo==1) {   
+            $personas = DB::table('personas')->select('personas.*','clu.clues AS clu_clues','clu.nombre AS clu_nombre','col.nombre AS col_nombre','loc.nombre AS loc_nombre','mun.nombre AS mun_nombre','tp.clave AS tp_clave','tp.descripcion AS tp_descripcion');         
+            if (Auth::user()->is('root|admin')) { } else { // Limitar por clues               
+                $personas = $personas->where('clu.jurisdicciones_id', Auth::user()->idJurisdiccion);
+            }
+
+            if (isset($parametros['filtro']) && $parametros['filtro']==1){ // filtros
+                $text = 'Filtros: ';
+                if(isset($parametros['municipios_id']) && $parametros['municipios_id']!=0){
+                    $personas = $personas->where('personas.municipios_id', $parametros['municipios_id']);
+                }
+                if(isset($parametros['clues_id']) && $parametros['clues_id']!=0){
+                    $personas = $personas->where('personas.clues_id', $parametros['clues_id']);
+                }
+                if(isset($parametros['localidades_id']) && $parametros['localidades_id']!=0){
+                    $personas = $personas->where('personas.localidades_id', $parametros['localidades_id']);
+                }
+                if(isset($parametros['agebs_id']) && $parametros['agebs_id']!=0){
+                    $personas = $personas->where('personas.agebs_id', $parametros['agebs_id']);
+                }
+                if(isset($parametros['sector']) && $parametros['sector']!="" && $parametros['sector']!=NULL){
+                    $personas = $personas->where('personas.sector', $parametros['sector']);
+                }
+                if(isset($parametros['manzana']) && $parametros['manzana']!="" && $parametros['manzana']!=NULL){
+                    $personas = $personas->where('personas.manzana', $parametros['manzana']);
+                }
+            } 
+            if(isset($parametros['filtro']) && $parametros['filtro']==2){ // buscar por cadena de texto
+                $text = 'Nombre o CURP: '.$parametros['q'];
+                $personas = $personas->where('personas.curp','LIKE',"%".$parametros['q']."%")
+                ->orWhere(DB::raw("CONCAT(personas.nombre,' ',personas.apellido_paterno,' ',personas.apellido_materno)"),'LIKE',"%".$parametros['q']."%");
+            }
+            
+            $data = $personas->where('personas.deleted_at', NULL)
+                ->leftJoin('clues AS clu','clu.id','=','personas.clues_id')
+                ->leftJoin('municipios AS mun','mun.id','=','personas.municipios_id')
+                ->leftJoin('localidades AS loc','loc.id','=','personas.localidades_id')
+                ->leftJoin('colonias AS col','col.id','=','personas.colonias_id')
+                ->leftJoin('tipos_partos AS tp','tp.id','=','personas.tipos_partos_id')
+                ->orderBy('personas.municipios_id', 'ASC')
+                ->orderBy('personas.clues_id', 'ASC')
+                ->orderBy('personas.apellido_paterno', 'ASC')
+                ->orderBy('personas.apellido_materno', 'ASC')
+                ->orderBy('personas.nombre', 'ASC')
+                ->get();
+            
+                /*if($rep['seg']==true){
+                foreach ($data as $cont=>$value) { // valorar seguimientos, biologico y actividades
+                    $value->seguimientos = collect();
+                    $bd = explode("-", $value->fecha_nacimiento);
+                    
+                    $esquema_detalle = DB::table('vacunas_esquemas AS ve')
+                        ->select('ve.id','ve.vacunas_id','ve.tipo_aplicacion','ve.esquemas_id','ve.intervalo_inicio_anio','ve.intervalo_inicio_mes','ve.intervalo_inicio_dia','ve.margen_anticipacion','fila','columna','ve.deleted_at','v.clave','v.nombre','v.orden_esquema AS v_orden_esquema','v.color_rgb')
+                        ->join('vacunas AS v','v.id','=','ve.vacunas_id')
+                        ->where('ve.esquemas_id', $bd[0])
+                        ->where('ve.deleted_at', NULL)
+                        ->where('v.deleted_at', NULL)                
+                        ->orderBy('v_orden_esquema')
+                        ->orderBy('intervalo_inicio_anio', 'ASC')
+                        ->orderBy('intervalo_inicio_mes', 'ASC')
+                        ->orderBy('intervalo_inicio_dia', 'ASC')
+                        ->orderBy('fila', 'ASC')
+                        ->orderBy('columna', 'ASC')
+                        ->get(); 
+                    $seguimientos = collect();
+                    foreach ($esquema_detalle as $key_esquema => $value_esquema) {
+                        $marca = ' ';
+                        $pve = PersonaVacunaEsquema::select('fecha_aplicacion')->where('personas_id', $value->id)->where('vacunas_esquemas_id', $value_esquema->id)->where('deleted_at', NULL)->take(1)->get();
+                        $hoy = Carbon::today("America/Mexico_City");
+                        $fecha_ideal = Carbon::parse($bd[0]."-".$bd[1]."-".$bd[2]." 00:00:00","America/Mexico_City")->addYears($value_esquema->intervalo_inicio_anio)->addMonths($value_esquema->intervalo_inicio_mes)->addDays($value_esquema->intervalo_inicio_dia)->subDays($value_esquema->margen_anticipacion);
+                        if($fecha_ideal<=$hoy){ $marca = '__'; }
+                        if(count($pve)>0){ $marca = 'X'; }                    
+                        $seguimientos->push(['id' => $value_esquema->id, 'tipo_aplicacion' => $ta_abreviatura[$value_esquema->tipo_aplicacion], 'vacunas_id' => $value_esquema->vacunas_id, 'clave' => $value_esquema->clave, 'marca' => $marca, 'color_rgb' => $value_esquema->color_rgb]);
+                    }
+                    $value->seguimientos = $seguimientos;
+                }
+                }*/
+            
+            $usuario = User::with('jurisdiccion')->find(Auth::user()->id);
+            return response()->json(['text' => $text, 'data' => $data, 'user' => $usuario]);
+        } else {
+            return response()->json([ 'data' => [$data]]);
+        }
+    }
+
     public function curp(Request $request)
     {         
         $encontrada = false;
@@ -651,6 +748,7 @@ class PersonaController extends Controller
                 'unique'   => 'El campo :attribute ya existe',
                 'numeric'  => 'El campo :attribute debe ser un número.',
                 'same'     => 'El campo :attribute debe ser igual al password',
+                'sometimes'=> 'El campo :attribute debe sometimes',
                 'confirmed'=> 'El campo :attribute debe ser confirmado',
                 'date'     => 'El campo :attribute debe ser formato fecha',
                 'before'   => 'La :attribute debe ser menor o igual a la fecha limite(fecha actual o fecha de nacimiento del niño)'
@@ -662,7 +760,7 @@ class PersonaController extends Controller
                 'materno'                                => 'required|min:2|max:20|string',
                 'clue_id'                                => 'required|min:1|numeric',
                 'fecha_nacimiento'                       => 'required|date|before:tomorrow',
-                'fecha_nacimiento_tutor'                 => 'required|date|before:fecha_nacimiento',
+                'fecha_nacimiento_tutor'                 => 'sometimes|date|before:fecha_nacimiento',
                 'curp'                                   => 'required|min:17|max:18',
                 'genero'                                 => 'required|in:F,M',
                 'tipo_parto_id'                          => 'required|min:1|numeric',
@@ -671,7 +769,7 @@ class PersonaController extends Controller
                 'localidad_id'                           => 'required|min:1|numeric',
                 'calle'                                  => 'required|min:1|max:100',
                 'numero'                                 => 'required|min:1|max:5',
-                'tutor'                                  => 'required|min:10|max:100',
+                'tutor'                                  => 'sometimes|required|min:10|max:100',
             ];
             
             $this->validate($request, $rules, $messages);
@@ -1331,6 +1429,7 @@ class PersonaController extends Controller
                 'unique'   => 'El campo :attribute ya existe',
                 'numeric'  => 'El campo :attribute debe ser un número.',
                 'same'     => 'El campo :attribute debe ser igual al password',
+                'sometimes'=> 'El campo :attribute debe sometimes',
                 'confirmed'=> 'La :attribute debe ser confirmada',
                 'date'     => 'La :attribute debe ser formato fecha',
                 'before'   => 'La :attribute debe ser menor o igual a la fecha limite(fecha actual o fecha de nacimiento del niño)'
@@ -1350,8 +1449,8 @@ class PersonaController extends Controller
                 'localidad_id'                           => 'required|min:1|numeric',
                 'calle'                                  => 'required|min:1|max:100',
                 'numero'                                 => 'required|min:1|max:5',
-                'tutor'                                  => 'required|min:10|max:100',
-                'fecha_nacimiento_tutor'                 => 'required|date|before:fecha_nacimiento',
+                'tutor'                                  => 'sometimes|required|min:10|max:100',
+                'fecha_nacimiento_tutor'                 => 'sometimes|required|date|before:fecha_nacimiento',
             ];
 
             $this->validate($request, $rules, $messages);

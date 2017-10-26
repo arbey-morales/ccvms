@@ -12,7 +12,11 @@
 */
 
 Route::get('/', ['middleware' => 'auth', function () {
-    return view('home');
+    if(\Auth::user()->is('red-frio')){
+        return redirect('temperatura');
+    } else {
+        return redirect('persona');
+    }        
 }]);
 
 Route::group(['namespace' => 'Auth','prefix' => 'auth'], function () {
@@ -23,34 +27,39 @@ Route::group(['namespace' => 'Auth','prefix' => 'auth'], function () {
 });
 
 Route::group(['namespace' => 'Transaccion', 'middleware' => 'auth'], function () {
-    // Trancacciones
+    // Trancacciones vacunación
     Route::resource('usuario',                             'UserController');
     Route::resource('monitoreo',                           'MonitoreoController');
     Route::get('dashboard',                                'PersonaController@dashboard');
+    Route::get('persona/buscar',                           'PersonaController@buscar');
     Route::get('persona/curp',                             'PersonaController@curp');
     Route::get('persona/reporte',                          'PersonaController@reporte');
     Route::resource('persona',                             'PersonaController');
     Route::resource('cuadro-dist-juris',                   'CuadroDistribucionJurisdiccionalController');
     Route::resource('cuadro_distribucion_clue',            'CuadroDistribucionClueController');   
-    
+    // Trancacciones red de frío
     Route::resource('temperatura',                         'TemperaturaContenedorController');
 });  
 
 Route::group(['prefix' => 'catalogo', 'namespace' => 'Catalogo', 'middleware' => 'auth'], function () {
-    // Catalogos
-    Route::resource('ageb',             'AgebController',            ['only' => ['index', 'show']]);
-    Route::resource('clue',             'ClueController');
-    Route::resource('codigo',           'CodigoCensoController',     ['only' => ['index', 'show']]);
-    Route::resource('entidad',          'EntidadController',         ['only' => ['index', 'show']]);
-    Route::resource('esquema',          'EsquemaController',         ['only' => ['index', 'show']]);
-    Route::resource('institucion',      'InstitucionController',     ['only' => ['index', 'show']]);
-    Route::resource('jurisdiccion',     'JurisdiccionController',    ['only' => ['index', 'show']]);
-    Route::resource('localidad',        'LocalidadController');
-    Route::resource('municipio',        'MunicipioController',       ['only' => ['index', 'show']]);
-    Route::resource('colonia',          'ColoniaController');
-    Route::resource('pais',             'PaisController',            ['only' => ['index', 'show']]);
-    Route::resource('tipo-parto',       'TipoPartoController',       ['only' => ['index', 'show']]);
-
+    // Catalogos vacunación
+    Route::resource('ageb',                 'AgebController',                   ['only' => ['index', 'show']]);
+    Route::resource('clue',                 'ClueController');
+    Route::resource('codigo',               'CodigoCensoController',            ['only' => ['index', 'show']]);
+    Route::resource('entidad',              'EntidadController',                ['only' => ['index', 'show']]);
+    Route::resource('esquema',              'EsquemaController',                ['only' => ['index', 'show']]);
+    Route::resource('institucion',          'InstitucionController',            ['only' => ['index', 'show']]);
+    Route::resource('jurisdiccion',         'JurisdiccionController',           ['only' => ['index', 'show']]);
+    Route::resource('localidad',            'LocalidadController');
+    Route::resource('municipio',            'MunicipioController',              ['only' => ['index', 'show']]);
+    Route::resource('colonia',              'ColoniaController');
+    Route::resource('pais',                 'PaisController',                   ['only' => ['index', 'show']]);
+    Route::resource('tipo-parto',           'TipoPartoController',              ['only' => ['index', 'show']]);
+    // Catalogos Red de frío
+    Route::resource('marca',                'MarcaController');
+    Route::resource('modelo',               'ModeloController');
+    Route::resource('estatus-contenedor',   'EstatusContenedorController',      ['only' => ['index', 'show']]);
+    Route::resource('contenedor-biologico', 'ContenedorBiologicoController');
 });
 
 // PDF

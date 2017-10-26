@@ -28,24 +28,27 @@ class ClueController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $parametros = Input::only('q');
+        $parametros = Input::only('q','municipios_id');
         if (Auth::user()->can('show.catalogos') && Auth::user()->activo==1) {
-            if (Auth::user()->is('root|admin')) {
-                if ($parametros['q']) {
-                    $data =  Clue::where('clues','LIKE',"%".$parametros['q']."%")->orWhere('nombre','LIKE',"%".$parametros['q']."%")->with('municipio','localidad','jurisdiccion')->where('deleted_at',NULL)->get();
-                } else {
-                    $data =  Clue::with('municipio','localidad','jurisdiccion')->where('deleted_at',NULL)->get();
-                }
-            } else {
-                if ($parametros['q']) {
-                    $data = Clue::where('clues','LIKE',"%".$parametros['q']."%")->orWhere('nombre','LIKE',"%".$parametros['q']."%")->where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->with('municipio','localidad','jurisdiccion')->get();
-                } else {
-                    $data = Clue::where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->with('municipio','localidad','jurisdiccion')->get();
-                }
-            }       
-            return view('catalogo.clue.index')->with('data', $data)->with('q', $parametros['q']);
+            $data = Clue::with('municipio','localidad','jurisdiccion')/*->where('instituciones_id',13)*/->where('deleted_at',NULL);
+            if (Auth::user()->is('root|admin')) { } else {
+                $data = $data->where('jurisdicciones_id', Auth::user()->idJurisdiccion);                
+            }            
+            if ($parametros['q']) {
+                $data = $data->where('clues','LIKE',"%".$parametros['q']."%")->orWhere('nombre','LIKE',"%".$parametros['q']."%");
+            } 
+            if ($parametros['municipios_id']) {
+                $data = $data->where('municipios_id', $parametros['municipios_id']);
+            }
+            $data = $data->get();
+
+            if ($request->ajax()) {
+                return response()->json([ 'data' => $data]);
+            } else {  
+                return view('catalogo.clue.index')->with('data', $data)->with('q', $parametros['q']);
+            }
         } else {
             return response()->view('errors.allPagesError', ['icon' => 'user-secret', 'error' => '403', 'title' => 'Forbidden / Prohibido', 'message' => 'No tiene autorización para acceder al recurso. Se ha negado el acceso.'], 403);
         }
