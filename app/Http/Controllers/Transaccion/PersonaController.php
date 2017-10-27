@@ -767,7 +767,6 @@ class PersonaController extends Controller
                 'materno'                                => 'required|min:2|max:20|string',
                 'clue_id'                                => 'required|min:1|numeric',
                 'fecha_nacimiento'                       => 'required|date|before:tomorrow',
-                'fecha_nacimiento_tutor'                 => 'sometimes|date|before:fecha_nacimiento',
                 'curp'                                   => 'required|min:17|max:18',
                 'genero'                                 => 'required|in:F,M',
                 'tipo_parto_id'                          => 'required|min:1|numeric',
@@ -776,7 +775,6 @@ class PersonaController extends Controller
                 'localidad_id'                           => 'required|min:1|numeric',
                 'calle'                                  => 'required|min:1|max:100',
                 'numero'                                 => 'required|min:1|max:5',
-                'tutor'                                  => 'sometimes|required|min:10|max:100',
             ];
             
             $this->validate($request, $rules, $messages);
@@ -805,7 +803,12 @@ class PersonaController extends Controller
             $request->fecha_nacimiento = $fecha_nacimiento[2].'-'.$fecha_nacimiento[1].'-'.$fecha_nacimiento[0]; // formato valido para guardar fecha n
 
             $fecha_nacimiento_tutor = explode('-',$request->fecha_nacimiento_tutor);
-            $request->fecha_nacimiento_tutor = $fecha_nacimiento_tutor[2].'-'.$fecha_nacimiento_tutor[1].'-'.$fecha_nacimiento_tutor[0]; // formato valido para guardar fecha n t
+            if(array_key_exists(0, $fecha_nacimiento_tutor) && array_key_exists(1, $fecha_nacimiento_tutor) && array_key_exists(2, $fecha_nacimiento_tutor)){
+                $request->fecha_nacimiento_tutor = $fecha_nacimiento_tutor[2].'-'.$fecha_nacimiento_tutor[1].'-'.$fecha_nacimiento_tutor[0]; // formato valido para guardar fecha n t
+            } else {
+                $request->fecha_nacimiento_tutor = NULL;
+            }
+            
                    
             $persona = new Persona;
             $persona->id                    = $persona_id;
@@ -1217,7 +1220,12 @@ class PersonaController extends Controller
                 $persona->edad = $total_anios.' '.$letra_total_anios.' '.$total_meses.' '.$letra_total_meses.' '.$total_dias.' '.$letra_total_dias;
 
                 $fn_tutor = explode("-",$persona->fecha_nacimiento_tutor);
-                $persona->fecha_nacimiento_tutor = date($fn_tutor[2].'-'.$fn_tutor[1].'-'.$fn_tutor[0]);
+                if(array_key_exists(0, $fn_tutor) && array_key_exists(1, $fn_tutor) && array_key_exists(2, $fn_tutor)){
+                    $persona->fecha_nacimiento_tutor = date($fn_tutor[2].'-'.$fn_tutor[1].'-'.$fn_tutor[0]);
+                } else {
+                    $persona->fecha_nacimiento_tutor = NULL;
+                }
+                
                 $fn_nino = explode("-",$persona->fecha_nacimiento);
                 $persona->fecha_nacimiento = date($fn_nino[2].'-'.$fn_nino[1].'-'.$fn_nino[0]);
             } else {
@@ -1395,7 +1403,11 @@ class PersonaController extends Controller
                 }
             
                 $fn_tutor = explode("-",$persona->fecha_nacimiento_tutor);
-                $persona->fecha_nacimiento_tutor = date($fn_tutor[2].'-'.$fn_tutor[1].'-'.$fn_tutor[0]);
+                if(array_key_exists(0, $fn_tutor) && array_key_exists(1, $fn_tutor) && array_key_exists(2, $fn_tutor)){
+                    $persona->fecha_nacimiento_tutor = date($fn_tutor[2].'-'.$fn_tutor[1].'-'.$fn_tutor[0]);
+                } else {
+                    $persona->fecha_nacimiento_tutor = NULL;
+                }
                 $fn_nino = explode("-",$persona->fecha_nacimiento);
                 $persona->fecha_nacimiento = date($fn_nino[2].'-'.$fn_nino[1].'-'.$fn_nino[0]);
 
@@ -1456,8 +1468,6 @@ class PersonaController extends Controller
                 'localidad_id'                           => 'required|min:1|numeric',
                 'calle'                                  => 'required|min:1|max:100',
                 'numero'                                 => 'required|min:1|max:5',
-                'tutor'                                  => 'sometimes|required|min:10|max:100',
-                'fecha_nacimiento_tutor'                 => 'sometimes|required|date|before:fecha_nacimiento',
             ];
 
             $this->validate($request, $rules, $messages);
@@ -1495,8 +1505,12 @@ class PersonaController extends Controller
             $request->fecha_nacimiento = $fecha_nacimiento[2].'-'.$fecha_nacimiento[1].'-'.$fecha_nacimiento[0]; // formato valido para guardar fecha n
 
             $fecha_nacimiento_tutor = explode('-',$request->fecha_nacimiento_tutor);
-            $request->fecha_nacimiento_tutor = $fecha_nacimiento_tutor[2].'-'.$fecha_nacimiento_tutor[1].'-'.$fecha_nacimiento_tutor[0]; // formato valido para guardar fecha n t
-            
+            if(array_key_exists(0, $fecha_nacimiento_tutor) && array_key_exists(1, $fecha_nacimiento_tutor) && array_key_exists(2, $fecha_nacimiento_tutor)){
+                $request->fecha_nacimiento_tutor = $fecha_nacimiento_tutor[2].'-'.$fecha_nacimiento_tutor[1].'-'.$fecha_nacimiento_tutor[0]; // formato valido para guardar fecha n t
+            } else {
+                $request->fecha_nacimiento_tutor = NULL;
+            }
+
             $persona->nombre                              = strtoupper($request->nombre);
             $persona->apellido_paterno                    = strtoupper($request->paterno);
             $persona->apellido_materno                    = strtoupper($request->materno);
