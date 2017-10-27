@@ -25,11 +25,13 @@ class AgebController extends Controller
     {
         if (Auth::user()->can('show.catalogos') && Auth::user()->activo==1) {
             $parametros = Input::only('q','localidades_id'); 
-            $data = DB::table('agebs as a')->select('a.*','l.nombre as localidad','m.nombre as municipio')->where('a.deleted_at',NULL);
+            $data = DB::table('agebs as a')
+            ->select('a.*','l.nombre as localidad','m.nombre as municipio')
+            ->leftJoin('localidades as l','l.id','=','a.localidades_id')
+            ->leftJoin('municipios as m','m.id','=','l.municipios_id')
+            ->where('a.deleted_at',NULL);
             if (Auth::user()->is('root|admin')) { } else {
-                $data = $data->leftJoin('localidades as l','l.id','=','a.localidades_id')
-                ->leftJoin('municipios as m','m.id','=','l.municipios_id')
-                ->where('m.jurisdicciones_id', Auth::user()->idJurisdiccion);
+                $data = $data->where('m.jurisdicciones_id', Auth::user()->idJurisdiccion);
             }  
             if ($parametros['q']) {
                 $data = $data->where('a.id','LIKE',"%".$parametros['q']."%");

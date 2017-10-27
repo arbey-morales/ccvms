@@ -24,10 +24,12 @@ class LocalidadController extends Controller
     {
         if (Auth::user()->can('show.catalogos') && Auth::user()->activo==1) {
             $parametros = Input::only('q','municipios_id');
-            $data =  DB::table('localidades as l')->select('l.*','m.nombre as municipio')->where('l.deleted_at',NULL);
+            $data =  DB::table('localidades as l')
+                ->select('l.*','m.nombre as municipio')
+                ->leftJoin('municipios as m','m.id','=','l.municipios_id')
+                ->where('l.deleted_at',NULL);
             if (Auth::user()->is('root|admin')) { } else {
-                $data = $data->leftJoin('municipios as m','m.id','=','l.municipios_id')
-                ->where('m.jurisdicciones_id', Auth::user()->idJurisdiccion);
+                $data = $data->where('m.jurisdicciones_id', Auth::user()->idJurisdiccion);
             }  
             if ($parametros['q']) {
                 $data = $data->where('l.clave','LIKE',"%".$parametros['q']."%")->orWhere('l.nombre','LIKE',"%".$parametros['q']."%");
