@@ -201,6 +201,12 @@
         iniciarMunicipio();
     });
 
+    $('#todo').change(function() {
+        if ($(this).is(':checked')){
+            $(".js-ajax").click();
+        }
+    });
+
     /*** BUSCAR */
     $(".js-ajax").click(function(e){
         e.preventDefault();

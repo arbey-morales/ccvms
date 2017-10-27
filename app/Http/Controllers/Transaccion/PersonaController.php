@@ -381,36 +381,38 @@ class PersonaController extends Controller
                 $personas = $personas->where('clu.jurisdicciones_id', Auth::user()->idJurisdiccion);
             }
 
-            if (isset($parametros['filtro']) && $parametros['filtro']==1){ // filtros
-                $text = 'Filtros: ';
-                if(isset($parametros['municipios_id']) && $parametros['municipios_id']!=0){
-                    $personas = $personas->where('personas.municipios_id', $parametros['municipios_id']);
+            if ($parametros['todo']==NULL){
+                if (isset($parametros['filtro']) && $parametros['filtro']==1){ // filtros
+                    $text = 'Filtros: ';
+                    if(isset($parametros['municipios_id']) && $parametros['municipios_id']!=0){
+                        $personas = $personas->where('personas.municipios_id', $parametros['municipios_id']);
+                    }
+                    if(isset($parametros['clues_id']) && $parametros['clues_id']!=0){
+                        $personas = $personas->where('personas.clues_id', $parametros['clues_id']);
+                    }
+                    if(isset($parametros['localidades_id']) && $parametros['localidades_id']!=0){
+                        $personas = $personas->where('personas.localidades_id', $parametros['localidades_id']);
+                    }
+                    if(isset($parametros['agebs_id']) && $parametros['agebs_id']!=0){
+                        $personas = $personas->where('personas.agebs_id', $parametros['agebs_id']);
+                    }
+                    if(isset($parametros['sector']) && $parametros['sector']!="" && $parametros['sector']!=NULL){
+                        $personas = $personas->where('personas.sector', $parametros['sector']);
+                    }
+                    if(isset($parametros['manzana']) && $parametros['manzana']!="" && $parametros['manzana']!=NULL){
+                        $personas = $personas->where('personas.manzana', $parametros['manzana']);
+                    }
+                } 
+                if(isset($parametros['filtro']) && $parametros['filtro']==2){ // buscar por cadena de texto
+                    $text = 'Nombre o CURP: '.$parametros['q'];
+                    $personas = $personas->where(function($query) use ($parametros) {
+                        $query->where('personas.curp','LIKE',"%".$parametros['q']."%")
+                        ->orWhere('personas.tutor','LIKE',"%".$parametros['q']."%")
+                        ->orWhere(\DB::raw("CONCAT(personas.nombre,' ',personas.apellido_paterno,' ',personas.apellido_materno)"),'LIKE',"%".$parametros['q']."%");
+                    });
+                    /*$personas = $personas->where('personas.curp','LIKE',"%".$parametros['q']."%")
+                    ->orWhere(DB::raw("CONCAT(personas.nombre,' ',personas.apellido_paterno,' ',personas.apellido_materno)"),'LIKE',"%".$parametros['q']."%");*/
                 }
-                if(isset($parametros['clues_id']) && $parametros['clues_id']!=0){
-                    $personas = $personas->where('personas.clues_id', $parametros['clues_id']);
-                }
-                if(isset($parametros['localidades_id']) && $parametros['localidades_id']!=0){
-                    $personas = $personas->where('personas.localidades_id', $parametros['localidades_id']);
-                }
-                if(isset($parametros['agebs_id']) && $parametros['agebs_id']!=0){
-                    $personas = $personas->where('personas.agebs_id', $parametros['agebs_id']);
-                }
-                if(isset($parametros['sector']) && $parametros['sector']!="" && $parametros['sector']!=NULL){
-                    $personas = $personas->where('personas.sector', $parametros['sector']);
-                }
-                if(isset($parametros['manzana']) && $parametros['manzana']!="" && $parametros['manzana']!=NULL){
-                    $personas = $personas->where('personas.manzana', $parametros['manzana']);
-                }
-            } 
-            if(isset($parametros['filtro']) && $parametros['filtro']==2){ // buscar por cadena de texto
-                $text = 'Nombre o CURP: '.$parametros['q'];
-                $personas = $personas->where(function($query) use ($parametros) {
-                    $query->where('personas.curp','LIKE',"%".$parametros['q']."%")
-                    ->orWhere('personas.tutor','LIKE',"%".$parametros['q']."%")
-                    ->orWhere(\DB::raw("CONCAT(personas.nombre,' ',personas.apellido_paterno,' ',personas.apellido_materno)"),'LIKE',"%".$parametros['q']."%");
-                });
-                /*$personas = $personas->where('personas.curp','LIKE',"%".$parametros['q']."%")
-                ->orWhere(DB::raw("CONCAT(personas.nombre,' ',personas.apellido_paterno,' ',personas.apellido_materno)"),'LIKE',"%".$parametros['q']."%");*/
             }
             
             $data = $personas->where('personas.deleted_at', NULL)
