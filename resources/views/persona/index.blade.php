@@ -175,9 +175,9 @@
         });
 
         // Delete on Ajax 
-        $('.btn-delete').click(function(e){
+        $( "#contenido" ).on( "click", ".btn-delete", function(e) {
             e.preventDefault();
-            var row = $(this).parents('tr');
+            var row = $(this).parents('div');
             registro_borrar = row.data('id');
             $("#modal-text").html(row.data('nombre'));
         });
@@ -242,7 +242,7 @@
                         var url_edit = '{{ Route::getCurrentRoute()->getPath() }}';
                         //var con = '<li class="media event"> <a class="pull-left border-aero profile_thumb"> <i class="fa fa-user aero"></i> </a> <div class="media-body"> <a class="title" href="#">Ms. Mary Jane</a> <p><strong>$2300. </strong> Agent Avarage Sales </p> <p> <small>12 Sales Today</small> </p> </div> </li>';
                         //$("#contenido").append(con);
-                        $("#contenido").append('<div class="row"><div class="col-md-1"><button type="button" class="btn btn-danger btn-delete" style="font-size:large;" data-toggle="modal" data-target=".bs-example-modal-lg"> <i class="fa fa-trash"></i></button></div> <div class="col-md-11"><a href="'+url_edit+'/'+cont.id+'"> <div class="mail_list"> <div class="right">  <h3> '+icono+' - '+cont.apellido_paterno+' '+cont.apellido_materno+' '+cont.nombre+' | <span style="color:tomato;">  '+cont.curp+'</span> | <span style="color:gray; font-weight:normal;"> TUTOR: '+cont.tutor+'</span> <small>'+cont.fecha_nacimiento+'</small></h3> <p> <span style="color:#428bca; font-weight:bold;">  '+cont.clu_clues+' - </span> <span style="color:#317d79; padding-right:20px;">  '+cont.clu_nombre+' - </span>  '+cont.calle+' '+cont.numero+', '+cont.col_nombre+', '+cont.loc_nombre+', '+cont.mun_nombre+' </p>  </div> </div> </a></div></div>');
+                        $("#contenido").append('<div class="row '+cont.id+'" data-toggle="tooltip" data-placement="top" data-original-title="'+cont.usuario_id+' / '+cont.created_at+'"><div class="col-md-1" id="'+cont.id+'" data-id="'+cont.id+'" data-nombre="'+cont.nombre+' '+cont.apellido_paterno+' '+cont.apellido_materno+'"><button type="button" class="btn btn-danger btn-delete" style="font-size:large;" data-toggle="modal" data-target=".bs-example-modal-lg"> <i class="fa fa-trash"></i></button></div> <div class="col-md-11"><a href="'+url_edit+'/'+cont.id+'"> <div class="mail_list"> <div class="right">  <h3> '+icono+' - '+cont.apellido_paterno+' '+cont.apellido_materno+' '+cont.nombre+' | <span style="color:tomato;">  '+cont.curp+'</span> | <span style="color:gray; font-weight:normal;"> TUTOR: '+cont.tutor+'</span> <small>'+cont.fecha_nacimiento+'</small></h3> <p> <span style="color:#428bca; font-weight:bold;">  '+cont.clu_clues+' - </span> <span style="color:#317d79; padding-right:20px;">  '+cont.clu_nombre+' - </span>  '+cont.calle+' '+cont.numero+', '+cont.col_nombre+', '+cont.loc_nombre+', '+cont.mun_nombre+' </p>  </div> </div> </a></div></div>');
                         //$("#contenido").append('<tr><td class="text-left">'+(i + 1)+'</td><td class="text-left"><a class="btn btn-default" href="'+url_edit+'/'+cont.id+'" class="button"> '+icono+' </a> '+cont.apellido_paterno+' '+cont.apellido_materno+' '+cont.nombre+'</td><td class="text-left">'+cont.curp+'</td><td class="text-left">'+cont.fecha_nacimiento+'</td><td class="text-left">'+cont.calle+' '+cont.numero+', '+cont.col_nombre+', '+cont.loc_nombre+', '+cont.mun_nombre+'</td><td class="text-left"><strong>'+cont.clu_clues+'</strong>, '+cont.clu_nombre+'</td><td class="text-left"><a class="btn btn-primary" href="'+url_edit+'/'+cont.id+'/edit" class="button"> <i class="fa fa-edit"></i> </a><button type="button" class="btn btn-danger btn-delete" data-toggle="modal" data-target=".bs-example-modal-lg"> <i class="fa fa-trash"></i></button></td></tr>');
                     });
                     //$("#contenido").append('</ul>');
@@ -370,7 +370,7 @@
                     } else {
                         notificar('Información','Cargando localidades','info',2000);
                         $.each(response.data, function( i, cont ) {
-                            localidades.push({ 'id': cont.id, 'text': ''+cont.nombre });
+                            localidades.push({ 'id': cont.id, 'text': ''+ cont.clave+' - '+cont.nombre });
                         }); 
                     } 
                 } 
@@ -438,15 +438,15 @@
 
     // Confirm delete on Ajax
     $('.btn-confirm-delete').click(function(e){
-        var row = $("tr#"+registro_borrar);
+        var row = $("div#"+registro_borrar);
         var form = $("#form-delete");
         var url_delete = form.attr('action').replace(":ITEM_ID", registro_borrar);
-        var data = $("#form-delete").serialize();
-        $.post(url_delete, data, function(response, status){
+        var dato = $("#form-delete").serialize();
+        $.post(url_delete, dato, function(response, status){
             if (response.code==1) {
                 notificar(response.title,response.text,response.type,3000);
                 if(response.type=='success') {
-                    row.fadeOut();
+                    row.slideUp('slow'); $("div."+registro_borrar).slideUp('slow');
                 }
             }
             if (response.code==0) {
@@ -454,7 +454,7 @@
             }
         }).fail(function(){
             notificar('Error','No se procesó la eliminación del registro','error',3000);
-            row.fadeIn();
+            row.show(); $("div."+registro_borrar).show();
         });
     });
 
@@ -487,6 +487,7 @@
 
     ///// Seguimientos    
     function tablaSeguimientos() {
+        console.log(data);
         var dosiss   = [];
         var dosis_extra   = [];
         var vac = [];
