@@ -27,7 +27,8 @@ class LocalidadController extends Controller
             $data =  DB::table('localidades as l')
                 ->select('l.*','m.nombre as municipio')
                 ->leftJoin('municipios as m','m.id','=','l.municipios_id')
-                ->where('l.deleted_at',NULL);
+                ->where('l.deleted_at',NULL)
+                ->orderBy('l.nombre', 'ASC');
             if (Auth::user()->is('root|admin')) { } else {
                 $data = $data->where('m.jurisdicciones_id', Auth::user()->idJurisdiccion);
             }  

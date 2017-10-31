@@ -63,7 +63,7 @@
                     <div class="bt-flabels__wrapper">
                         <span class="select-label">* Unidad de salud</span>
                         {!! Form::label('clue_id', '* Unidad de salud', ['for' => 'clue_id'] ) !!}
-                        {!! Form::select('clue_id', $clues,  0, ['class' => 'form-control js-data-clue select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'clue_id', 'data-placeholder' => '* Unidad de salud', 'style' => 'width:100%'] ) !!}
+                        {!! Form::select('clue_id', [],  0, ['class' => 'form-control js-data-clue select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'clue_id', 'data-placeholder' => '* Unidad de salud', 'style' => 'width:100%'] ) !!}
                         <span class="bt-flabels__error-desc">Requerido</span>
                     </div>
                     <div class="uk-grid uk-grid-collapse">
@@ -112,7 +112,7 @@
                             <div class="bt-flabels__wrapper bt-flabels--right">  
                                 <span class="select-label">* Entidad federativa de nacimiento</span>                              
                                 {!! Form::label('entidad_federativa_nacimiento_id', '* Entidad federativa de nacimiento', ['for' => 'entidad_federativa_nacimiento_id'] ) !!}
-                                {!! Form::select('entidad_federativa_nacimiento_id', $estados,  $clue_selected->entidades_id, ['class' => 'form-control js-data-estado select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'entidad_federativa_nacimiento_id',  'data-placeholder' => '* Entidad federativa de nacimiento', 'style' => 'width:100%'] ) !!}
+                                {!! Form::select('entidad_federativa_nacimiento_id', [], 0, ['class' => 'form-control js-data-estado select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'entidad_federativa_nacimiento_id',  'data-placeholder' => '* Entidad federativa de nacimiento', 'style' => 'width:100%'] ) !!}
                                 <span class="bt-flabels__error-desc">Requerido</span>
                             </div>
                         </div>
@@ -129,7 +129,7 @@
                             <div class="bt-flabels__wrapper bt-flabels--right">
                                 <span class="select-label">* Tipo de parto</span>
                                 {!! Form::label('tipo_parto_id', '* Tipo de parto', ['for' => 'tipo_parto_id'] ) !!}
-                                {!! Form::select('tipo_parto_id', $partos,  1, ['class' => 'form-control js-data-parto select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'tipo_parto_id',  'data-placeholder' => '* Tipo de parto', 'style' => 'width:100%'] ) !!}
+                                {!! Form::select('tipo_parto_id', [], 0, ['class' => 'form-control js-data-parto select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'tipo_parto_id',  'data-placeholder' => '* Tipo de parto', 'style' => 'width:100%'] ) !!}
                                 <span class="bt-flabels__error-desc">Requerido</span>
                             </div>
                         </div>
@@ -156,7 +156,7 @@
                             <div class="bt-flabels__wrapper">
                                 <span class="select-label">* Municipio</span>
                                 {!! Form::label('municipio_id', '* Municipio', ['for' => 'municipio_id'] ) !!}
-                                {!! Form::select('municipio_id', $municipios,  $clue_selected->municipios_id, ['class' => 'form-control js-data-municipio select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'municipio_id',  'data-placeholder' => '* Municipio', 'style' => 'width:100%'] ) !!}
+                                {!! Form::select('municipio_id', [], 0, ['class' => 'form-control js-data-municipio select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'municipio_id',  'data-placeholder' => '* Municipio', 'style' => 'width:100%'] ) !!}
                                 <span class="bt-flabels__error-desc">Requerido</span>
                             </div>
                         </div>
@@ -164,7 +164,7 @@
                             <div class="bt-flabels__wrapper bt-flabels--right">   
                                 <span class="select-label">* Localidad</span>
                                 {!! Form::label('localidad_id', '* Localidad', ['for' => 'localidad_id'] ) !!}
-                                {!! Form::select('localidad_id', $localidades, $clue_selected->localidades_id, ['class' => 'form-control js-data-localidad select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'localidad_id',  'data-placeholder' => '* Localidad', 'style' => 'width:100%'] ) !!}
+                                {!! Form::select('localidad_id', [], 0, ['class' => 'form-control js-data-localidad select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'localidad_id',  'data-placeholder' => '* Localidad', 'style' => 'width:100%'] ) !!}
                                 <span class="bt-flabels__error-desc">Requerido</span>
                             </div>
                         </div>
@@ -174,7 +174,7 @@
                             <div class="bt-flabels__wrapper">
                                 <span class="select-label">AGEB</span>
                                 {!! Form::label('ageb_id', 'AGEB', ['for' => 'ageb_id'] ) !!}
-                                {!! Form::select('ageb_id', $agebs, 0, ['class' => 'form-control js-data-ageb select2', 'id' => 'ageb_id', 'data-placeholder' => 'Ageb', 'style' => 'width:100%'] ) !!}
+                                {!! Form::select('ageb_id', [], 0, ['class' => 'form-control js-data-ageb select2', 'id' => 'ageb_id', 'data-placeholder' => 'Ageb', 'style' => 'width:100%'] ) !!}
                             </div>
                         </div>
                         <div class="uk-width-1-2">
@@ -222,7 +222,7 @@
                             <div class="bt-flabels__wrapper">
                                 <span class="select-label">Colonia</span>
                                 {!! Form::label('colonias_id', 'Colonia', ['for' => 'colonias_id'] ) !!}
-                                {!! Form::select('colonias_id', $colonias, 0, ['class' => 'form-control js-data-colonia select2', 'id' => 'colonias_id', 'data-placeholder' => 'Colonia', 'style' => 'width:100%'] ) !!}
+                                {!! Form::select('colonias_id', [], 0, ['class' => 'form-control js-data-colonia select2', 'id' => 'colonias_id', 'data-placeholder' => 'Colonia', 'style' => 'width:100%'] ) !!}
                             </div>
                         </div>
                         <div class="uk-width-1-2">
@@ -238,7 +238,7 @@
                             <div class="bt-flabels__wrapper">   
                                 <span class="select-label">Afiliación</span>
                                 {!! Form::label('institucion_id', 'Afiliación', ['for' => 'institucion_id'] ) !!}
-                                {!! Form::select('institucion_id', $instituciones,  0, ['class' => 'form-control js-data-institucion select2', 'data-parsley-type' => 'number', 'data-parsley-min' => '0', 'id' => 'institucion_id',  'data-placeholder' => '* Afilación', 'style' => 'width:100%'] ) !!}
+                                {!! Form::select('institucion_id', [],  0, ['class' => 'form-control js-data-institucion select2', 'data-parsley-type' => 'number', 'data-parsley-min' => '0', 'id' => 'institucion_id',  'data-placeholder' => '* Afilación', 'style' => 'width:100%'] ) !!}
                                 <span class="bt-flabels__error-desc">Requerido</span>
                             </div>
                         </div>
@@ -246,7 +246,7 @@
                             <div class="bt-flabels__wrapper bt-flabels--right">  
                                 <span class="select-label">Código</span>                                                         
                                 {!! Form::label('codigo_id', 'Código', ['for' => 'codigo_id'] ) !!}
-                                {!! Form::select('codigo_id', $codigos, 0, ['class' => 'form-control js-data-codigo select2', 'data-parsley-type' => 'number', 'data-parsley-min' => '0', 'id' => 'codigo_id',  'data-placeholder' => '* Código', 'style' => 'width:100%'] ) !!}
+                                {!! Form::select('codigo_id', [], 0, ['class' => 'form-control js-data-codigo select2', 'data-parsley-type' => 'number', 'data-parsley-min' => '0', 'id' => 'codigo_id',  'data-placeholder' => '* Código', 'style' => 'width:100%'] ) !!}
                                 <span class="bt-flabels__error-desc">Requerido</span>
                             </div>
                         </div>
@@ -331,8 +331,6 @@
     {!! Html::script('assets/mine/js/personaNuevo.js') !!}
 
     <script>
-        var clues = $.parseJSON(escaparCharEspeciales('{{json_encode($clues)}}'));     
-        
         function escaparCharEspeciales(str)
         {
             var map =

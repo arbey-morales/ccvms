@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Input;
 use \Validator,\Hash, \Response, \DB;
 use App\Http\Controllers\Controller;
 use App\Http\Requests;
-use App\Models\Catalogo\Entidad;
+use App\Catalogo\Entidad;
 
 class EntidadController extends Controller
 {
@@ -22,9 +22,9 @@ class EntidadController extends Controller
         $parametros = Input::only('q');
         
         if ($parametros['q']) {
-             $data =  Entidad::where('clave','LIKE',"%".$parametros['q']."%")->orWhere('nombre','LIKE',"%".$parametros['q']."%")->get();
+             $data =  Entidad::where('clave','LIKE',"%".$parametros['q']."%")->orWhere('nombre','LIKE',"%".$parametros['q']."%")->orderBy('nombre', 'ASC')->get();
         } else {
-             $data =  Entidad::all();
+             $data =  Entidad::orderBy('nombre', 'ASC')->get();
         }
        
         return Response::json([ 'data' => $data], HttpResponse::HTTP_OK);

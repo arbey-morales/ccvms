@@ -3,12 +3,16 @@
 namespace App\Http\Controllers\Catalogo;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Response as HttpResponse;
-use Illuminate\Support\Facades\Input;
-use \Validator,\Hash, \Response, \DB;
-use App\Http\Controllers\Controller;
+
 use App\Http\Requests;
-use App\Models\Catalogo\TipoParto;
+use App\Http\Controllers\Controller;
+use Auth;
+use DB;
+use Input;
+use Carbon\Carbon;
+
+use Session; 
+use App\Catalogo\TipoParto;
 
 class TipoPartoController extends Controller
 {
@@ -17,17 +21,18 @@ class TipoPartoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(request $request)
     {
         $parametros = Input::only('q');
-        
+
+        $data = TipoParto::where('deleted_at', NULL)->orderBy('clave', 'ASC');
         if ($parametros['q']) {
-             $data =  TipoParto::where('clave','LIKE',"%".$parametros['q']."%")->orWhere('descripcion','LIKE',"%".$parametros['q']."%")->get();
-        } else {
-             $data =  TipoParto::all();
+             $data = $data->where('clave','LIKE',"%".$parametros['q']."%")->orWhere('descripcion','LIKE',"%".$parametros['q']."%");
         }
+        
+        $data = $data->get();
        
-        return Response::json([ 'data' => $data], HttpResponse::HTTP_OK);
+        return response()->json([ 'data' => $data]);
     }
 
     /**

@@ -370,7 +370,7 @@ class PersonaController extends Controller
      */
     public function buscar(Request $request)
     {
-        $parametros = Input::only(['q','municipios_id','localidades_id','clues_id','agebs_id','sector','manzana','filtro','todo']);
+        $parametros = Input::only(['q','municipios_id','localidades_id','clues_id','agebs_id','sector','manzana','filtro','todo','rep']);
         $ta_abreviatura = $this->ta_abreviatura;
         $q = "";
         $text = '';
@@ -427,8 +427,8 @@ class PersonaController extends Controller
                 ->orderBy('personas.apellido_materno', 'ASC')
                 ->orderBy('personas.nombre', 'ASC')
                 ->get();
-            
-                /*if($rep['seg']==true){
+                
+            if($parametros['rep']=='seg'){
                 foreach ($data as $cont=>$value) { // valorar seguimientos, biologico y actividades
                     $value->seguimientos = collect();
                     $bd = explode("-", $value->fecha_nacimiento);
@@ -458,13 +458,25 @@ class PersonaController extends Controller
                     }
                     $value->seguimientos = $seguimientos;
                 }
-                }*/
+            }
             
             $usuario = User::with('jurisdiccion')->find(Auth::user()->id);
-            return response()->json(['text' => $text, 'data' => $data, 'user' => $usuario]);
+            return response()->json(['text' => $text, 'data' => $data, 'usuario' => $usuario]);
         } else {
             return response()->json([ 'data' => [$data]]);
         }
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function curp_repetida(Request $request)
+    {
+       $data = Persona::where('curp', $request->curp)->where('deleted_at', NULL)->get();
+        return response()->json([ 'data' => $data]);
     }
 
     public function curp(Request $request)
@@ -647,88 +659,8 @@ class PersonaController extends Controller
      */
 	public function create()
     {
-        if (Auth::user()->can('create.personas') && Auth::user()->activo==1) {     
-			if (Auth::user()->is('root|admin')) {
-				$clues = Clue::select('id','clues','nombre','entidades_id','municipios_id','localidades_id')->where('instituciones_id',13)->where('deleted_at',NULL)->where('estatus_id', 1)->get();
-				$municipios = Municipio::select('id','clave','nombre')->where('deleted_at',NULL)->get();
-                $localidades = Localidad::select('id','clave','nombre')->where('deleted_at',NULL)->get();
-                $colonias = Colonia::select('id','nombre','municipios_id')->where('deleted_at',NULL)->with('municipio')->get();
-                $agebs = Ageb::select('id','municipios_id','localidades_id')->where('deleted_at',NULL)->with('municipio','localidad')->get();
-			} else {
-                $localidades = collect();
-                $colonias = collect();
-                $agebs = collect();
-				$clues = Clue::select('id','clues','nombre','entidades_id','municipios_id','localidades_id')->where('instituciones_id',13)->where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->where('estatus_id', 1)->get();
-				$municipios = Municipio::select('id','clave','nombre')->where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->get();
-                foreach($municipios as $key=> $mpio){
-                    $localidades_temp = Localidad::select('id','clave','nombre')->where('municipios_id', $mpio->id)->where('deleted_at',NULL)->get(); 
-                    $colonias_temp = Colonia::select('id','nombre','municipios_id')->where('municipios_id', $mpio->id)->where('deleted_at',NULL)->with('municipio')->get();
-                    foreach($localidades_temp as $id=> $item){
-                        $localidades->push($item);
-                    }
-                    foreach($colonias_temp as $id=> $item){
-                        $colonias->push($item);
-                    }
-                    $agebs_temp = Ageb::select('id','municipios_id','localidades_id')->where('municipios_id', $mpio->id)->where('deleted_at',NULL)->with('municipio','localidad')->get(); 
-                    foreach($agebs_temp as $k=> $i){
-                        $agebs->push($i);
-                    }
-                }
-			}
-            
-            $estados = Entidad::select('id','clave','nombre')->where('deleted_at',NULL)->get();
-			$instituciones = Institucion::select('id','clave','nombre')->where('deleted_at',NULL)->get();
-			$codigos = CodigoCenso::select('id','clave','nombre')->where('deleted_at',NULL)->get();
-			$tiposparto = TipoParto::select('id','clave','descripcion')->where('deleted_at',NULL)->get();
-
-            $clue_selected = 0;
-            $arrayclue[0] = 'Seleccionar unidad de salud';
-            foreach ($clues as $cont=>$clue) {
-                $arrayclue[$clue->id] = $clue->clues .' - '.$clue->nombre;
-                if($cont==0)
-                    $clue_selected = $clue;
-            }
-            
-            $arraymunicipio[0] = 'Seleccionar Municipio';
-			foreach ($municipios as $municipio) {
-                $arraymunicipio[$municipio->id] = $municipio->clave .' - '.$municipio->nombre;
-            }
-
-            $arrayageb[0] = 'Seleccionar AGEB';
-            foreach ($agebs as $ageb) {
-                $arrayageb[$ageb->id] = substr($ageb->id, -4).' - '.$ageb->localidad->nombre.', '.$ageb->municipio->nombre;
-            }
-            
-			foreach ($estados as $estado) {
-                $arrayestado[$estado->id] = $estado->clave .' - '.$estado->nombre;
-            }
-            $arraylocalidad[0] = 'Seleccionar localidad';
-            foreach ($localidades as $localidad) {
-                $arraylocalidad[$localidad->id] = $localidad->clave .' - '.$localidad->nombre;
-            }
-
-            $arraycolonia[0] = 'Sin colonia';
-            foreach ($colonias as $colonia) {
-                $arraycolonia[$colonia->id] = $colonia->nombre.', '.$colonia->municipio->nombre;
-            }			
-
-			$arraycodigo = array();
-			$arraycodigo[0] = 'Ningún código';
-			foreach ($codigos as $codigo) {
-                $arraycodigo[$codigo->id] = $codigo->clave .' - '.$codigo->nombre;
-            }
-
-			foreach ($tiposparto as $tipoparto) {
-                $arraytipoparto[$tipoparto->id] = $tipoparto->clave .' - '.$tipoparto->descripcion;
-            }
-
-			$arrayinstitucion = array();
-			$arrayinstitucion[0] = 'Ninguna afiliación';
-			foreach ($instituciones as $institucion) {
-                $arrayinstitucion[$institucion->id] = $institucion->clave .' - '.$institucion->nombre;
-            }
-            
-            return view('persona.create')->with(['colonias' => $arraycolonia, 'agebs' => $arrayageb, 'clue_selected' => $clue_selected, 'instituciones' => $arrayinstitucion, 'localidades' => $arraylocalidad, 'clues' => $arrayclue, 'municipios' => $arraymunicipio, 'estados' => $arrayestado, 'codigos' => $arraycodigo, 'partos' => $arraytipoparto]);
+        if (Auth::user()->can('create.personas') && Auth::user()->activo==1) {
+            return view('persona.create');
         } else {
             return response()->view('errors.allPagesError', ['icon' => 'user-secret', 'error' => '403', 'title' => 'Forbidden / Prohibido', 'message' => 'No tiene autorización para acceder al recurso. Se ha negado el acceso.'], 403);
         }

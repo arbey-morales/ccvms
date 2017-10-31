@@ -3,12 +3,16 @@
 namespace App\Http\Controllers\Catalogo;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Response as HttpResponse;
-use Illuminate\Support\Facades\Input;
-use \Validator,\Hash, \Response, \DB;
-use App\Http\Controllers\Controller;
+
 use App\Http\Requests;
-use App\Models\Catalogo\Codigo;
+use App\Http\Controllers\Controller;
+use Auth;
+use DB;
+use Input;
+use Carbon\Carbon;
+
+use Session; 
+use App\Catalogo\CodigoCenso;
 
 class CodigoCensoController extends Controller
 {
@@ -17,17 +21,15 @@ class CodigoCensoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         $parametros = Input::only('q');
-        
+        $data = CodigoCenso::where('deleted_at', NULL)->orderBy('clave', 'ASC');
         if ($parametros['q']) {
-             $data =  Codigo::where('clave','LIKE',"%".$parametros['q']."%")->orWhere('nombre','LIKE',"%".$parametros['q']."%")->get();
-        } else {
-             $data =  Codigo::all();
-        }
-       
-        return Response::json([ 'data' => $data], HttpResponse::HTTP_OK);
+             $data =  $data->where('clave','LIKE',"%".$parametros['q']."%")->orWhere('nombre','LIKE',"%".$parametros['q']."%");
+        }       
+        $data = $data->get();
+        return response()->json([ 'data' => $data]);
     }
 
     /**

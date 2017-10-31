@@ -32,12 +32,13 @@ Route::group(['namespace' => 'Transaccion', 'middleware' => 'auth'], function ()
     Route::resource('monitoreo',                           'MonitoreoController');
     Route::get('dashboard',                                'PersonaController@dashboard');
     Route::get('persona/buscar',                           'PersonaController@buscar');
+    Route::get('persona/curp-repetida',                    'PersonaController@curp_repetida');
     Route::get('persona/curp',                             'PersonaController@curp');
     Route::get('persona/reporte',                          'PersonaController@reporte');
     Route::resource('persona',                             'PersonaController');
     Route::resource('cuadro-dist-juris',                   'CuadroDistribucionJurisdiccionalController');
     Route::resource('cuadro_distribucion_clue',            'CuadroDistribucionClueController');   
-    // Trancacciones red de frío
+    // Transacciones red de frío
     Route::resource('temperatura',                         'TemperaturaContenedorController');
 });  
 

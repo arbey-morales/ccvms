@@ -32,7 +32,7 @@ class ClueController extends Controller
     {
         $parametros = Input::only('q','municipios_id');
         if (Auth::user()->can('show.catalogos') && Auth::user()->activo==1) {
-            $data = Clue::with('municipio','localidad','jurisdiccion')/*->where('instituciones_id',13)*/->where('deleted_at',NULL);
+            $data = Clue::with('municipio','localidad','jurisdiccion')->where('instituciones_id',13)->where('deleted_at',NULL);
             if (Auth::user()->is('root|admin')) { } else {
                 $data = $data->where('jurisdicciones_id', Auth::user()->idJurisdiccion);                
             }            

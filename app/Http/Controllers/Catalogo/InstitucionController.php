@@ -3,12 +3,16 @@
 namespace App\Http\Controllers\Catalogo;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Response as HttpResponse;
-use Illuminate\Support\Facades\Input;
-use \Validator,\Hash, \Response, \DB;
-use App\Http\Controllers\Controller;
+
 use App\Http\Requests;
-use App\Models\Catalogo\Institucion;
+use App\Http\Controllers\Controller;
+use Auth;
+use DB;
+use Input;
+use Carbon\Carbon;
+
+use Session; 
+use App\Catalogo\Institucion;
 
 class InstitucionController extends Controller
 {
@@ -17,17 +21,15 @@ class InstitucionController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         $parametros = Input::only('q');
-        
+        $data = Institucion::where('deleted_at', NULL)->orderBy('clave', 'ASC');
         if ($parametros['q']) {
-             $data =  Institucion::where('clave','LIKE',"%".$parametros['q']."%")->orWhere('nombreCorto','LIKE',"%".$parametros['q']."%")->orWhere('nombre','LIKE',"%".$parametros['q']."%")->get();
-        } else {
-             $data =  Institucion::all();
+             $data = $data->where('clave','LIKE',"%".$parametros['q']."%")->orWhere('nombreCorto','LIKE',"%".$parametros['q']."%")->orWhere('nombre','LIKE',"%".$parametros['q']."%");
         }
-       
-        return Response::json([ 'data' => $data], HttpResponse::HTTP_OK);
+        $data = $data->get();
+        return response()->json([ 'data' => $data]);
     }
 
     /**

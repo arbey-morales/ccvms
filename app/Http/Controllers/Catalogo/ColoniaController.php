@@ -24,37 +24,35 @@ class ColoniaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $parametros = Input::only('q');
+        $parametros = Input::only('q','municipios_id');
         if (Auth::user()->can('show.catalogos') && Auth::user()->activo==1) {
-            if (Auth::user()->is('root|admin')) {
-                if ($parametros['q']) {
-                    $data =  Colonia::where('codigo_postal','LIKE',"%".$parametros['q']."%")->orWhere('nombre','LIKE',"%".$parametros['q']."%")->with('municipio','entidad','ciudad')->where('deleted_at',NULL)->get();
-                } else {
-                    $data =  Colonia::with('municipio','entidad','ciudad')->where('deleted_at',NULL)->get();
-                }
-            } else {
-                if ($parametros['q']) { // Limitar colonias de los municipios de la juris
-                    $data = Colonia::select('colonias.*')
-                    ->join('municipios as m','m.id','=','colonias.municipios_id')
-                    ->where('m.jurisdicciones_id',Auth::user()->idJurisdiccion)
-                    ->where('codigo_postal','LIKE',"%".$parametros['q']."%")
-                    ->orWhere('nombre','LIKE',"%".$parametros['q']."%")
-                    ->where('deleted_at',NULL)
-                    ->with('municipio','entidad','ciudad')
-                    ->get();
-                } else {
-                    $data = Colonia::select('colonias.*')
-                    ->join('municipios as m','m.id','=','colonias.municipios_id')
-                    ->where('m.jurisdicciones_id',Auth::user()->idJurisdiccion)
-                    ->where('m.deleted_at',NULL)
-                    ->where('colonias.deleted_at',NULL)
-                    ->with('municipio','entidad','ciudad')
-                    ->get();
-                }
-            }       
-            return view('catalogo.colonia.index')->with('data', $data)->with('q', $parametros['q']);
+            $data =  DB::table('colonias as c')->select('c.*','m.nombre as mun_nombre','ci.descripcion as ciu_nombre')                
+                ->leftJoin('municipios as m','m.id','=','c.municipios_id')
+                ->leftJoin('ciudades as ci','ci.id','=','c.ciudades_id')
+                ->leftJoin('jurisdicciones as j','j.id','=','m.jurisdicciones_id')
+                ->where('c.deleted_at',NULL)
+                ->orderBy('c.nombre', 'ASC');
+
+            if (Auth::user()->is('root|admin')) { } else {
+                $data = $data->where('m.jurisdicciones_id',Auth::user()->idJurisdiccion);
+            }
+
+            if ($parametros['q']) {
+                $data = $data->where('c.codigo_postal','LIKE',"%".$parametros['q']."%")->orWhere('c.nombre','LIKE',"%".$parametros['q']."%");
+            }
+            if ($parametros['municipios_id']) {
+                $data = $data->where('municipios_id', $parametros['municipios_id']);
+            }
+
+            $data = $data->get();
+
+            if ($request->ajax()) {
+                return response()->json([ 'data' => $data]);
+            } else { 
+                return view('catalogo.colonia.index')->with('data', $data)->with('q', $parametros['q']);
+            }
         } else {
             return response()->view('errors.allPagesError', ['icon' => 'user-secret', 'error' => '403', 'title' => 'Forbidden / Prohibido', 'message' => 'No tiene autorización para acceder al recurso. Se ha negado el acceso.'], 403);
         }

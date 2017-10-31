@@ -3,6 +3,18 @@ $("#fecha_nacimiento_tutor,#fecha_nacimiento").mask("99-99-9999");
 // GUARADARÁ EL ESQUEMA SELECCIONADO
 var ultimo_esquema = ''; 
 var ultima_fecha_nacimiento = '';
+// EQUIVALENCIA DE CLAVES ESTADOS
+var estados_equivalencia = ["X","AS","BC","BS","CC","CL","CM","CS","CH","DF","DG","GT","GR","HG","JC","MC","MN","MS","NT","NL","OC","PL","QT","QR","SP","SL","SR","TC","TS","TL","VZ","YN","ZS"];
+var clues = [{ 'id': 0, 'text': '* Unidad de salud' }];
+var clue_actual = {municipios_id:0, localidades_id:0};
+var municipios = [{ 'id': 0, 'text': '* Municipio' }];
+var estados = [{ 'id': 0, 'text': '* Entidad federativa de nacimiento' }];
+var localidades = [{ 'id': 0, 'text': '* Localidad' }];
+var colonias = [{ 'id': 0, 'text': 'Sin colonia' }];
+var agebs = [{ 'id': 0, 'text': 'AGEB' }];
+var afiliaciones = [{ 'id': 0, 'text': 'Ninguna afiliación' }];
+var codigos = [{ 'id': 0, 'text': 'Ningún código' }];
+var tipos_partos = [{ 'id': 0, 'text': '* Tipo de parto' }];
 
 // CARGA EL ESQUEMA CON BASE A LA FECHA 01-01-AÑO ACTUAL
 setTimeout(function() {          
@@ -29,17 +41,31 @@ $("#personas-form").submit(function(e){
     });
 });
 
-// EQUIVALENCIA DE CLAVES ESTADOS
-var estados_equivalencia = ["X","AS","BC","BS","CC","CL","CM","CS","CH","DF","DG","GT","GR","HG","JC","MC","MN","MS","NT","NL","OC","PL","QT","QR","SP","SL","SR","TC","TS","TL","VZ","YN","ZS"];
-var localidad = { 'id':null, 'nombre':'Localidad'};
-
 // INICIA SELECT2 PARA ESTOS SELECTORES
-$(".js-data-clue,.js-data-ageb,.js-data-colonia,.js-data-genero,.js-data-parto,.js-data-estado,.js-data-municipio,.js-data-codigo,.js-data-institucion,.js-data-localidad").select2();
+$(".js-data-genero").select2();
 
 // SI CAMBIAN ESTOS SELECTS VALIDAR LOS CAMPOS DE ENTRADA PARA VALIDAR CURP
 $(".js-data-estado,.js-data-genero").change(function(){
     setTimeout(function(){ validarCamposCURP(); }, 1000);
 });
+$("input#curp").change(function(){
+    curpRepetida(curp = $(this).val());
+});
+
+function curpRepetida(curp){
+    console.log(curp.length)
+    $.get('../persona/curp-repetida?curp='+curp, {}, function(response, status){
+        if(response.data.length>0){
+            $("input#curp").focus();
+            var p = response.data;
+            notificar('Información','* Verifique la CURP <strong>'+curp+'</strong> \n \n  - Datos: '+p[0].nombre+' '+p[0].apellido_paterno+' '+p[0].apellido_materno+' \n - Agregad@ el '+p[0].created_at,'error',8000);
+        } else {
+            console.log(55)
+        }
+    }).fail(function(){ 
+        notificar('Información','Falló comprobación de CURP','danger',2000);
+    });
+}
 
 // OBTIENE VALUE DE FECHA DE APLICACIÓN Y SE ENVÍA A VALIDACIÓN
 function validaAplicacion(id_vacuna_esquema, index){ //id_esquema y key del arreglo en js
@@ -52,6 +78,200 @@ function validaAplicacion(id_vacuna_esquema, index){ //id_esquema y key del arre
             $("#fecha_aplicacion"+id_vacuna_esquema).focus();
         } 
     }           
+}
+
+function iniciarClue(){
+    $('.js-data-clue').empty();
+    clues = [{ 'id': 0, 'text': '* Unidad de salud' }];
+    $.get('../catalogo/clue', {}, function(response, status){
+        if(response.data==null){
+            notificar('Sin resultados','warning',2000);
+        } else {      
+            while (clues.length) { clues.pop(); }                
+            clues.push({ 'id': 0, 'text': '* Unidad de salud' });           
+            if(response.data.length<=0){
+                notificar('Información','No existen unidades de salud','warning',2000);
+            } else {
+                notificar('Información','Cargando unidades de salud','info',2000);
+                $('.js-data-clue').empty();                      
+                $.each(response.data, function( i, cont ) {
+                    clues.push({ 'id': cont.id, 'text': cont.clues+' - '+cont.nombre });
+                });  
+            }  
+            $(".js-data-clue").select2({
+                language: "es",
+                data: clues
+            });
+        }
+    }).fail(function(){ 
+        notificar('Información','Falló carga de unidades de salud','danger',2000);
+        $(".js-data-clue").select2({
+            language: "es",
+            data:clues
+        }); 
+    });
+}
+
+function iniciarMunicipio(){
+    $('.js-data-municipio').empty();
+    municipios = [{ 'id': 0, 'text': '* Municipio' }];
+    $.get('../catalogo/municipio', {}, function(response, status){
+        if(response.data==null){
+            notificar('Sin resultados','warning',2000);
+        } else {      
+            while (municipios.length) { municipios.pop(); }                
+            municipios.push({ 'id': 0, 'text': '* Municipio' });           
+            if(response.data.length<=0){
+               // notificar('Información','No existen municipios','warning',2000);
+            } else {
+                $('.js-data-municipio').empty();                     
+                $.each(response.data, function( i, cont ) {
+                    municipios.push({ 'id': cont.id, 'text': cont.nombre });
+                });  
+            }  
+            $(".js-data-municipio").select2({
+                language: "es",
+                data: municipios
+            }); 
+            
+            $(".js-data-municipio").val(clue_actual.municipios_id).trigger("change");
+        }
+    }).fail(function(){ 
+        notificar('Información','Falló carga de municipios','danger',2000);
+        $(".js-data-municipio").select2({
+            language: "es",
+            data:municipios
+        }); 
+    });
+}
+
+function iniciarEstado(){
+    $('.js-data-estado').empty();
+    estados = [{ 'id': 0, 'text': '* Entidad federativa de nacimiento' }];
+    $.get('../catalogo/entidad', {}, function(response, status){
+        if(response.data==null){
+            notificar('Sin resultados','warning',2000);
+        } else {      
+            while (estados.length) { estados.pop(); }                
+            estados.push({ 'id': 0, 'text': '* Entidad federativa de nacimiento' });           
+            if(response.data.length<=0){
+               // notificar('Información','No existen municipios','warning',2000);
+            } else {
+                $('.js-data-estado').empty();                     
+                $.each(response.data, function( i, cont ) {
+                    estados.push({ 'id': cont.id, 'text': cont.nombre });
+                });  
+            }  
+            $(".js-data-estado").select2({
+                language: "es",
+                data: estados
+            }); 
+            
+            $(".js-data-estado").val(7).trigger("change");
+        }
+    }).fail(function(){ 
+        notificar('Información','Falló carga de estados','danger',2000);
+        $(".js-data-estado").select2({
+            language: "es",
+            data:estados
+        }); 
+    });
+}
+function iniciarCodigo(){
+    $('.js-data-codigo').empty();
+    codigos = [{ 'id': 0, 'text': '* Ningún código' }];
+    $.get('../catalogo/codigo', {}, function(response, status){
+        if(response.data==null){
+            notificar('Sin resultados','warning',2000);
+        } else {      
+            while (codigos.length) { codigos.pop(); }                
+            codigos.push({ 'id': 0, 'text': '* Ningún código' });           
+            if(response.data.length<=0){
+               // notificar('Información','No existen municipios','warning',2000);
+            } else {
+                $('.js-data-codigo').empty();                     
+                $.each(response.data, function( i, cont ) {
+                    codigos.push({ 'id': cont.id, 'text': cont.clave+' - '+cont.nombre });
+                });  
+            }  
+            $(".js-data-codigo").select2({
+                language: "es",
+                data: codigos
+            }); 
+            
+            $(".js-data-codigo").val(0).trigger("change");
+        }
+    }).fail(function(){ 
+        notificar('Información','Falló carga de codigos','danger',2000);
+        $(".js-data-codigo").select2({
+            language: "es",
+            data:codigos
+        }); 
+    });
+}
+function iniciarTipoParto(){
+    $('.js-data-parto').empty();
+    tipos_partos = [{ 'id': 0, 'text': '* Tipos parto' }];
+    $.get('../catalogo/tipo-parto', {}, function(response, status){
+        if(response.data==null){
+            notificar('Sin resultados','warning',2000);
+        } else {      
+            while (tipos_partos.length) { tipos_partos.pop(); }                
+            tipos_partos.push({ 'id': 0, 'text': ' * Tipos parto' });           
+            if(response.data.length<=0){
+               // notificar('Información','No existen municipios','warning',2000);
+            } else {
+                $('.js-data-parto').empty();                     
+                $.each(response.data, function( i, cont ) {
+                    tipos_partos.push({ 'id': cont.id, 'text': cont.clave+' - '+cont.descripcion });
+                });  
+            }  
+            $(".js-data-parto").select2({
+                language: "es",
+                data: tipos_partos
+            }); 
+            
+            $(".js-data-parto").val(1).trigger("change");
+        }
+    }).fail(function(){ 
+        notificar('Información','Falló carga de tipos de parto','danger',2000);
+        $(".js-data-parto").select2({
+            language: "es",
+            data:tipos_partos
+        }); 
+    });
+}
+function iniciarAfiliacion(){
+    $('.js-data-institucion').empty();
+    afiliaciones = [{ 'id': 0, 'text': 'Ninguna afiliación' }];
+    $.get('../catalogo/institucion', {}, function(response, status){
+        if(response.data==null){
+            notificar('Sin resultados','warning',2000);
+        } else {      
+            while (afiliaciones.length) { afiliaciones.pop(); }                
+            afiliaciones.push({ 'id': 0, 'text': ' Ninguna afiliación' });           
+            if(response.data.length<=0){
+               // notificar('Información','No existen municipios','warning',2000);
+            } else {
+                $('.js-data-institucion').empty();                     
+                $.each(response.data, function( i, cont ) {
+                    afiliaciones.push({ 'id': cont.id, 'text': cont.clave+' - '+cont.nombre });
+                });  
+            }  
+            $(".js-data-institucion").select2({
+                language: "es",
+                data: afiliaciones
+            }); 
+            
+            $(".js-data-institucion").val(0).trigger("change");
+        }
+    }).fail(function(){ 
+        notificar('Información','Falló carga de afiliaciones','danger',2000);
+        $(".js-data-institucion").select2({
+            language: "es",
+            data:afiliaciones
+        }); 
+    });
 }
 
 // CADA QUE SE COLOCA UNA FECHA DE  NACIMIENTO DEL INFANTE SE ENVÍA A VALIDACIÓN
@@ -77,25 +297,181 @@ $("#fecha_nacimiento_tutor").blur(function(){
 
 // SI LA CLUE CAMBIA; SE SELECCIONAN SU LOCALIDAD Y MUNICIPIO
 $(".js-data-clue").change(function(){
+    $('.js-data-localidad').empty();
+    $(".js-data-municipio").val(clue_actual.municipios_id).trigger("change");
+    localidades = [{ 'id': 0, 'text': '* Localidad' }];
     var clue_id = $(this).val();
-    verClue(clues[clue_id]);
     if(clue_id==0){
-        $(".js-data-municipio").val(0).trigger("change");
-        $(".js-data-localidad").val(0).trigger("change");
+        $(".js-data-localidad").select2({
+            language: "es",
+            data: localidades
+        });
     } else {
-        $.get('../catalogo/clue/'+clue_id, function(response, status){ // Consulta        
-            $(".js-data-estado").val(response.data.entidades_id).trigger("change");
-            $(".js-data-municipio").val(response.data.municipios_id).trigger("change");
-            $(".js-data-localidad").val(response.data.localidades_id).trigger("change");
+        $.get('../catalogo/clue/'+clue_id, function(response, status){ // Consulta    
+            verClue(response.data.clues+' - '+response.data.nombre);
+            clue_actual = response.data;
+            cargarLocalidad(clue_actual.municipios_id);
+            $(".js-data-municipio").val(clue_actual.municipios_id).trigger("change");
         }).fail(function(){  // Calcula CURP
             notificar('Información','No se consultaron los detalles de la unidad de salud','warning',2000);
+            $(".js-data-localidad").select2({
+                language: "es",
+                data: localidades
+            });
         });
     }
 });
 
+$(".js-data-municipio").change(function(){
+    if($('.js-data-municipio').val()==0){ } else {
+        cargarLocalidad($('.js-data-municipio').val());
+        cargarColonia($('.js-data-municipio').val());
+    }
+});
+
+$(".js-data-localidad").change(function(){
+    if($('.js-data-localidad').val()==0){ } else {
+        cargarAgeb($('.js-data-localidad').val());
+    }
+});
+
+function cargarAgeb(localidad){
+    $('.js-data-ageb').empty();
+    agebs = [{ 'id': 0, 'text': 'AGEB' }];
+    $.get('../catalogo/ageb?localidades_id='+localidad, {}, function(response, status){
+        if(response.data==null){
+            //notificar('Sin resultados','warning',2000);
+        } else {      
+            while (agebs.length) { agebs.pop(); }                
+            agebs.push({ 'id': 0, 'text': 'AGEB' });           
+            if(response.data.length<=0){
+                //notificar('Información','No existen AGEBS','warning',2000);
+            } else {
+                //notificar('Información','Cargando AGBES','info',2000);
+                $('.js-data-ageb').empty();                      
+                $.each(response.data, function( i, cont ) {
+                    agebs.push({ 'id': cont.id, 'text':cont.id.substr(-4)+' : '+cont.localidad+' '+cont.municipio });
+                });  
+            }  
+            $(".js-data-ageb").select2({
+                language: "es",
+                data: agebs
+            });
+        }
+    }).fail(function(){ 
+        notificar('Información','Falló carga de AGEBS','danger',2000);
+        $(".js-data-ageb").select2({
+            language: "es",
+            data:agebs
+        }); 
+    });
+}
+
+function cargarColonia(municipio){
+    $('.js-data-colonia').empty();
+    colonias = [{ 'id': 0, 'text': 'Sin colonia' }];
+    $.get('../catalogo/colonia?municipios_id='+municipio, {}, function(response, status){
+        if(response.data==null){
+            //notificar('Sin resultados','warning',2000);
+        } else {      
+            while (colonias.length) { colonias.pop(); }                
+            colonias.push({ 'id': 0, 'text': 'Sin colonia' });           
+            if(response.data.length<=0){
+                //notificar('Información','No existen colonias','warning',2000);
+            } else {
+                $('.js-data-colonia').empty();                      
+                $.each(response.data, function( i, cont ) {
+                    colonias.push({ 'id': cont.id, 'text': cont.nombre });
+                });  
+            }  
+            $(".js-data-colonia").select2({
+                language: "es",
+                data: colonias
+            });
+            $(".js-data-colonia").val(clue_actual.localidades_id).trigger("change");
+        }
+    }).fail(function(){ 
+        notificar('Información','Falló carga de colonias','danger',2000);
+        $(".js-data-colonia").select2({
+            language: "es",
+            data:colonias
+        }); 
+    });
+}
+
+function cargarLocalidad(municipio){
+    $('.js-data-localidad').empty();
+    localidades = [{ 'id': 0, 'text': '* Localidad' }];
+    $.get('../catalogo/localidad?municipios_id='+municipio, {}, function(response, status){
+        if(response.data==null){
+            notificar('Sin resultados','warning',2000);
+        } else {      
+            while (localidades.length) { localidades.pop(); }                
+            localidades.push({ 'id': 0, 'text': '* Localidad' });           
+            if(response.data.length<=0){
+                //notificar('Información','No existen localidades','warning',2000);
+            } else {
+                $('.js-data-localidad').empty();                      
+                $.each(response.data, function( i, cont ) {
+                    localidades.push({ 'id': cont.id, 'text': cont.clave+' - '+cont.nombre });
+                });  
+            }  
+            $(".js-data-localidad").select2({
+                language: "es",
+                data: localidades
+            });
+            $(".js-data-localidad").val(clue_actual.localidades_id).trigger("change");
+        }
+    }).fail(function(){ 
+        notificar('Información','Falló carga de localidades','danger',2000);
+        $(".js-data-localidad").select2({
+            language: "es",
+            data:localidades
+        }); 
+    });
+}
+
 $(document).ready(function(){
+    $(".js-data-clue").select2({
+        language: "es",
+        data: clues
+    });
+    $(".js-data-municipio").select2({
+        language: "es",
+        data: municipios
+    });
+    $(".js-data-localidad").select2({
+        language: "es",
+        data: localidades
+    });
+    $(".js-data-ageb").select2({
+        language: "es",
+        data: agebs
+    });
+    $(".js-data-colonia").select2({
+        language: "es",
+        data: colonias
+    });
+    $(".js-data-institucion").select2({
+        language: "es",
+        data: afiliaciones
+    });
+    $(".js-data-codigo").select2({
+        language: "es",
+        data: codigos
+    });
+    $(".js-data-parto").select2({
+        language: "es",
+        data: tipos_partos
+    });
+
     var clue_id = $(".js-data-clue").val();
-    verClue(clues[clue_id]);
+    iniciarClue();  
+    iniciarMunicipio(); 
+    iniciarEstado();  
+    iniciarCodigo();
+    iniciarTipoParto();  
+    iniciarAfiliacion(); 
 });
 
 function verClue(clue){
@@ -413,6 +789,7 @@ function validarCamposCURP(){
         $.get('curp', data, function(response, status){ // Consulta CURP
             if(response.find==true){                        
                 $("#curp").val(response.curp);
+                curpRepetida(response.curp);
                 notificar('Información','Se encontró la CURP, asegurese que sea correcta','info',4000);
             }
             if(response.find==false || response.curp==""){ 
@@ -495,6 +872,7 @@ function obtieneIntervalo(anio,mes,dia){
 function calcularCURP(name, father_surname, mother_surname, born_date_d, born_date_m, born_date_a, born_state, gender){
     var  curp = mxk.getCURP(name, father_surname, mother_surname, born_date_d, born_date_m, born_date_a, born_state, gender);
     $("#curp").val(curp);
+    curpRepetida(curp);
     notificar('Información','Se CALCULÓ la CURP, verifique los datos','warning',3000);
 }
 

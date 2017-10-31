@@ -86,13 +86,13 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6">
-                            {!! Form::radio('rep', 'seg', $rep['seg'],['id' => 'seg', 'class' => 'flat']) !!}
+                            {!! Form::radio('rep', 'seg', true,['id' => 'seg', 'class' => 'flat']) !!}
                             {!! Form::label('seg', 'De seguimiento', ['for' => 'seg', 'style' => 'font-size:large; padding-right:10px;'] ) !!}
 <!--
-                            {!! Form::radio('rep', 'act', $rep['act'],['id' => 'act', 'class' => 'flat']) !!}
+                            {!! Form::radio('rep', 'act', false,['id' => 'act', 'class' => 'flat']) !!}
                             {!! Form::label('act', 'De actividades', ['for' => 'act', 'style' => 'font-size:large; padding-right:10px;'] ) !!}
 
-                            {!! Form::radio('rep', 'bio', $rep['bio'],['id' => 'bio', 'class' => 'flat']) !!}
+                            {!! Form::radio('rep', 'bio', false,['id' => 'bio', 'class' => 'flat']) !!}
                             {!! Form::label('bio', 'De biológico', ['for' => 'bio', 'style' => 'font-size:large; padding-right:10px;'] ) !!}
                             -->
                         </div>
@@ -161,7 +161,6 @@
     var data = [];
     var usuario = { jurisdiccion:{ clave:'', nombre:'' } };
     var text = '';
-    var definicionSeguimientos = tablaSeguimientos();
     var municipios = [{ 'id': 0, 'text': 'Seleccionar un municipio' }];
     var localidades = [{ 'id': 0, 'text': 'Seleccionar una localidad' }];
     var clues = [{ 'id': 0, 'text': 'Seleccionar una unidad de salud' }];
@@ -225,7 +224,7 @@
                 } else {
                     notificar('Información','Cargando '+response.data.length+' resultados','info',2000);
                     $(".no-resultados").html('<a class="btn btn-primary btn-lg" href="#" onClick="descargarSeguimientos()" class="button" data-toggle="tooltip" data-placement="bottom" title="" data-original-title=".Pdf"> <i class="fa fa-comment"></i> Seguimientos</a>');
-                    data = response.data;
+                    data = response.data;                    
                     usuario = response.usuario;
                     text = response.text;
                     $("#contenido").empty();
@@ -255,7 +254,7 @@
         });
     });
     /*** Si cambia o tiene el foco */
-    $(".js-data-clue,.js-data-localidad,.js-data-municipio,.js-data-ageb,#sector,#manzana").change(function(){
+    $(".js-data-clue,.js-data-localidad,.js-data-ageb,#sector,#manzana").change(function(){
         $("#q").val('');
         $("#filtro").val(1);
     });
@@ -266,18 +265,15 @@
     /*** Si cambia o tiene el foco */
     $("#q").change(function(){
         resetFiltro();
-        iniciarMunicipio();
     });
     $("#q").focus(function(){
         resetFiltro();
-        iniciarMunicipio();
     });
 
     function resetFiltro(){
         $("#filtro").val(2);
-        $(".js-data-clue,.js-data-localidad,.js-data-municipio,.js-data-ageb").empty();
+        $(".js-data-clue,.js-data-localidad,.js-data-ageb").empty();
         $("#sector,#manzana").val('');
-        municipios = [{ 'id': 0, 'text': 'Seleccionar un municipio' }];
         localidades = [{ 'id': 0, 'text': 'Seleccionar una localidad' }];
         clues = [{ 'id': 0, 'text': 'Seleccionar una unidad de salud' }];
         agebs = [{ 'id': 0, 'text': 'Seleccionar una ageb' }];
@@ -285,10 +281,7 @@
             language: "es",
             data: clues
         });
-        $(".js-data-municipio").select2({
-            language: "es",
-            data: municipios
-        });
+        $(".js-data-municipio").val(0).trigger("change");
         $(".js-data-localidad").select2({
             language: "es",
             data: localidades
@@ -458,10 +451,11 @@
         });
     });
 
-    function descargarSeguimientos()
+    /*function descargarSeguimientos()
     {
+        var definicionSeguimientos
         pdfMake.createPdf(definicionSeguimientos).download('Reporte de Seguimientos '+moment().format('DD-MM-YYYY')+'.pdf');
-    }
+    }*/
     function descargarActividades()
     {
         //pdfMake.createPdf(definicionActividades).open('Reporte de Actividades '+moment().format('DD-MM-YYYY')+'.pdf');
@@ -483,13 +477,10 @@
         };
         return str.replace(/&amp;|&lt;|&gt;|&quot;|&#039;/g, function(m) {return map[m];});
     }
-    
 
     ///// Seguimientos    
-    function tablaSeguimientos() {
-        console.log(data);
+    function descargarSeguimientos() {
         var dosiss   = [];
-        var dosis_extra   = [];
         var vac = [];
         var awd = [];
         var wd = 0;
@@ -584,7 +575,7 @@
             body.push(data_row);
         });
 
-        return definicionSeguimientos = {
+        var definicionSeguimientos = {
             // a string or { width: number, height: number } OFICIO PIXELS: { width: 1285, height: 816 }
             pageSize: 'A3',
             // by default we use portrait, you can change it to landscape if you wish
@@ -652,6 +643,8 @@
                 }
             }
         }
+
+        pdfMake.createPdf(definicionSeguimientos).download('Reporte de Seguimientos '+moment().format('DD-MM-YYYY')+'.pdf');
     }
             
     </script>
