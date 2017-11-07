@@ -29,6 +29,7 @@ use App\Catalogo\Vacuna;
 use App\Catalogo\Esquema;
 use App\Catalogo\VacunaEsquema;
 use App\Catalogo\PersonaVacunaEsquema;
+use App\Catalogo\PoblacionConapo;
 
 class PersonaController extends Controller
 {
@@ -122,7 +123,10 @@ class PersonaController extends Controller
                 $municipios = Municipio::where('deleted_at', NULL)->get(); 
                 $clues = DB::table('clues')->select('id','nombre','clues'); 
                 $m_selected = $municipios[0]->id;
-                $personas = DB::table('personas')->select('personas.*','clu.clues AS clu_clues','clu.nombre AS clu_nombre','col.nombre AS col_nombre','loc.nombre AS loc_nombre','mun.nombre AS mun_nombre','tp.clave AS tp_clave','tp.descripcion AS tp_descripcion'); 
+                $anios_atras = Carbon::today("America/Mexico_City")->subYears(10)->format('Y-m-d'); 
+                $personas = DB::table('personas')
+                    ->select('personas.*','clu.clues AS clu_clues','clu.nombre AS clu_nombre','col.nombre AS col_nombre','loc.nombre AS loc_nombre','mun.nombre AS mun_nombre','tp.clave AS tp_clave','tp.descripcion AS tp_descripcion')
+                    ->where('personas.fecha_nacimiento','>=',$anios_atras); 
                 if (!isset($parametros['q']) && !isset($parametros['municipios_id']) && !isset($parametros['edad']) && !isset($parametros['clues_id'])){
                     if(isset($parametros['todo']) && $parametros['todo']==1){ 
                         $text = 'Todo, sin filtros';
@@ -366,6 +370,16 @@ class PersonaController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param   int     filtro          1: búsqueda por filtros de municipio, localidad, clue, ageb, colonia, manzana y sector. 2: búsqueda por cadena de texto 
+     * @param   int     municipios_id   Id del lista de municipios  
+     * @param   int     localidaddes_id Id del lista de localidades 
+     * @param   int     clues_id        Id del lista de unidades de salud 
+     * @param   int     agebs_id        Id del lista de agebs 
+     * @param   string  sector          cadena de texto sector  
+     * @param   string  manzana         cadena de texto manzana     
+     * @param   string  q               Cadena de texto para búsqueda en personas. Se espera nombre de infante/tutor o CURP
+     * @param   int     todo            Determina si la busqueda es de todo lo registrado, valor esperado: 1
+     * @param   string  rep             Parametro que determina el tipo de reporte a mostrar, valores esperados: seg, act y bio
      * @return \Illuminate\Http\Response
      */
     public function buscar(Request $request)
@@ -374,15 +388,21 @@ class PersonaController extends Controller
         $ta_abreviatura = $this->ta_abreviatura;
         $q = "";
         $text = '';
+
+
+
         $today = Carbon::today("America/Mexico_City");
-		if (Auth::user()->can('show.personas') && Auth::user()->activo==1) {   
-            $personas = DB::table('personas')->select('personas.*','clu.clues AS clu_clues','clu.nombre AS clu_nombre','col.nombre AS col_nombre','loc.nombre AS loc_nombre','mun.nombre AS mun_nombre','tp.clave AS tp_clave','tp.descripcion AS tp_descripcion');         
+		if (Auth::user()->can('show.personas') && Auth::user()->activo==1) { 
+            $anios_atras = Carbon::today("America/Mexico_City")->subYears(10)->format('Y-m-d'); 
+            $personas = DB::table('personas')
+            ->select('personas.*','clu.clues AS clu_clues','clu.nombre AS clu_nombre','col.nombre AS col_nombre','loc.nombre AS loc_nombre','mun.nombre AS mun_nombre','tp.clave AS tp_clave','tp.descripcion AS tp_descripcion');  
+
             if (Auth::user()->is('root|admin')) { } else { // Limitar por clues               
                 $personas = $personas->where('clu.jurisdicciones_id', Auth::user()->idJurisdiccion);
             }
 
-            if ($parametros['todo']==NULL){
-                if (isset($parametros['filtro']) && $parametros['filtro']==1){ // filtros
+            if ($parametros['todo']==NULL){ // La búsqueda usa filtros
+                if (isset($parametros['filtro']) && $parametros['filtro']==1){ // Los filtros son: municipios, localidad, clue, agebs, colonias, manzana y sector
                     $text = 'Filtros: ';
                     if(isset($parametros['municipios_id']) && $parametros['municipios_id']!=0){
                         $personas = $personas->where('personas.municipios_id', $parametros['municipios_id']);
@@ -392,6 +412,9 @@ class PersonaController extends Controller
                     }
                     if(isset($parametros['localidades_id']) && $parametros['localidades_id']!=0){
                         $personas = $personas->where('personas.localidades_id', $parametros['localidades_id']);
+                    }
+                    if(isset($parametros['colonias_id']) && $parametros['colonias_id']!=0){
+                        $personas = $personas->where('personas.colonias_id', $parametros['colonias_id']);
                     }
                     if(isset($parametros['agebs_id']) && $parametros['agebs_id']!=0){
                         $personas = $personas->where('personas.agebs_id', $parametros['agebs_id']);
@@ -403,19 +426,18 @@ class PersonaController extends Controller
                         $personas = $personas->where('personas.manzana', $parametros['manzana']);
                     }
                 } 
-                if(isset($parametros['filtro']) && $parametros['filtro']==2){ // buscar por cadena de texto
-                    $text = 'Nombre o CURP: '.$parametros['q'];
+                if(isset($parametros['filtro']) && $parametros['filtro']==2){ // El filtro es buscar por cadena de texto
+                    $text = 'Nombre del infante/tutor o CURP: '.$parametros['q'];
                     $personas = $personas->where(function($query) use ($parametros) {
                         $query->where('personas.curp','LIKE',"%".$parametros['q']."%")
                         ->orWhere('personas.tutor','LIKE',"%".$parametros['q']."%")
                         ->orWhere(\DB::raw("CONCAT(personas.nombre,' ',personas.apellido_paterno,' ',personas.apellido_materno)"),'LIKE',"%".$parametros['q']."%");
                     });
-                    /*$personas = $personas->where('personas.curp','LIKE',"%".$parametros['q']."%")
-                    ->orWhere(DB::raw("CONCAT(personas.nombre,' ',personas.apellido_paterno,' ',personas.apellido_materno)"),'LIKE',"%".$parametros['q']."%");*/
                 }
             }
             
-            $data = $personas->where('personas.deleted_at', NULL)
+            $data = $personas->where('personas.fecha_nacimiento', '>=', $anios_atras)
+                ->where('personas.deleted_at', NULL)
                 ->leftJoin('clues AS clu','clu.id','=','personas.clues_id')
                 ->leftJoin('municipios AS mun','mun.id','=','personas.municipios_id')
                 ->leftJoin('localidades AS loc','loc.id','=','personas.localidades_id')
@@ -427,9 +449,10 @@ class PersonaController extends Controller
                 ->orderBy('personas.apellido_materno', 'ASC')
                 ->orderBy('personas.nombre', 'ASC')
                 ->get();
+
+            if($parametros['rep']=='seg'){ // Reporte de Seguimientos
                 
-            if($parametros['rep']=='seg'){
-                foreach ($data as $cont=>$value) { // valorar seguimientos, biologico y actividades
+                foreach ($data as $cont=>$value) { 
                     $value->seguimientos = collect();
                     $bd = explode("-", $value->fecha_nacimiento);
                     
@@ -458,6 +481,17 @@ class PersonaController extends Controller
                     }
                     $value->seguimientos = $seguimientos;
                 }
+            }
+
+
+            if($parametros['rep']=='act'){ // Reporte de actividades
+                $data = $personas->get();
+                $poblacion_conapo = PoblacionConapo::where('anio', Carbon::now()->format('Y'))->where('deleted_at', NULL )->get();
+            }
+
+
+
+            if($parametros['rep']=='bio'){ // Reporte de bilógicos
             }
             
             $usuario = User::with('jurisdiccion')->find(Auth::user()->id);

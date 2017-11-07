@@ -36,7 +36,7 @@
                 <div class="x_content">
 
                     <div class="row tile_count">
-                        <div class="col-md-7 col-sm-8 col-xs-12 tile_stats_count">
+                        <div class="col-md-7 col-sm-8 col-xs-12 tile_stats_count filtro">
                             <span class="count_top"><i class="fa fa-filter"></i> Filtros</span><br>
                             <div class="row">
                                 <div class="col-md-6">
@@ -53,7 +53,16 @@
                                     {!!Form::select('localidades_id', [], 0, ['class' => 'form-control js-data-localidad select2', 'style' => 'width:100%'])!!}
                                 </div>
                                 <div class="col-md-6">
+                                    {!!Form::select('colonias_id', [], 0, ['class' => 'form-control js-data-colonia select2', 'style' => 'width:100%'])!!}
+                                </div>
+                            </div>
+                            <br>
+                            <div class="row">
+                                <div class="col-md-6">
                                     {!!Form::select('agebs_id', [], 0, ['class' => 'form-control js-data-ageb select2', 'style' => 'width:100%'])!!}
+                                </div>
+                                <div class="col-md-6">
+                                    {!! Form::text('manzana', '', ['class' => 'form-control', 'id' => 'manzana', 'autocomplete' => 'off', 'placeholder' => '# manzana' ]) !!}
                                 </div>
                             </div>
                             <br>
@@ -61,12 +70,12 @@
                                 <div class="col-md-6">
                                     {!! Form::text('sector', '', ['class' => 'form-control', 'id' => 'sector', 'autocomplete' => 'off', 'placeholder' => '# Sector' ]) !!}
                                 </div>
-                                <div class="col-md-6">
-                                    {!! Form::text('manzana', '', ['class' => 'form-control', 'id' => 'manzana', 'autocomplete' => 'off', 'placeholder' => '# manzana' ]) !!}
+                                <div class="col-md-6" id="tipos-biologicos">
+                                {!!Form::select('vacunas_id', [], 0, ['class' => 'form-control js-data-biologico select2', 'style' => 'width:100%'])!!}
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3 col-sm-2 col-xs-12 tile_stats_count">
+                        <div class="col-md-3 col-sm-2 col-xs-12 tile_stats_count filtro-texto">
                             <span class="count_top"><i class="fa fa-male"></i> Nombre del infante/tutor o CURP</span>
                             <div class="row">
                                 <div class="col-md-12"> 
@@ -86,15 +95,15 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6">
-                            {!! Form::radio('rep', 'seg', true,['id' => 'seg', 'class' => 'flat']) !!}
+                            {!! Form::radio('rep', 'seg', true,['id' => 'seg', 'class' => 'tipo-reporte']) !!}
                             {!! Form::label('seg', 'De seguimiento', ['for' => 'seg', 'style' => 'font-size:large; padding-right:10px;'] ) !!}
-<!--
-                            {!! Form::radio('rep', 'act', false,['id' => 'act', 'class' => 'flat']) !!}
+
+                            {!! Form::radio('rep', 'act', false,['id' => 'act', 'class' => 'tipo-reporte']) !!}
                             {!! Form::label('act', 'De actividades', ['for' => 'act', 'style' => 'font-size:large; padding-right:10px;'] ) !!}
 
-                            {!! Form::radio('rep', 'bio', false,['id' => 'bio', 'class' => 'flat']) !!}
+                            {!! Form::radio('rep', 'bio', false,['id' => 'bio', 'class' => 'tipo-reporte']) !!}
                             {!! Form::label('bio', 'De biológico', ['for' => 'bio', 'style' => 'font-size:large; padding-right:10px;'] ) !!}
-                            -->
+                            
                         </div>
                         <div class="col-md-2 no-resultados">
                         </div>
@@ -163,9 +172,13 @@
     var text = '';
     var municipios = [{ 'id': 0, 'text': 'Seleccionar un municipio' }];
     var localidades = [{ 'id': 0, 'text': 'Seleccionar una localidad' }];
+    var colonias = [{ 'id': 0, 'text': 'Seleccionar una colonia' }];
+    var biologicos = [{ 'id': 0, 'text': 'Todos los biológicos' }];
     var clues = [{ 'id': 0, 'text': 'Seleccionar una unidad de salud' }];
     var agebs = [{ 'id': 0, 'text': 'Seleccionar una ageb' }];
-    
+
+    $("#tipos-biologicos").hide();
+
     $(document).ready(function() {
         $('#datatable-responsive').DataTable({
             language: {
@@ -193,16 +206,33 @@
             language: "es",
             data: localidades
         });
+        $(".js-data-colonia").select2({
+            language: "es",
+            data: colonias
+        });
         $(".js-data-ageb").select2({
             language: "es",
             data: agebs
         });
-        iniciarMunicipio();
+        $(".js-data-biologico").select2({
+            language: "es",
+            data: biologicos
+        });
+        
+        iniciarCatalogo();
     });
 
     $('#todo').change(function() {
         if ($(this).is(':checked')){
             $(".js-ajax").click();
+        }
+    });
+    
+    $('.tipo-reporte').change(function() {
+        if ($(this).val()=="seg"){
+            $("#tipos-biologicos").hide();
+        } else {
+            $("#tipos-biologicos").show();
         }
     });
 
@@ -241,7 +271,7 @@
                         var url_edit = '{{ Route::getCurrentRoute()->getPath() }}';
                         //var con = '<li class="media event"> <a class="pull-left border-aero profile_thumb"> <i class="fa fa-user aero"></i> </a> <div class="media-body"> <a class="title" href="#">Ms. Mary Jane</a> <p><strong>$2300. </strong> Agent Avarage Sales </p> <p> <small>12 Sales Today</small> </p> </div> </li>';
                         //$("#contenido").append(con);
-                        $("#contenido").append('<div class="row '+cont.id+'" data-toggle="tooltip" data-placement="top" data-original-title="'+cont.usuario_id+' / '+cont.created_at+'"><div class="col-md-1" id="'+cont.id+'" data-id="'+cont.id+'" data-nombre="'+cont.nombre+' '+cont.apellido_paterno+' '+cont.apellido_materno+'"><button type="button" class="btn btn-danger btn-delete" style="font-size:large;" data-toggle="modal" data-target=".bs-example-modal-lg"> <i class="fa fa-trash"></i></button></div> <div class="col-md-11"><a href="'+url_edit+'/'+cont.id+'"> <div class="mail_list"> <div class="right">  <h3> '+icono+' - '+cont.apellido_paterno+' '+cont.apellido_materno+' '+cont.nombre+' | <span style="color:tomato;">  '+cont.curp+'</span> | <span style="color:gray; font-weight:normal;"> TUTOR: '+cont.tutor+'</span> <small>'+cont.fecha_nacimiento+'</small></h3> <p> <span style="color:#428bca; font-weight:bold;">  '+cont.clu_clues+' - </span> <span style="color:#317d79; padding-right:20px;">  '+cont.clu_nombre+' - </span>  '+cont.calle+' '+cont.numero+', '+cont.col_nombre+', '+cont.loc_nombre+', '+cont.mun_nombre+' </p>  </div> </div> </a></div></div>');
+                        $("#contenido").append('<div class="row '+cont.id+'" data-toggle="tooltip" data-placement="top" data-original-title="dfsfsdfsdf'+cont.usuario_id+' / '+cont.created_at+'"><div class="col-md-1" id="'+cont.id+'" data-id="'+cont.id+'" data-nombre="'+cont.nombre+' '+cont.apellido_paterno+' '+cont.apellido_materno+'"><button type="button" class="btn btn-danger btn-delete" style="font-size:large;" data-toggle="modal" data-target=".bs-example-modal-lg"> <i class="fa fa-trash"></i></button></div> <div class="col-md-11"><a href="'+url_edit+'/'+cont.id+'"> <div class="mail_list"> <div class="right">  <h3> '+icono+' - '+cont.apellido_paterno+' '+cont.apellido_materno+' '+cont.nombre+' | <span style="color:tomato;">  '+cont.curp+'</span> | <span style="color:gray; font-weight:normal;"> TUTOR: '+cont.tutor+'</span> <small>'+cont.fecha_nacimiento+'</small></h3> <p> <span style="color:#428bca; font-weight:bold;">  '+cont.clu_clues+' - </span> <span style="color:#317d79; padding-right:20px;">  '+cont.clu_nombre+' - </span>  '+cont.calle+' '+cont.numero+', '+cont.col_nombre+', '+cont.loc_nombre+', '+cont.mun_nombre+' </p>  </div> </div> </a></div></div>');
                         //$("#contenido").append('<tr><td class="text-left">'+(i + 1)+'</td><td class="text-left"><a class="btn btn-default" href="'+url_edit+'/'+cont.id+'" class="button"> '+icono+' </a> '+cont.apellido_paterno+' '+cont.apellido_materno+' '+cont.nombre+'</td><td class="text-left">'+cont.curp+'</td><td class="text-left">'+cont.fecha_nacimiento+'</td><td class="text-left">'+cont.calle+' '+cont.numero+', '+cont.col_nombre+', '+cont.loc_nombre+', '+cont.mun_nombre+'</td><td class="text-left"><strong>'+cont.clu_clues+'</strong>, '+cont.clu_nombre+'</td><td class="text-left"><a class="btn btn-primary" href="'+url_edit+'/'+cont.id+'/edit" class="button"> <i class="fa fa-edit"></i> </a><button type="button" class="btn btn-danger btn-delete" data-toggle="modal" data-target=".bs-example-modal-lg"> <i class="fa fa-trash"></i></button></td></tr>');
                     });
                     //$("#contenido").append('</ul>');
@@ -253,16 +283,19 @@
             $(".no-resultados").empty();
         });
     });
+    
     /*** Si cambia o tiene el foco */
-    $(".js-data-clue,.js-data-localidad,.js-data-ageb,#sector,#manzana").change(function(){
+    $(".filtro").click(function(){
         $("#q").val('');
         $("#filtro").val(1);
     });
-    $(".js-data-clue,.js-data-localidad,.js-data-municipio,.js-data-ageb,#sector,#manzana").focus(function(){
+    $(".js-data-clue,.js-data-localidad,.js-data-colonia,.js-data-municipio,.js-data-ageb,#sector,#manzana").focus(function(){
         $("#q").val('');
         $("#filtro").val(1);
     });
-    /*** Si cambia o tiene el foco */
+    $(".filtro-texto").click(function(){
+        resetFiltro();        
+    });
     $("#q").change(function(){
         resetFiltro();
     });
@@ -270,13 +303,30 @@
         resetFiltro();
     });
 
-    function resetFiltro(){
-        $("#filtro").val(2);
-        $(".js-data-clue,.js-data-localidad,.js-data-ageb").empty();
+    /*$(".js-data-clue,.js-data-localidad,.js-data-colonia,.js-data-municipio,.js-data-ageb,#sector,#manzana").change(function(){
+        $("#q").val('');
+        $("#filtro").val(1);
+    });
+    $(".js-data-clue,.js-data-localidad,.js-data-colonia,.js-data-municipio,.js-data-ageb,#sector,#manzana").focus(function(){
+        $("#q").val('');
+        $("#filtro").val(1);
+    });
+    
+    $("#q").change(function(){
+        resetFiltro();
+    });
+    $("#q").focus(function(){
+        resetFiltro();
+    });*/
+
+    function resetFiltro(){  
+        $("#filtro").val(2);      
+        $(".js-data-clue,.js-data-localidad,.js-data-colonia,.js-data-ageb").empty();
         $("#sector,#manzana").val('');
         localidades = [{ 'id': 0, 'text': 'Seleccionar una localidad' }];
         clues = [{ 'id': 0, 'text': 'Seleccionar una unidad de salud' }];
         agebs = [{ 'id': 0, 'text': 'Seleccionar una ageb' }];
+        colonias = [{ 'id': 0, 'text': 'Seleccionar una colonia' }];
         $(".js-data-clue").select2({
             language: "es",
             data: clues
@@ -286,13 +336,17 @@
             language: "es",
             data: localidades
         });
+        $(".js-data-colonia").select2({
+            language: "es",
+            data: colonias
+        });
         $(".js-data-ageb").select2({
             language: "es",
             data: agebs
         });
     }
 
-    function iniciarMunicipio(){
+    function iniciarCatalogo(){
         $.get('../catalogo/municipio', {}, function(response, status){
             if(response.data==null){
                 notificar('Sin resultados','warning',2000);
@@ -316,12 +370,37 @@
         }).fail(function(){ 
             notificar('Información','Falló carga de municipios','danger',2000);
         });
+
+        $.get('../catalogo/vacuna', {}, function(response, status){
+            if(response.data==null){
+                notificar('Sin resultados','warning',2000);
+            } else {         
+                while (biologicos.length) { biologicos.pop(); }                
+                biologicos.push({ 'id': 0, 'text': 'Todos los biológicos' });           
+                if(response.data.length<=0){
+                    notificar('Información','No existen biológicos','warning',2000);
+                } else {
+                    notificar('Información','Cargando biológicos','info',2000);
+                    $('.js-data-biologico').empty();                      
+                    $.each(response.data, function( i, cont ) {
+                        biologicos.push({ 'id': cont.id, 'text': cont.nombre });
+                    });  
+                }  
+                $(".js-data-biologico").select2({
+                    language: "es",
+                    data: biologicos
+                });
+            }
+        }).fail(function(){ 
+            notificar('Información','Falló carga de biológicos','danger',2000);
+        });
     }
 
     $(".js-data-municipio").change(function(e){
-        $('.js-data-localidad,.js-data-clue').empty();
+        $('.js-data-localidad,.js-data-clue,.js-data-colonia').empty();
         localidades = [{ 'id': 0, 'text': 'Seleccionar una localidad' }];
         clues = [{ 'id': 0, 'text': 'Seleccionar una unidad de salud' }];
+        colonias = [{ 'id': 0, 'text': 'Seleccionar una colonia' }];
         if($(this).val()!=0){ 
             /** CLUES */            
             $.get('../catalogo/clue?municipios_id='+$(this).val(), {}, function(response, status){
@@ -378,6 +457,34 @@
                     data:localidades
                 });
             });
+
+            /** COLONIAS */
+            $.get('../catalogo/colonia?municipios_id='+$(this).val(), {}, function(response, status){
+                while (colonias.length) { colonias.pop(); }                
+                colonias.push({ 'id': 0, 'text': 'Seleccionar una colonia' });
+                if(response.data==null){
+                    notificar('Sin resultados','warning',2000);
+                } else {                                        
+                    if(response.data.length<=0){
+                        notificar('Información','No existen colonias','warning',2000);
+                    } else {
+                        notificar('Información','Cargando colonias','info',2000);
+                        $.each(response.data, function( i, cont ) {
+                            colonias.push({ 'id': cont.id, 'text':  cont.nombre+' - '+cont.mun_nombre });
+                        }); 
+                    } 
+                } 
+                $(".js-data-colonia").select2({
+                    language: "es",
+                    data:colonias
+                });
+            }).fail(function(){ 
+                notificar('Información','Falló carga de colonias','danger',2000);
+                $(".js-data-colonia").select2({
+                    language: "es",
+                    data:colonias
+                });
+            });
         } else {
             $(".js-data-clue").select2({
                 language: "es",
@@ -386,6 +493,10 @@
             $(".js-data-localidad").select2({
                 language: "es",
                 data:localidades
+            });
+            $(".js-data-colonia").select2({
+                language: "es",
+                data: colonias
             });
         }       
     });

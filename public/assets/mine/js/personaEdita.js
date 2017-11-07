@@ -65,8 +65,7 @@ $("#fecha_nacimiento_tutor").blur(function(){
     if (moment($(this).val(),'DD-MM-YYYY').isValid()) {
             comprobarFecha($(this).val(), $(this).attr('placeholder'), 2, null);
     } else {
-        notificar('Información','Verifique la fecha de nacimiento del tutor','info',3000);
-        $(this).focus();
+        $(this).val('');
     }            
 });
 

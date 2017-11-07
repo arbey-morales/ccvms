@@ -54,8 +54,10 @@ Route::group(['prefix' => 'catalogo', 'namespace' => 'Catalogo', 'middleware' =>
     Route::resource('localidad',            'LocalidadController');
     Route::resource('municipio',            'MunicipioController',              ['only' => ['index', 'show']]);
     Route::resource('colonia',              'ColoniaController');
+    Route::resource('vacuna',               'VacunaController');
     Route::resource('pais',                 'PaisController',                   ['only' => ['index', 'show']]);
     Route::resource('tipo-parto',           'TipoPartoController',              ['only' => ['index', 'show']]);
+    Route::resource('poblacion-conapo',     'PoblacionConapoController');
     // Catalogos Red de frío
     Route::resource('marca',                'MarcaController');
     Route::resource('modelo',               'ModeloController');

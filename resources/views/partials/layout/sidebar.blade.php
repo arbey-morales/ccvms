@@ -65,7 +65,7 @@
                 <li><a><i class="fa fa-tasks"></i> Info. CCVMS  <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                         @permission('show.catalogos')
-                            <li><a href="{{ route('usuario.index') }}">Coberturas RENAPO</a></li>
+                            <li><a href="{{ route('catalogo.poblacion-conapo.index') }}">Población CONAPO</a></li>
                             <li><a href="{{ route('usuario.index') }}">Esquema de vacunación</a></li>
                         @endpermission
                     </ul>
