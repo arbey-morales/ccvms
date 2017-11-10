@@ -95,15 +95,16 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6">
+                        
                             {!! Form::radio('rep', 'seg', true,['id' => 'seg', 'class' => 'tipo-reporte']) !!}
                             {!! Form::label('seg', 'De seguimiento', ['for' => 'seg', 'style' => 'font-size:large; padding-right:10px;'] ) !!}
-
+                            <!--
                             {!! Form::radio('rep', 'act', false,['id' => 'act', 'class' => 'tipo-reporte']) !!}
                             {!! Form::label('act', 'De actividades', ['for' => 'act', 'style' => 'font-size:large; padding-right:10px;'] ) !!}
 
                             {!! Form::radio('rep', 'bio', false,['id' => 'bio', 'class' => 'tipo-reporte']) !!}
                             {!! Form::label('bio', 'De biológico', ['for' => 'bio', 'style' => 'font-size:large; padding-right:10px;'] ) !!}
-                            
+                            -->
                         </div>
                         <div class="col-md-2 no-resultados">
                         </div>
@@ -695,7 +696,7 @@
             header: {
                 margin: [40,30],
                 /*columns: [
-                    { image: logo_sm, width: 85 },
+                    { image: logo_ccvms, width: 85 },
                     { text: 'Reporte de seguimiento \n Jurisdicción '+usuario.jurisdiccion.clave+' '+usuario.jurisdiccion.nombre, width: 970, alignment: 'center', bold: true },
                     { image: censia, width: 50 }
                 ]*/
@@ -706,7 +707,7 @@
                             widths: [ '15%','70%','15%'], 
                             body: [
                                 [
-                                    { image: logo_sm, width: 72 }, 
+                                    { image: logo_ccvms, width: 40 }, 
                                     { text: 'Reporte de seguimiento \n Jurisdicción '+usuario.jurisdiccion.clave+' '+usuario.jurisdiccion.nombre, alignment: 'center', bold: true },
                                     { image: censia, width: 50, alignment:'right'}
                                 ]

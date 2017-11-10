@@ -485,8 +485,88 @@ class PersonaController extends Controller
 
 
             if($parametros['rep']=='act'){ // Reporte de actividades
-                $data = $personas->get();
-                $poblacion_conapo = PoblacionConapo::where('anio', Carbon::now()->format('Y'))->where('deleted_at', NULL )->get();
+                $data = collect();
+                $esquema_detalle = DB::table('vacunas_esquemas AS ve')
+                    ->select('ve.id','ve.vacunas_id','ve.tipo_aplicacion','ve.esquemas_id','ve.intervalo_inicio_anio','ve.intervalo_inicio_mes','ve.intervalo_inicio_dia','ve.margen_anticipacion','fila','columna','ve.deleted_at','v.clave','v.nombre','v.orden_esquema AS v_orden_esquema','v.color_rgb')
+                    ->join('vacunas AS v','v.id','=','ve.vacunas_id')
+                    ->where('ve.esquemas_id', Carbon::now()->format('Y'))
+                    ->where('ve.deleted_at', NULL)
+                    ->where('v.deleted_at', NULL)                
+                    ->orderBy('v_orden_esquema')
+                    ->orderBy('intervalo_inicio_anio', 'ASC')
+                    ->orderBy('intervalo_inicio_mes', 'ASC')
+                    ->orderBy('intervalo_inicio_dia', 'ASC')
+                    ->orderBy('fila', 'ASC')
+                    ->orderBy('columna', 'ASC')
+                    ->get();
+                
+                if(isset($parametros['municipios_id']) && $parametros['municipios_id']!=0){
+                    $poblacion_oficial_municipio = PoblacionConapo::where('anio', Carbon::now()->format('Y'))->where('municipios_id',$parametros['municipios_id'])->where('deleted_at', NULL )->take(1)->get();
+                    if(count($poblacion_oficial_municipio)<0){
+                        $poblacion_oficial_municipio[0]->hombres_0 = 0;   
+                        $poblacion_oficial_municipio[0]->hombres_1 = 0;
+                        $poblacion_oficial_municipio[0]->hombres_2 = 0;
+                        $poblacion_oficial_municipio[0]->hombres_3 = 0;
+                        $poblacion_oficial_municipio[0]->hombres_4 = 0;
+                        $poblacion_oficial_municipio[0]->hombres_5 = 0;
+                        $poblacion_oficial_municipio[0]->hombres_6 = 0;
+                        $poblacion_oficial_municipio[0]->hombres_7 = 0;
+                        $poblacion_oficial_municipio[0]->hombres_8 = 0;
+                        $poblacion_oficial_municipio[0]->hombres_9 = 0; 
+                        $poblacion_oficial_municipio[0]->mujeres_10= 0; 
+                        $poblacion_oficial_municipio[0]->mujeres_0 = 0;   
+                        $poblacion_oficial_municipio[0]->mujeres_1 = 0;
+                        $poblacion_oficial_municipio[0]->mujeres_2 = 0;
+                        $poblacion_oficial_municipio[0]->mujeres_3 = 0;
+                        $poblacion_oficial_municipio[0]->mujeres_4 = 0;
+                        $poblacion_oficial_municipio[0]->mujeres_5 = 0;
+                        $poblacion_oficial_municipio[0]->mujeres_6 = 0;
+                        $poblacion_oficial_municipio[0]->mujeres_7 = 0;
+                        $poblacion_oficial_municipio[0]->mujeres_8 = 0;
+                        $poblacion_oficial_municipio[0]->mujeres_9 = 0; 
+                        $poblacion_oficial_municipio[0]->mujeres_10= 0; 
+                    }
+                    
+                    $edad_cero_mes_nominal = 0;
+                    $edad_uno_mes_nominal = 0;
+                    $edad_dos_mes_nominal = 0;
+                    $edad_tres_mes_nominal = 0;
+                    $edad_cuatro_mes_nominal = 0;
+                    $edad_cinco_mes_nominal = 0;
+                    $edad_seis_mes_nominal = 0;
+                    $edad_siete_mes_nominal = 0;
+                    $edad_ocho_mes_nominal = 0;
+                    $edad_nueve_mes_nominal = 0;
+                    $edad_diez_mes_nominal = 0;
+                    $edad_once_mes_nominal = 0;
+                    $edad_uno_anio_nominal = 0;
+                    $edad_dos_anio_nominal = 0;
+                    $menor_un_mes = Carbon::today("America/Mexico_City")->subMonths(1)->format('Y-m-d');
+                    
+                    $data = $personas->where('personas.fecha_nacimiento', '>=', $menor_un_mes)
+                        ->where('personas.deleted_at', NULL)
+                        ->where('personas.municipios_id',$parametros['municipios_id'])
+                        ->count();
+                    //dd($data);
+                    $data->push(["edad"=>"0 mes", "poblacion_oficial"=>($poblacion_oficial_municipio[0]->hombres_1 + $poblacion_oficial_municipio[0]->mujeres_1) , "poblacion_nominal"=>0]);
+                    $data->push(["edad"=>"1 mes", "poblacion_oficial"=>($poblacion_oficial_municipio[0]->hombres_1 + $poblacion_oficial_municipio[0]->mujeres_1) , "poblacion_nominal"=>0]);
+                    $data->push(["edad"=>"2 mes", "poblacion_oficial"=>($poblacion_oficial_municipio[0]->hombres_1 + $poblacion_oficial_municipio[0]->mujeres_1) , "poblacion_nominal"=>0]);
+                    $data->push(["edad"=>"3 mes", "poblacion_oficial"=>($poblacion_oficial_municipio[0]->hombres_1 + $poblacion_oficial_municipio[0]->mujeres_1) , "poblacion_nominal"=>0]);
+                    $data->push(["edad"=>"4 mes", "poblacion_oficial"=>($poblacion_oficial_municipio[0]->hombres_1 + $poblacion_oficial_municipio[0]->mujeres_1) , "poblacion_nominal"=>0]);
+                    $data->push(["edad"=>"5 mes", "poblacion_oficial"=>($poblacion_oficial_municipio[0]->hombres_1 + $poblacion_oficial_municipio[0]->mujeres_1) , "poblacion_nominal"=>0]);
+                    $data->push(["edad"=>"6 mes", "poblacion_oficial"=>($poblacion_oficial_municipio[0]->hombres_1 + $poblacion_oficial_municipio[0]->mujeres_1) , "poblacion_nominal"=>0]);
+                    $data->push(["edad"=>"7 mes", "poblacion_oficial"=>($poblacion_oficial_municipio[0]->hombres_1 + $poblacion_oficial_municipio[0]->mujeres_1) , "poblacion_nominal"=>0]);
+                    $data->push(["edad"=>"8 mes", "poblacion_oficial"=>($poblacion_oficial_municipio[0]->hombres_1 + $poblacion_oficial_municipio[0]->mujeres_1) , "poblacion_nominal"=>0]);
+                    $data->push(["edad"=>"9 mes", "poblacion_oficial"=>($poblacion_oficial_municipio[0]->hombres_1 + $poblacion_oficial_municipio[0]->mujeres_1) , "poblacion_nominal"=>0]);
+                    $data->push(["edad"=>"10 mes", "poblacion_oficial"=>($poblacion_oficial_municipio[0]->hombres_1 + $poblacion_oficial_municipio[0]->mujeres_1) , "poblacion_nominal"=>0]);
+                    $data->push(["edad"=>"11 mes", "poblacion_oficial"=>($poblacion_oficial_municipio[0]->hombres_1 + $poblacion_oficial_municipio[0]->mujeres_1) , "poblacion_nominal"=>0]);
+                    $data->push(["edad"=>"< 12 meses", "poblacion_oficial"=>($poblacion_oficial_municipio[0]->hombres_2 + $poblacion_oficial_municipio[0]->mujeres_2) , "poblacion_nominal"=>0]);
+                    $data->push(["edad"=>"< 2 años", "poblacion_oficial"=>($poblacion_oficial_municipio[0]->hombres_2 + $poblacion_oficial_municipio[0]->mujeres_2) , "poblacion_nominal"=>0]);
+
+                    dd($menor_un_mes);
+                } else { // Todos los municipios
+
+                }
             }
 
 

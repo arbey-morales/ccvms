@@ -198,7 +198,7 @@
             header: {
                 margin: [ 40, 30, 40, 30 ],
                 columns: [
-                    { image: logo_sm, width: 85 },
+                    { image:ccvms, width: 85 },
                     { text: 'Censo Nominal \n Jurisdicción '+usuario.jurisdiccion.clave+' '+usuario.jurisdiccion.nombre, width: 790, alignment: 'center', bold: true },
                     { image: censia, width: 50 }
                 ]

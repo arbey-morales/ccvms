@@ -103,7 +103,7 @@
                 header: {
                     margin: [ 40, 30, 40, 30 ],
                     columns: [
-                        { image: logo_sm, width: 85 },
+                        { image: logo_cvvms, width: 85 },
                         { text: 'Avance global de capturas', width: 380, alignment: 'center', bold: true },
                         { image: censia, width: 50 }
                     ]
@@ -240,7 +240,7 @@
                 header: {
                     margin: [ 40, 30, 40, 30 ],
                     columns: [
-                        { image: logo_sm, width: 85 },
+                        { image: logo_ccvms, width: 85 },
                         { text: 'Monitoreo de capturas '+texto, width: 980, alignment: 'center', bold: true },
                         { image: censia, width: 50 }
                     ]

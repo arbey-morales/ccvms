@@ -60,9 +60,11 @@
               <div class="separator">
                 <div class="clearfix"></div>
                 <br />
-                <div>
-                  <h1>  <img src="{{ url('images/salud-mesoamerica.png') }}" alt="..." class="img-rounded" width="290px"></h1>
-                  <p>©2017 Todos los derechos reservados. CCVMS</p>
+                <div class="row">
+                  <div class="col-md-6 col-sm-12" style="text-align:left;"> <img src="{{ url('images/salud-mesoamerica.png') }}" alt="..." class="img-rounded" width="100%"></div>
+                  <div class="col-md-6 col-sm-12" style="text-align:right;"> <img src="{{ url('images/sm.png') }}" alt="..." class="img-rounded" width="50%"></div>
+                  <div class="clearfix"></div>
+                  <p>©2017 Todos los derechos reservados</p>
                 </div>
               </div>
             {!! Form::close() !!}

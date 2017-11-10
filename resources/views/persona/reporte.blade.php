@@ -283,7 +283,7 @@
                 header: {
                     margin: [ 40, 30, 40, 30 ],
                     columns: [
-                        { image: logo_sm, width: 85 },
+                        { image: logo_ccvms, width: 85 },
                         { text: 'Seguimientos de '+titulo+' \n Jurisdicción '+usuario.jurisdiccion.clave+' '+usuario.jurisdiccion.nombre, width: 790, alignment: 'center', bold: true },
                         { image: censia, width: 50 }
                     ]
