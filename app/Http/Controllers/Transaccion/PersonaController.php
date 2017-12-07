@@ -384,73 +384,74 @@ class PersonaController extends Controller
      */
     public function buscar(Request $request)
     {
-        $parametros = Input::only(['q','municipios_id','localidades_id','clues_id','agebs_id','sector','manzana','filtro','todo','rep']);
+        $parametros = Input::only(['q','jurisdicciones_id','municipios_id','localidades_id','clues_id','agebs_id','sector','manzana','filtro','todo','rep']);
         $ta_abreviatura = $this->ta_abreviatura;
         $q = "";
         $text = '';
 
-
-
         $today = Carbon::today("America/Mexico_City");
 		if (Auth::user()->can('show.personas') && Auth::user()->activo==1) { 
             $anios_atras = Carbon::today("America/Mexico_City")->subYears(10)->format('Y-m-d'); 
-            $personas = DB::table('personas')
-            ->select('personas.*','clu.clues AS clu_clues','clu.nombre AS clu_nombre','col.nombre AS col_nombre','loc.nombre AS loc_nombre','mun.nombre AS mun_nombre','tp.clave AS tp_clave','tp.descripcion AS tp_descripcion');  
+            if($parametros['rep']=='seg'){ // Reporte de Seguimientos
+                $personas = DB::table('personas')
+                ->select('personas.*','clu.clues AS clu_clues','clu.jurisdicciones_id AS clu_jurisdiccion_id','clu.nombre AS clu_nombre','col.nombre AS col_nombre','loc.nombre AS loc_nombre','mun.nombre AS mun_nombre','tp.clave AS tp_clave','tp.descripcion AS tp_descripcion');  
 
-            if (Auth::user()->is('root|admin')) { } else { // Limitar por clues               
-                $personas = $personas->where('clu.jurisdicciones_id', Auth::user()->idJurisdiccion);
-            }
-
-            if ($parametros['todo']==NULL){ // La búsqueda usa filtros
-                if (isset($parametros['filtro']) && $parametros['filtro']==1){ // Los filtros son: municipios, localidad, clue, agebs, colonias, manzana y sector
-                    $text = 'Filtros: ';
-                    if(isset($parametros['municipios_id']) && $parametros['municipios_id']!=0){
-                        $personas = $personas->where('personas.municipios_id', $parametros['municipios_id']);
-                    }
-                    if(isset($parametros['clues_id']) && $parametros['clues_id']!=0){
-                        $personas = $personas->where('personas.clues_id', $parametros['clues_id']);
-                    }
-                    if(isset($parametros['localidades_id']) && $parametros['localidades_id']!=0){
-                        $personas = $personas->where('personas.localidades_id', $parametros['localidades_id']);
-                    }
-                    if(isset($parametros['colonias_id']) && $parametros['colonias_id']!=0){
-                        $personas = $personas->where('personas.colonias_id', $parametros['colonias_id']);
-                    }
-                    if(isset($parametros['agebs_id']) && $parametros['agebs_id']!=0){
-                        $personas = $personas->where('personas.agebs_id', $parametros['agebs_id']);
-                    }
-                    if(isset($parametros['sector']) && $parametros['sector']!="" && $parametros['sector']!=NULL){
-                        $personas = $personas->where('personas.sector', $parametros['sector']);
-                    }
-                    if(isset($parametros['manzana']) && $parametros['manzana']!="" && $parametros['manzana']!=NULL){
-                        $personas = $personas->where('personas.manzana', $parametros['manzana']);
-                    }
-                } 
-                if(isset($parametros['filtro']) && $parametros['filtro']==2){ // El filtro es buscar por cadena de texto
-                    $text = 'Nombre del infante/tutor o CURP: '.$parametros['q'];
-                    $personas = $personas->where(function($query) use ($parametros) {
-                        $query->where('personas.curp','LIKE',"%".$parametros['q']."%")
-                        ->orWhere('personas.tutor','LIKE',"%".$parametros['q']."%")
-                        ->orWhere(\DB::raw("CONCAT(personas.nombre,' ',personas.apellido_paterno,' ',personas.apellido_materno)"),'LIKE',"%".$parametros['q']."%");
-                    });
+                if (Auth::user()->is('root|admin')) { } else {            
+                    $personas = $personas->where('clu.jurisdicciones_id', Auth::user()->idJurisdiccion);
                 }
-            }
+
+                if ($parametros['todo']==NULL){ // La búsqueda usa filtros
+                    if (isset($parametros['filtro']) && $parametros['filtro']==1){ // Los filtros son: jurisdicciones(root,admin), municipios, localidad, clue, agebs, colonias, manzana y sector
+                        $text = 'Filtros: ';
+                        if(isset($parametros['jurisdicciones_id']) && $parametros['jurisdicciones_id']!=0){
+                            $personas = $personas->where('clu.jurisdicciones_id', $parametros['jurisdicciones_id']);
+                        }
+                        if(isset($parametros['municipios_id']) && $parametros['municipios_id']!=0){
+                            $personas = $personas->where('personas.municipios_id', $parametros['municipios_id']);
+                        }
+                        if(isset($parametros['clues_id']) && $parametros['clues_id']!=0){
+                            $personas = $personas->where('personas.clues_id', $parametros['clues_id']);
+                        }
+                        if(isset($parametros['localidades_id']) && $parametros['localidades_id']!=0){
+                            $personas = $personas->where('personas.localidades_id', $parametros['localidades_id']);
+                        }
+                        if(isset($parametros['colonias_id']) && $parametros['colonias_id']!=0){
+                            $personas = $personas->where('personas.colonias_id', $parametros['colonias_id']);
+                        }
+                        if(isset($parametros['agebs_id']) && $parametros['agebs_id']!=0){
+                            $personas = $personas->where('personas.agebs_id', $parametros['agebs_id']);
+                        }
+                        if(isset($parametros['sector']) && $parametros['sector']!="" && $parametros['sector']!=NULL){
+                            $personas = $personas->where('personas.sector', $parametros['sector']);
+                        }
+                        if(isset($parametros['manzana']) && $parametros['manzana']!="" && $parametros['manzana']!=NULL){
+                            $personas = $personas->where('personas.manzana', $parametros['manzana']);
+                        }
+                    } 
+                    if(isset($parametros['filtro']) && $parametros['filtro']==2){ // El filtro es buscar por cadena de texto
+                        $text = 'Nombre del infante/tutor o CURP: '.$parametros['q'];
+                        $personas = $personas->where(function($query) use ($parametros) {
+                            $query->where('personas.curp','LIKE',"%".$parametros['q']."%")
+                            ->orWhere('personas.tutor','LIKE',"%".$parametros['q']."%")
+                            ->orWhere(\DB::raw("CONCAT(personas.nombre,' ',personas.apellido_paterno,' ',personas.apellido_materno)"),'LIKE',"%".$parametros['q']."%");
+                        });
+                    }
+                }
             
-            $data = $personas->where('personas.fecha_nacimiento', '>=', $anios_atras)
+                $data = $personas->where('personas.fecha_nacimiento', '>=', $anios_atras)
                 ->where('personas.deleted_at', NULL)
                 ->leftJoin('clues AS clu','clu.id','=','personas.clues_id')
                 ->leftJoin('municipios AS mun','mun.id','=','personas.municipios_id')
                 ->leftJoin('localidades AS loc','loc.id','=','personas.localidades_id')
                 ->leftJoin('colonias AS col','col.id','=','personas.colonias_id')
                 ->leftJoin('tipos_partos AS tp','tp.id','=','personas.tipos_partos_id')
+                ->orderBy('clu_jurisdiccion_id', 'ASC')
                 ->orderBy('personas.municipios_id', 'ASC')
                 ->orderBy('personas.clues_id', 'ASC')
                 ->orderBy('personas.apellido_paterno', 'ASC')
                 ->orderBy('personas.apellido_materno', 'ASC')
                 ->orderBy('personas.nombre', 'ASC')
-                ->get();
-
-            if($parametros['rep']=='seg'){ // Reporte de Seguimientos
+                ->get();            
                 
                 foreach ($data as $cont=>$value) { 
                     $value->seguimientos = collect();
@@ -527,43 +528,144 @@ class PersonaController extends Controller
                         $poblacion_oficial_municipio[0]->mujeres_10= 0; 
                     }
                     
-                    $edad_cero_mes_nominal = 0;
-                    $edad_uno_mes_nominal = 0;
-                    $edad_dos_mes_nominal = 0;
-                    $edad_tres_mes_nominal = 0;
-                    $edad_cuatro_mes_nominal = 0;
-                    $edad_cinco_mes_nominal = 0;
-                    $edad_seis_mes_nominal = 0;
-                    $edad_siete_mes_nominal = 0;
-                    $edad_ocho_mes_nominal = 0;
-                    $edad_nueve_mes_nominal = 0;
-                    $edad_diez_mes_nominal = 0;
-                    $edad_once_mes_nominal = 0;
-                    $edad_uno_anio_nominal = 0;
-                    $edad_dos_anio_nominal = 0;
-                    $menor_un_mes = Carbon::today("America/Mexico_City")->subMonths(1)->format('Y-m-d');
-                    
-                    $data = $personas->where('personas.fecha_nacimiento', '>=', $menor_un_mes)
-                        ->where('personas.deleted_at', NULL)
-                        ->where('personas.municipios_id',$parametros['municipios_id'])
-                        ->count();
-                    //dd($data);
-                    $data->push(["edad"=>"0 mes", "poblacion_oficial"=>($poblacion_oficial_municipio[0]->hombres_1 + $poblacion_oficial_municipio[0]->mujeres_1) , "poblacion_nominal"=>0]);
-                    $data->push(["edad"=>"1 mes", "poblacion_oficial"=>($poblacion_oficial_municipio[0]->hombres_1 + $poblacion_oficial_municipio[0]->mujeres_1) , "poblacion_nominal"=>0]);
-                    $data->push(["edad"=>"2 mes", "poblacion_oficial"=>($poblacion_oficial_municipio[0]->hombres_1 + $poblacion_oficial_municipio[0]->mujeres_1) , "poblacion_nominal"=>0]);
-                    $data->push(["edad"=>"3 mes", "poblacion_oficial"=>($poblacion_oficial_municipio[0]->hombres_1 + $poblacion_oficial_municipio[0]->mujeres_1) , "poblacion_nominal"=>0]);
-                    $data->push(["edad"=>"4 mes", "poblacion_oficial"=>($poblacion_oficial_municipio[0]->hombres_1 + $poblacion_oficial_municipio[0]->mujeres_1) , "poblacion_nominal"=>0]);
-                    $data->push(["edad"=>"5 mes", "poblacion_oficial"=>($poblacion_oficial_municipio[0]->hombres_1 + $poblacion_oficial_municipio[0]->mujeres_1) , "poblacion_nominal"=>0]);
-                    $data->push(["edad"=>"6 mes", "poblacion_oficial"=>($poblacion_oficial_municipio[0]->hombres_1 + $poblacion_oficial_municipio[0]->mujeres_1) , "poblacion_nominal"=>0]);
-                    $data->push(["edad"=>"7 mes", "poblacion_oficial"=>($poblacion_oficial_municipio[0]->hombres_1 + $poblacion_oficial_municipio[0]->mujeres_1) , "poblacion_nominal"=>0]);
-                    $data->push(["edad"=>"8 mes", "poblacion_oficial"=>($poblacion_oficial_municipio[0]->hombres_1 + $poblacion_oficial_municipio[0]->mujeres_1) , "poblacion_nominal"=>0]);
-                    $data->push(["edad"=>"9 mes", "poblacion_oficial"=>($poblacion_oficial_municipio[0]->hombres_1 + $poblacion_oficial_municipio[0]->mujeres_1) , "poblacion_nominal"=>0]);
-                    $data->push(["edad"=>"10 mes", "poblacion_oficial"=>($poblacion_oficial_municipio[0]->hombres_1 + $poblacion_oficial_municipio[0]->mujeres_1) , "poblacion_nominal"=>0]);
-                    $data->push(["edad"=>"11 mes", "poblacion_oficial"=>($poblacion_oficial_municipio[0]->hombres_1 + $poblacion_oficial_municipio[0]->mujeres_1) , "poblacion_nominal"=>0]);
-                    $data->push(["edad"=>"< 12 meses", "poblacion_oficial"=>($poblacion_oficial_municipio[0]->hombres_2 + $poblacion_oficial_municipio[0]->mujeres_2) , "poblacion_nominal"=>0]);
-                    $data->push(["edad"=>"< 2 años", "poblacion_oficial"=>($poblacion_oficial_municipio[0]->hombres_2 + $poblacion_oficial_municipio[0]->mujeres_2) , "poblacion_nominal"=>0]);
+                    $edad_0m_nominal            = 0;
+                    $edad_1m_nominal            = 0;
+                    $edad_2m_nominal            = 0;
+                    $edad_3m_nominal            = 0;
+                    $edad_4m_nominal            = 0;
+                    $edad_5m_nominal            = 0;
+                    $edad_6m_nominal            = 0;
+                    $edad_7m_nominal            = 0;
+                    $edad_8m_nominal            = 0;
+                    $edad_9m_nominal            = 0;
+                    $edad_10m_nominal           = 0;
+                    $edad_11m_nominal           = 0;
+                    $edad_menores_1a_nominal    = 0;
+                    $edad_12_17m_nominal        = 0;
+                    $edad_18_24m_nominal        = 0;
+                    $edad_1a_nominal            = 0;
+                    $edad_2a_nominal            = 0;
+                    $edad_3a_nominal            = 0;
+                    $edad_4a_nominal            = 0;
+                    $edad_1_4a_nominal          = 0;
+                    $edad_5a_nominal            = 0;
+                    $edad_6a_nominal            = 0;
+                    $edad_7a_nominal            = 0;
+                    $edad_5_7a_nominal          = 0;
+                    $edad_0_7a_nominal          = 0;
+                    $r = 0;
 
-                    dd($menor_un_mes);
+                    $menor_siete_anios = Carbon::today("America/Mexico_City")->subYears(7)->format('Y-m-d');
+                    
+                    $data_actividad = DB::table('personas')
+                        ->select('personas.id','personas.fecha_nacimiento','personas.municipios_id','personas.deleted_at')
+                        ->where('fecha_nacimiento', '>=', $menor_siete_anios)
+                        ->where('fecha_nacimiento', '<=', Carbon::today("America/Mexico_City")->format('Y-m-d'))
+                        ->where('deleted_at', NULL)
+                        ->where('municipios_id', $parametros['municipios_id'])
+                        ->get();
+                        
+                    foreach ($data_actividad as $key => $value) {
+                        /**
+                         * Menores de un año
+                         */
+                        if($value->fecha_nacimiento >  Carbon::today("America/Mexico_City")->subMonths(1)->format('Y-m-d'))
+                            $edad_0m_nominal++;
+                        if($value->fecha_nacimiento >  Carbon::today("America/Mexico_City")->subMonths(2)->format('Y-m-d') && $value->fecha_nacimiento <= Carbon::today("America/Mexico_City")->subMonths(1)->format('Y-m-d'))
+                            $edad_1m_nominal++;
+                        if($value->fecha_nacimiento >  Carbon::today("America/Mexico_City")->subMonths(3)->format('Y-m-d') && $value->fecha_nacimiento <= Carbon::today("America/Mexico_City")->subMonths(2)->format('Y-m-d'))
+                            $edad_2m_nominal++;
+                        if($value->fecha_nacimiento >  Carbon::today("America/Mexico_City")->subMonths(4)->format('Y-m-d') && $value->fecha_nacimiento <= Carbon::today("America/Mexico_City")->subMonths(3)->format('Y-m-d'))
+                            $edad_3m_nominal++;
+                        if($value->fecha_nacimiento >  Carbon::today("America/Mexico_City")->subMonths(5)->format('Y-m-d') && $value->fecha_nacimiento <= Carbon::today("America/Mexico_City")->subMonths(4)->format('Y-m-d'))
+                            $edad_4m_nominal++;
+                        if($value->fecha_nacimiento >  Carbon::today("America/Mexico_City")->subMonths(6)->format('Y-m-d') && $value->fecha_nacimiento <= Carbon::today("America/Mexico_City")->subMonths(5)->format('Y-m-d'))
+                            $edad_5m_nominal++;
+                        if($value->fecha_nacimiento >  Carbon::today("America/Mexico_City")->subMonths(7)->format('Y-m-d') && $value->fecha_nacimiento <= Carbon::today("America/Mexico_City")->subMonths(6)->format('Y-m-d'))
+                            $edad_6m_nominal++;
+                        if($value->fecha_nacimiento >  Carbon::today("America/Mexico_City")->subMonths(8)->format('Y-m-d') && $value->fecha_nacimiento <= Carbon::today("America/Mexico_City")->subMonths(7)->format('Y-m-d'))
+                            $edad_7m_nominal++;
+                        if($value->fecha_nacimiento >  Carbon::today("America/Mexico_City")->subMonths(9)->format('Y-m-d') && $value->fecha_nacimiento <= Carbon::today("America/Mexico_City")->subMonths(8)->format('Y-m-d'))
+                            $edad_8m_nominal++;
+                        if($value->fecha_nacimiento >  Carbon::today("America/Mexico_City")->subMonths(10)->format('Y-m-d') && $value->fecha_nacimiento <= Carbon::today("America/Mexico_City")->subMonths(9)->format('Y-m-d'))
+                            $edad_9m_nominal++;
+                        if($value->fecha_nacimiento >  Carbon::today("America/Mexico_City")->subMonths(11)->format('Y-m-d') && $value->fecha_nacimiento <= Carbon::today("America/Mexico_City")->subMonths(10)->format('Y-m-d'))
+                            $edad_10m_nominal++;
+                        if($value->fecha_nacimiento >  Carbon::today("America/Mexico_City")->subMonths(12)->format('Y-m-d') && $value->fecha_nacimiento <= Carbon::today("America/Mexico_City")->subMonths(11)->format('Y-m-d'))
+                            $edad_11m_nominal++;
+                        $edad_menores_1a_nominal = $edad_0m_nominal + $edad_1m_nominal + $edad_2m_nominal + $edad_3m_nominal + $edad_4m_nominal + $edad_5m_nominal + $edad_6m_nominal + $edad_7m_nominal+ $edad_8m_nominal + $edad_9m_nominal + $edad_10m_nominal + $edad_11m_nominal;
+                        /**
+                         * Un año
+                         */
+                        if($value->fecha_nacimiento >  Carbon::today("America/Mexico_City")->subMonths(17)->format('Y-m-d') && $value->fecha_nacimiento <= Carbon::today("America/Mexico_City")->subMonths(12)->format('Y-m-d'))
+                            $edad_12_17m_nominal++;
+                        if($value->fecha_nacimiento >  Carbon::today("America/Mexico_City")->subMonths(24)->format('Y-m-d') && $value->fecha_nacimiento <= Carbon::today("America/Mexico_City")->subMonths(17)->format('Y-m-d'))
+                            $edad_18_24m_nominal++;
+                        $edad_1a_nominal = $edad_12_17m_nominal + $edad_18_24m_nominal;
+                        /**
+                         * Dos años
+                         */
+                        if($value->fecha_nacimiento >  Carbon::today("America/Mexico_City")->subMonths(36)->format('Y-m-d') && $value->fecha_nacimiento <= Carbon::today("America/Mexico_City")->subMonths(24)->format('Y-m-d'))
+                            $edad_2a_nominal++;
+                        /**
+                         * Tres años
+                         */
+                        if($value->fecha_nacimiento >  Carbon::today("America/Mexico_City")->subMonths(48)->format('Y-m-d') && $value->fecha_nacimiento <= Carbon::today("America/Mexico_City")->subMonths(36)->format('Y-m-d'))
+                            $edad_3a_nominal++;
+                        /**
+                         * Cuatro años
+                         */
+                        if($value->fecha_nacimiento >  Carbon::today("America/Mexico_City")->subMonths(60)->format('Y-m-d') && $value->fecha_nacimiento <= Carbon::today("America/Mexico_City")->subMonths(48)->format('Y-m-d'))
+                            $edad_4a_nominal++;
+                        $edad_1_4a_nominal = $edad_1a_nominal + $edad_2a_nominal + $edad_3a_nominal + $edad_4a_nominal;
+                        /**
+                         * Cinco años
+                         */
+                        if($value->fecha_nacimiento >  Carbon::today("America/Mexico_City")->subMonths(72)->format('Y-m-d') && $value->fecha_nacimiento <= Carbon::today("America/Mexico_City")->subMonths(60)->format('Y-m-d'))
+                            $edad_5a_nominal++;
+                        /**
+                         * Seis años
+                         */
+                        if($value->fecha_nacimiento >  Carbon::today("America/Mexico_City")->subMonths(84)->format('Y-m-d') && $value->fecha_nacimiento <= Carbon::today("America/Mexico_City")->subMonths(72)->format('Y-m-d'))
+                            $edad_6a_nominal++;
+                        /**
+                         * Siete años
+                         */
+                        if($value->fecha_nacimiento >  Carbon::today("America/Mexico_City")->subMonths(96)->format('Y-m-d') && $value->fecha_nacimiento <= Carbon::today("America/Mexico_City")->subMonths(84)->format('Y-m-d'))
+                            $edad_7a_nominal++;
+
+                        $edad_5_7a_nominal = $edad_5a_nominal + $edad_6a_nominal + $edad_7a_nominal;
+                        $edad_0_7a_nominal = $edad_menores_1a_nominal + $edad_1_4a_nominal + $edad_5_7a_nominal;
+                    }
+                    
+                    $po_1a = ($poblacion_oficial_municipio[0]->hombres_1 + $poblacion_oficial_municipio[0]->mujeres_1);
+                    
+                    $data->push(["edad"=>"0 mes",       "poblacion_oficial"=>($po_1a/12) , "poblacion_nominal"=>$edad_0m_nominal]);
+                    $data->push(["edad"=>"1 mes",       "poblacion_oficial"=>($po_1a/12) , "poblacion_nominal"=>$edad_1m_nominal]);
+                    $data->push(["edad"=>"2 mes",       "poblacion_oficial"=>($po_1a/12) , "poblacion_nominal"=>$edad_2m_nominal]);
+                    $data->push(["edad"=>"3 mes",       "poblacion_oficial"=>($po_1a/12) , "poblacion_nominal"=>$edad_3m_nominal]);
+                    $data->push(["edad"=>"4 mes",       "poblacion_oficial"=>($po_1a/12) , "poblacion_nominal"=>$edad_4m_nominal]);
+                    $data->push(["edad"=>"5 mes",       "poblacion_oficial"=>($po_1a/12) , "poblacion_nominal"=>$edad_5m_nominal]);
+                    $data->push(["edad"=>"6 mes",       "poblacion_oficial"=>($po_1a/12) , "poblacion_nominal"=>$edad_6m_nominal]);
+                    $data->push(["edad"=>"7 mes",       "poblacion_oficial"=>($po_1a/12) , "poblacion_nominal"=>$edad_7m_nominal]);
+                    $data->push(["edad"=>"8 mes",       "poblacion_oficial"=>($po_1a/12) , "poblacion_nominal"=>$edad_8m_nominal]);
+                    $data->push(["edad"=>"9 mes",       "poblacion_oficial"=>($po_1a/12) , "poblacion_nominal"=>$edad_9m_nominal]);
+                    $data->push(["edad"=>"10 mes",      "poblacion_oficial"=>($po_1a/12) , "poblacion_nominal"=>$edad_10m_nominal]);
+                    $data->push(["edad"=>"11 mes",      "poblacion_oficial"=>($po_1a/12) , "poblacion_nominal"=>$edad_11m_nominal]);
+                    $data->push(["edad"=>"< 1 año",     "poblacion_oficial"=> $po_1a     , "poblacion_nominal"=>$edad_menores_1a_nominal]);
+                    $data->push(["edad"=>"12-17 meses", "poblacion_oficial"=>($po_1a/2)  , "poblacion_nominal"=>$edad_12_17m_nominal]);
+                    $data->push(["edad"=>"18-24 meses", "poblacion_oficial"=>($po_1a/2)  , "poblacion_nominal"=>$edad_18_24m_nominal]);
+                    $data->push(["edad"=>"1 año",       "poblacion_oficial"=> $po_1a     , "poblacion_nominal"=>$edad_1a_nominal]);
+                    $data->push(["edad"=>"2 años",      "poblacion_oficial"=>($poblacion_oficial_municipio[0]->hombres_1 + $poblacion_oficial_municipio[0]->mujeres_1) , "poblacion_nominal"=>$edad_0m_nominal]);
+                    $data->push(["edad"=>"3 años",      "poblacion_oficial"=>($poblacion_oficial_municipio[0]->hombres_2 + $poblacion_oficial_municipio[0]->mujeres_2) , "poblacion_nominal"=>$edad_0m_nominal]);
+                    $data->push(["edad"=>"4 años",      "poblacion_oficial"=>($poblacion_oficial_municipio[0]->hombres_3 + $poblacion_oficial_municipio[0]->mujeres_3) , "poblacion_nominal"=>$edad_0m_nominal]);
+                    $data->push(["edad"=>"1-4 años",    "poblacion_oficial"=>($poblacion_oficial_municipio[0]->hombres_4 + $poblacion_oficial_municipio[0]->mujeres_4) , "poblacion_nominal"=>$edad_0m_nominal]);
+                    $data->push(["edad"=>"5 años",      "poblacion_oficial"=>($poblacion_oficial_municipio[0]->hombres_5 + $poblacion_oficial_municipio[0]->mujeres_5) , "poblacion_nominal"=>$edad_0m_nominal]);
+                    $data->push(["edad"=>"6 años",      "poblacion_oficial"=>($poblacion_oficial_municipio[0]->hombres_6 + $poblacion_oficial_municipio[0]->mujeres_6) , "poblacion_nominal"=>$edad_0m_nominal]);
+                    $data->push(["edad"=>"7 años",      "poblacion_oficial"=>($poblacion_oficial_municipio[0]->hombres_7 + $poblacion_oficial_municipio[0]->mujeres_7) , "poblacion_nominal"=>$edad_0m_nominal]);
+                    $data->push(["edad"=>"5-7 años",    "poblacion_oficial"=>($poblacion_oficial_municipio[0]->hombres_1 + $poblacion_oficial_municipio[0]->mujeres_1) , "poblacion_nominal"=>$edad_0m_nominal]);
+                    $data->push(["edad"=>"0-7 años",    "poblacion_oficial"=>($poblacion_oficial_municipio[0]->hombres_1 + $poblacion_oficial_municipio[0]->mujeres_1) , "poblacion_nominal"=>$edad_0m_nominal]);
+                    
                 } else { // Todos los municipios
 
                 }

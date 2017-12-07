@@ -144,6 +144,7 @@ return [
         Rap2hpoutre\LaravelLogViewer\LaravelLogViewerServiceProvider::class,
         Way\Generators\GeneratorsServiceProvider::class,
         Xethron\MigrationsGenerator\MigrationsGeneratorServiceProvider::class,
+        Maatwebsite\Excel\ExcelServiceProvider::class,      
 
         /*
          * Application Service Providers...
@@ -180,6 +181,7 @@ return [
         'DB'        => Illuminate\Support\Facades\DB::class,
         'Eloquent'  => Illuminate\Database\Eloquent\Model::class,
         'Event'     => Illuminate\Support\Facades\Event::class,
+        'Excel'     => Maatwebsite\Excel\Facades\Excel::class,
         'File'      => Illuminate\Support\Facades\File::class,
         'Form'      => Collective\Html\FormFacade::class,
         'Gate'      => Illuminate\Support\Facades\Gate::class,

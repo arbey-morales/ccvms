@@ -21,21 +21,22 @@ class MunicipioController extends Controller
      */
     public function index(Request $request)
     {
-        $parametros = Input::only('q','municipios_id');
+        $parametros = Input::only('q','jurisdicciones_id');
         $data = Municipio::where('deleted_at',NULL)->with('jurisdiccion')
             ->orderBy('nombre', 'ASC');
-        if (Auth::user()->is('root|admin')) { } else {
+        if (Auth::user()->is('root|admin')) {
+            if ($parametros['jurisdicciones_id']) {
+                $data = $data = $data->where('jurisdicciones_id', $parametros['jurisdicciones_id']);
+            }
+        } else {
             $data = $data->where('jurisdicciones_id', Auth::user()->idJurisdiccion);  
         }  
         if ($parametros['q']) {
             $data = $data = $data->where('clave','LIKE',"%".$parametros['q']."%")->orWhere('nombre','LIKE',"%".$parametros['q']."%");
         }
-        if ($parametros['municipios_id']) {
-            $data = $data = $data->where('municipios_id', $parametros['q']);
-        }
+        
 
         $data = $data->get();
-        
         if ($request->ajax()) {
             return response()->json([ 'data' => $data]);
         } else {

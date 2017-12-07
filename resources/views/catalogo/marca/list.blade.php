@@ -11,7 +11,7 @@
     </thead>
     <tbody>
         @foreach($data as $key=>$item)
-            <tr>
+            <tr id="{{ $item->id }}" data-id="{{ $item->id }}" data-nombre="{{ $item->nombre }}" data-toggle="tooltip" data-placement="top">
                 <td class="text-center"><strong> {{ ++$key }} </strong></td>
                 <td class="text-left">{{ $item->nombre }}</td>
                 <td class="text-left">{{ $item->usuario_id }}</td>

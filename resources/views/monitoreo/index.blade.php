@@ -249,7 +249,7 @@
                     margin: [ 40, 30, 40, 30 ],                
                     columns: [
                         { text: usuario.nombre+' '+usuario.paterno+' '+usuario.materno+' / '+usuario.email, alignment: 'left' },
-                        { text: moment().format('LL'), alignment: 'right' }
+                        { text: moment().format('LL / H:m:s'), alignment: 'right' }
                     ]
                 },
                 content: [

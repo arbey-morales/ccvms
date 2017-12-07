@@ -28,9 +28,9 @@
                 <li>
                     <a href="{{ url('temperatura') }}"><i class="fa fa-share-alt-square"></i> Registro de temperaturas</a>
                 </li>
-                <li>
+               <!-- <li>
                     <a href="{{ url('mantenimiento') }}"><i class="fa fa-wrench"></i> Mantenimiento de equipos</a>
-                </li>
+                </li>-->
                 @endpermission
             @endrole
             
@@ -66,7 +66,7 @@
                     <ul class="nav child_menu">
                         @permission('show.catalogos')
                             <li><a href="{{ route('catalogo.poblacion-conapo.index') }}">Población CONAPO</a></li>
-                            <li><a href="{{ route('usuario.index') }}">Esquema de vacunación</a></li>
+                            <!--<li><a href="{{ route('usuario.index') }}">Esquema de vacunación</a></li>-->
                         @endpermission
                     </ul>
                 </li>
@@ -74,10 +74,11 @@
                     <ul class="nav child_menu">
                         @permission('show.usuarios')<li><a href="{{ route('usuario.index') }}">Usuarios</a></li>@endpermission
                         @permission('show.usuarios')<li><a href="{{ route('monitoreo.index') }}">Monitoreo</a></li>@endpermission
-                        @role('root') 
+                       <!-- @role('root') 
                             @permission('show.roles')<li><a href="#">Roles</a></li>@endpermission
                             @permission('show.permissions')<li><a href="#">Permisos</a></li>@endpermission
                         @endrole 
+                        -->
                     </ul>
                 </li>
             </ul>

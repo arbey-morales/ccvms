@@ -20,12 +20,11 @@ class JurisdiccionController extends Controller
     public function index()
     {
         $parametros = Input::only('q');
-        
+        $data =  Jurisdiccion::with('entidad');
         if ($parametros['q']) {
-             $data =  Jurisdiccion::where('clave','LIKE',"%".$parametros['q']."%")->orWhere('nombre','LIKE',"%".$parametros['q']."%")->with('entidad')->get();
-        } else {
-             $data =  Jurisdiccion::with('entidad')->get();
+             $data =  $data->where('clave','LIKE',"%".$parametros['q']."%")->orWhere('nombre','LIKE',"%".$parametros['q']."%");
         }
+        $data =  $data->get();
        
         return Response::json([ 'data' => $data], HttpResponse::HTTP_OK);
     }

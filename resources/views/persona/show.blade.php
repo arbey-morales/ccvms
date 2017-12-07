@@ -26,10 +26,10 @@
                 </li>
                 <li><a href="#profile" data-toggle="tab">Esquema</a>
                 </li>
-                <li><a href="#messages" data-toggle="tab">Estadísticas</a>
+                <!--<li><a href="#messages" data-toggle="tab">Estadísticas</a>
                 </li>
                 <li><a href="#settings" data-toggle="tab">Otros</a>
-                </li>
+                </li>-->
                 </ul>
             </div>
 

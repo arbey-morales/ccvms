@@ -59,7 +59,6 @@
     {!! Html::script('assets/mine/js/dataTables/dataTables.responsive.min.js') !!}
     {!! Html::script('assets/mine/js/dataTables/responsive.bootstrap.js') !!}
 
-    <!-- Datatables -->
     <script>
         var registro_borrar = null;
         $(document).ready(function() {

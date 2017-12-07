@@ -36,8 +36,16 @@ $("#personas-form").submit(function(e){
         } else {
             notificar('Error','Error en el servidor','No se guardó el registro','error',3000);
         }
-    }).fail(function(){ 
+    }).fail(function(jqXhr){ 
         notificar('Información','No se guardó el registro verifique los datos o recargue la página','error',4000);
+        if( jqXhr.status === 422 ) {
+            var errors = jqXhr.responseJSON;
+            var msg = '';
+            $.each( errors , function( key, value ) {
+                msg = msg +'- '+value[0]+'\n';
+            });
+            notificar('Información',msg,'error',2000);
+        }
     });
 });
 
@@ -126,7 +134,7 @@ function iniciarMunicipio(){
             } else {
                 $('.js-data-municipio').empty();                     
                 $.each(response.data, function( i, cont ) {
-                    municipios.push({ 'id': cont.id, 'text': cont.nombre });
+                    municipios.push({ 'id': cont.id, 'text': cont.clave+'-'+cont.nombre });
                 });  
             }  
             $(".js-data-municipio").select2({

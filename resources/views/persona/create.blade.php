@@ -329,19 +329,4 @@
     {!! Html::script('assets/mine/js/myTags.js') !!}
     {!! Html::script('assets/mine/js/mx_CURP_RFC.js') !!}
     {!! Html::script('assets/mine/js/personaNuevo.js') !!}
-
-    <script>
-        function escaparCharEspeciales(str)
-        {
-            var map =
-            {
-                '&amp;': '&',
-                '&lt;': '<',
-                '&gt;': '>',
-                '&quot;': '"',
-                '&#039;': "'"
-            };
-            return str.replace(/&amp;|&lt;|&gt;|&quot;|&#039;/g, function(m) {return map[m];});
-        }
-    </script>
 @endsection

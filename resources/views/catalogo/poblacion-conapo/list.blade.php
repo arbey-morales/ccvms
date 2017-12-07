@@ -33,7 +33,7 @@
 <tbody>
     @foreach($data as $key=>$item)
         <tr data-id="{{ $item->id }}" data-toggle="tooltip" data-placement="top">    
-            <td class="text-left"><a class="btn btn-success" href="{{ url(Route::getCurrentRoute()->getPath().'/'.$item->id) }}" class="button"> <strong>{{ $item->mun_clave }}</strong> </a> {{$item->mun_nombre}}</td>        
+            <td class="text-left"><a class="btn btn-success" href="#" class="button"> <strong>{{ $item->mun_clave }}</strong> </a> {{$item->mun_nombre}}</td>        
             <td style="vertical-align:middle; text-align:center;">{{$item->hombres_0}}</td>
             <td style="vertical-align:middle; text-align:center;">{{$item->hombres_1}}</td>
             <td style="vertical-align:middle; text-align:center;">{{$item->hombres_2}}</td>
