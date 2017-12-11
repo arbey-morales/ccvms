@@ -48,12 +48,16 @@ class UserController extends Controller
         if (Auth::user()->is('admin|root') && Auth::user()->can('create.usuarios') && Auth::user()->activo==1) {
             
             $jurisdicciones = Jurisdiccion::all();
+            $roles = Role::where('level','!=',1)->get();
 
             foreach ($jurisdicciones as $jurisdiccion) {
                 $arrayJurisdicciones[$jurisdiccion->id] = $jurisdiccion->clave .' - '.$jurisdiccion->nombre;
             }
+            foreach ($roles as $rol) {
+                $arrayRoles[$rol->id] = $rol->name .' - '.$rol->description;
+            }
 
-            return view('usuario.create')->with(['jurisdicciones' => $arrayJurisdicciones]);
+            return view('usuario.create')->with(['jurisdicciones' => $arrayJurisdicciones,'roles' => $arrayRoles]);
         } else {
             return response()->view('errors.allPagesError', ['icon' => 'user-secret', 'error' => '403', 'title' => 'Forbidden / Prohibido', 'message' => 'No tiene autorización para acceder al recurso. Se ha negado el acceso.'], 403);
         }
@@ -80,10 +84,9 @@ class UserController extends Controller
 
         //dd($lastId);
 
-        if (Auth::user()->is('root')) {
-            $roles = Role::all();
+        if (isset($request->role_id) && $request->role_id != NULL) {
         } else {
-            $roles = Role::where('level', '!=', 1)->get();
+            $request->role_id = 3;
         }
 
         if (Auth::user()->is('admin|root') && Auth::user()->can('create.usuarios') && Auth::user()->activo==1) {
@@ -142,7 +145,7 @@ class UserController extends Controller
                         }
 
                         // Attach Roles
-                        $usuario->attachRole(3);
+                        $usuario->attachRole($request->role_id);
 
                         $msgGeneral = 'Hey! se gurdaron los datos';
                         $type       = 'flash_message_ok';
@@ -213,16 +216,20 @@ class UserController extends Controller
                 ->first();
             }
 
-           $jurisdicciones = Jurisdiccion::all();
+            $jurisdicciones = Jurisdiccion::all();
+            $roles = Role::where('level','!=',1)->get();
 
             foreach ($jurisdicciones as $jurisdiccion) {
                 $arrayJurisdicciones[$jurisdiccion->id] = $jurisdiccion->clave .' - '.$jurisdiccion->nombre;
+            }
+            foreach ($roles as $rol) {
+                $arrayRoles[$rol->id] = $rol->name .' - '.$rol->description;
             }
 
             if (!$usuarioSend) {
                 return response()->view('errors.allPagesError', ['icon' => 'search-minus', 'error' => '404', 'title' => 'Not found / No se encuentra', 'message' => 'El servidor no puede encontrar el recurso solicitado y no es posible determinar si esta ausencia es temporal o permanente.'], 404);
             }
-            return view('usuario.edit')->with(['data' => $usuarioSend, 'jurisdicciones' => $arrayJurisdicciones]);
+            return view('usuario.edit')->with(['data' => $usuarioSend, 'jurisdicciones' => $arrayJurisdicciones, 'roles' => $arrayRoles]);
         } else {
             return response()->view('errors.allPagesError', ['icon' => 'user-secret', 'error' => '403', 'title' => 'Forbidden / Prohibido', 'message' => 'No tiene autorización para acceder al recurso. Se ha negado el acceso.'], 403);
         }
@@ -244,14 +251,12 @@ class UserController extends Controller
         $imgSave                  = 'user-default.png';
         $destinationPath          = 'storage/user/profile/';
 
-        if (Auth::user()->is('root')) {
-            $roles = Role::all();
+        if (isset($request->role_id) && $request->role_id != NULL) {
         } else {
-            $roles = Role::where('level', '!=', 1)->get();
+            $request->role_id = $user->rolesuser[0]->role_id;
         }
 
-        $user = User::findOrFail($id);
-
+        $usuario = User::findOrFail($id);
         if (Auth::user()->is('admin|root') && Auth::user()->can('update.usuarios') && Auth::user()->activo==1) {
             $messages = [
                 'required' => 'El campo :attribute es requirido',
@@ -285,7 +290,7 @@ class UserController extends Controller
                 $extension = $request->foto->getClientOriginalExtension();
                 $imgSave   = 'USER_RAND'.rand(111111111111111,999999999999999).'_U'.Auth::user()->id.'USI'.Auth::user()->idSitio.'_DATE_'.date('Y-m-d').'.'.$extension;
             } else {
-                $imgSave = $user->foto;
+                $imgSave = $usuario->foto;
             }
 
             try {
@@ -327,7 +332,10 @@ class UserController extends Controller
                 }
             
                 if ($updates) {
-
+                    // >Detach Roles
+                    $user->detachRole($usuario->rolesuser[0]->role_id);
+                    // Attach Roles
+                    $user->attachRole($request->role_id);
                     $msgGeneral = 'Se guardaron los cambios.';
                     $type       = 'flash_message_ok';
                 } else {

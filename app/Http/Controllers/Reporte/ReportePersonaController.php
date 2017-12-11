@@ -73,7 +73,8 @@ class ReportePersonaController extends Controller
     /**
      * Consigue tipo de aplicación.
      *
-     * @return string
+     * @param   int    Clave entera del tipo de aplicación
+     * @return string  Cadena descriptiva del tipo de aplicación
      */
     public function tipoAplicacion($tipo){
         if($tipo==1) {
@@ -96,7 +97,7 @@ class ReportePersonaController extends Controller
         }
     }
 
-        /**
+    /**
      * Display a listing of the resource.
      * @param   string  q               Cadena de texto para búsqueda en personas. Se espera nombre de infante/tutor o CURP
      * @param   int     todo            Determina si la busqueda es de todo lo registrado, valor esperado: 1

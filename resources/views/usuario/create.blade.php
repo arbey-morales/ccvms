@@ -107,6 +107,11 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="uk-grid uk-grid-collapse">
+                                    {!! Form::label('role_id', 'Rol', ['for' => 'role_id'] ) !!}
+                                    {!! Form::select('role_id', $roles, 1, ['class' => 'form-control js-data-role select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'role_id', 'style' => 'width:100%'] ) !!}
+                                    <span class="bt-flabels__error-desc">Requerido</span>
+                                </div>
                             </div>
                             
                             <br>
@@ -219,7 +224,7 @@
     <!-- Select2 personalizado -->
     <script>
         //var localidad = { 'id':null, 'nombre':'Seleccionar una localidad', 'municipio':'','estado':'' };
-        $(".js-data-jurisdiccion").select2();
+        $(".js-data-jurisdiccion,.js-data-role").select2();
         /*$(".js-data-localidad-ajax").select2({
             ajax: {
                 url: "/catalogo/localidad/search",

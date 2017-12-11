@@ -107,6 +107,11 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="uk-grid uk-grid-collapse">
+                                    {!! Form::label('role_id', 'Rol', ['for' => 'role_id'] ) !!}
+                                    {!! Form::select('role_id', $roles, $data->rolesuser[0]->role_id, ['class' => 'form-control js-data-role select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'role_id', 'style' => 'width:100%'] ) !!}
+                                    <span class="bt-flabels__error-desc">Requerido</span>
+                                </div>
                             </div>
                             <h4 class="text-info">Dejar vacio el password para no hacerle cambios.</h4>
                              <h4 class="text-warning">@if(Auth::user()->id==$data->id) Si hace cambios a su mail o password será redireccionado para iniciar sesión @endif </h4>
@@ -196,7 +201,7 @@
             $("#password_confirmation").prop('placeholder','Repetir password');
         });
 
-         $(".js-data-jurisdiccion").select2();
+         $(".js-data-jurisdiccion,.js-data-role").select2();
     </script>
     <!-- Select2 Personalizado -->
     <!--<script>
