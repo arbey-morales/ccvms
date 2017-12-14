@@ -644,7 +644,7 @@ $(".js-ajax-actividad").click(function(e){
                 data_actividad = response.data;
                 texto = response.text;
                 usuario = response.user;
-                $(".no-resultados").empty().html('<button type="button" onClick="descargarActividades()" class="btn btn-info btn-lg"> <i class="fa fa-file-pdf-o"></i> Actividades</button> <span style="padding-left:40px; font-size:large;">'+response.data.length+' Resultados</span>'); 
+                //$(".no-resultados").empty().html('<button type="button" onClick="descargarActividades()" class="btn btn-info btn-lg"> <i class="fa fa-file-pdf-o"></i> Actividades</button> <span style="padding-left:40px; font-size:large;">'+response.data.length+' Resultados</span>'); 
                 $("#contenido").empty();  
                 var tabla = '';    
                 tabla+= '<table id="data-table" class="table table-bordered dt-responsive nowrap" cellspacing="0" width="100%">';  // Inicio de tabla 

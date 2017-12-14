@@ -17,9 +17,14 @@ use App\Catalogo\Municipio;
 class AgebController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * @api {get} /catalogo/ageb/:id Devuelve detalles de AGEB's
+     * @apiName GetAgeb
+     * @apiGroup Ageb
      *
-     * @return \Illuminate\Http\Response
+     * @apiParam {String} id Agebs único.
+     *
+     * @apiSuccess {String} firstname Firstname of the Ageb.
+     * @apiSuccess {String} lastname  Lastname of the Ageb.
      */
     public function index(Request $request)
     {
@@ -53,21 +58,37 @@ class AgebController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+	 * @api {get} /catalogo/ageb/ Devuelve detalles de AGEB's 
+	 * @apiVersion 0.1.0
+	 * @apiName GetAgeb
+	 * @apiGroup Ageb
+	 *
+	 * @apiParam {Number} id Agebs unique ID.
+	 *
+	 * @apiSuccess {Number} code  Código 0 conforme todo ha ido bien.
+	 * @apiSuccess {Bool} true/false  True o false dependiendo del resultado.
+	 *
+	 * @apiSuccessExample Success-Response:
+	 *     HTTP/1.1 200 OK
+	 *     {
+	 *       "code": 0,
+	 *       "response": true
+	 *     }
+	 *
+	 * @apiError AgebNotFound The id of the Ageb was not found.
+	 *
+	 * @apiErrorExample Error-Response:
+	 *     HTTP/1.1 404 Not Found
+	 *     {
+	 *       "error": "AgebNotFound"
+	 *     }
+	 */
     public function show($id)
     {
-
-        return redirect()->back();
-        /*$data = Ageb::with('municipio','localidad')->find($id);        
-        
+        $data = Ageb::with('municipio','localidad')->find($id);           
         if(!$data ){            
-            return Response::json(['error' => "No se encuentra el recurso que esta buscando."], HttpResponse::HTTP_NOT_FOUND);
+            return response()->json(['error' => "No se encuentra el recurso que esta buscando."]);
         }
-
-        return Response::json([ 'data' => $data ], HttpResponse::HTTP_OK);*/
+        return response()->json([ 'data' => $data]);
     }
 }

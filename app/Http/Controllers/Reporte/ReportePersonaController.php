@@ -310,8 +310,8 @@ class ReportePersonaController extends Controller
                         foreach ($municipios as $key => $value) {
                             $pom_temp = PoblacionConapo::where('anio', Carbon::now()->format('Y'))->where('municipios_id',$value->id)->where('deleted_at', NULL )->take(1)->get();
                             $pom_temp = $pom_temp->toArray();
-                            if(count($pom_temp)<0){                    
-                                $pom_temp = $pom_temp[0];                    
+                            if(count($pom_temp)<=0){                    
+                                $pom_temp = [];                    
                                 for ($i=0; $i < 10; $i++) { 
                                     $pom_temp['hombres_'.$i] = 0;
                                     $pom_temp['mujeres_'.$i] = 0;

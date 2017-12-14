@@ -76,8 +76,8 @@
                     <div class="uk-grid uk-grid-collapse">
                         <div class="uk-width-1-2">
                             <div class="bt-flabels__wrapper">
-                                {!! Form::label('folio', 'Folio', ['for' => 'folio'] ) !!}
-                                {!! Form::text('folio', null , ['class' => 'form-control', 'data-parsley-required' => 'true', 'id' => 'folio', 'autocomplete' => 'off', 'placeholder' => 'Folio' ]  ) !!}
+                                {!! Form::label('folio', '* Folio', ['for' => 'folio'] ) !!}
+                                {!! Form::text('folio', null , ['class' => 'form-control', 'data-parsley-required' => 'true', 'id' => 'folio', 'autocomplete' => 'off', 'placeholder' => '* Folio' ]  ) !!}
                                 <span class="bt-flabels__error-desc">Requerido</span>
                             </div>
                         </div>
@@ -103,7 +103,7 @@
                             <div class="bt-flabels__wrapper">
                                 <span class="select-label">* Modelo</span>                                                         
                                 {!! Form::label('modelos_id', '* Modelo', ['for' => 'modelos_id'] ) !!}
-                                {!! Form::select('modelos_id', $modelos, 0, ['class' => 'form-control js-data-modelo select2', 'data-parsley-type' => 'number', 'data-parsley-min' => '0', 'id' => 'modelos_id',  'data-placeholder' => '* * Modelo', 'style' => 'width:100%'] ) !!}
+                                {!! Form::select('modelos_id', $modelos, 0, ['class' => 'form-control js-data-modelo select2', 'data-parsley-type' => 'number', 'data-parsley-min' => '0', 'id' => 'modelos_id',  'data-placeholder' => '* Modelo', 'style' => 'width:100%'] ) !!}
                                 <span class="bt-flabels__error-desc">Requerido</span>
                             </div>
                         </div>

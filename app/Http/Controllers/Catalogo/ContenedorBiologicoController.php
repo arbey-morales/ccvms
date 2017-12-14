@@ -67,6 +67,9 @@ class ContenedorBiologicoController extends Controller
             $tipos_contenedores  = TipoContenedor::where('deleted_at',NULL)->get();
             $modelos  = Modelo::where('deleted_at',NULL)->get();
             $estatus = EstatusContenedor::where('deleted_at',NULL)->get();
+            $arraymarca=[];
+            $arrayestatu=[];
+            $arraymodelo=[];
             foreach ($estatus as $estatu) {
                 $arrayestatu[$estatu->id] = $estatu->descripcion;
             }
