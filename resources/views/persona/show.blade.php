@@ -199,15 +199,15 @@
             legend: {
                 orient : 'vertical',
                 x : 'left',
-                data:['Aplicadas','Faltantes']
+                data:['Aplicadas: '+aplicaciones_reales.length,'Faltantes: '+(esquema_detalle.length - aplicaciones_reales.length)]
             },
             toolbox: {
                 show : true,
                 feature : {
                     mark : {show: true},
-                    dataView : {show: true, readOnly: false},
+                    dataView : {show: true, readOnly: false, title:'Ver como texto', lang: ['Esquema ideal','Cerrar','Actualizar']},
                     magicType : {
-                        show: true, 
+                        show: true,                         
                         type: ['pie', 'funnel'],
                         option: {
                             funnel: {
@@ -218,8 +218,8 @@
                             }
                         }
                     },
-                    restore : {show: true},
-                    saveAsImage : {show: true}
+                    restore : {show: true, title:'Restaurar'},
+                    saveAsImage : {show: true, title:'Guardar imagen'}
                 }
             },
             calculable : true,
@@ -230,8 +230,8 @@
                     radius : '55%',
                     center: ['50%', '60%'],
                     data:[
-                        {value:aplicaciones_reales.length, name:'Aplicadas'},
-                        {value:(esquema_detalle.length - aplicaciones_reales.length), name:'Faltantes'}
+                        {value:aplicaciones_reales.length, name:'Aplicadas: '+aplicaciones_reales.length},
+                        {value:(esquema_detalle.length - aplicaciones_reales.length), name:'Faltantes: '+(esquema_detalle.length - aplicaciones_reales.length)}
                     ]
                 }
             ]
@@ -252,13 +252,13 @@
             legend: {
                 orient : 'vertical',
                 x : 'left',
-                data:['Aplicadas','Faltantes']
+                data:['Aplicadas: '+aplicaciones_reales.length,'Faltantes: '+(esquema.vacunas_esquemas.length - aplicaciones_reales.length)]
             },
             toolbox: {
                 show : true,
                 feature : {
                     mark : {show: true},
-                    dataView : {show: true, readOnly: false},
+                    dataView : {show: true, readOnly: false, title:'Ver como texto', lang: ['Esquema real','Cerrar','Actualizar']},
                     magicType : {
                         show: true, 
                         type: ['pie', 'funnel'],
@@ -271,8 +271,8 @@
                             }
                         }
                     },
-                    restore : {show: true},
-                    saveAsImage : {show: true}
+                    restore : {show: true, title:'Restaurar'},
+                    saveAsImage : {show: true, title:'Guardar imagen'}
                 }
             },
             calculable : true,
@@ -283,8 +283,8 @@
                     radius : '55%',
                     center: ['50%', '60%'],
                     data:[
-                        {value:aplicaciones_reales.length, name:'Aplicadas'},
-                        {value:(esquema.vacunas_esquemas.length - aplicaciones_reales.length), name:'Faltantes'}
+                        {value:aplicaciones_reales.length, name:'Aplicadas: '+aplicaciones_reales.length},
+                        {value:(esquema.vacunas_esquemas.length - aplicaciones_reales.length), name:'Faltantes: '+(esquema.vacunas_esquemas.length - aplicaciones_reales.length)}
                     ]
                 }
             ]

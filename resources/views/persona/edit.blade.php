@@ -44,12 +44,12 @@
             <ul class="nav navbar-right panel_toolbox">
                 <li>
                     <a class="" href="{{ route('persona.index') }}">
-                        <i class="fa fa-long-arrow-left"></i>
+                        <i class="fa fa-chevron-circle-left" style="font-size:30px;"></i>
                     </a>
                 </li>
                 <li>
                     <a class="collapse-link">
-                        <i class="fa fa-chevron-up"></i>
+                        
                     </a>
                 </li>
             </ul>
@@ -63,7 +63,7 @@
                     <div class="bt-flabels__wrapper">
                         <span class="select-label">* Unidad de salud </span>
                         {!! Form::label('clue_id', '* Unidad de salud', ['for' => 'clue_id'] ) !!}
-                        {!! Form::select('clue_id', $clues,  $data->clues_id, ['class' => 'form-control js-data-clue select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'clue_id', 'data-placeholder' => '* Unidad de salud', 'style' => 'width:100%'] ) !!}
+                        {!! Form::select('clue_id', [],  $data->clues_id, ['class' => 'form-control js-data-clue select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'clue_id', 'data-placeholder' => '* Unidad de salud', 'style' => 'width:100%'] ) !!}
                         <span class="bt-flabels__error-desc">Requerido</span>
                     </div>
                     <div class="uk-grid uk-grid-collapse">
@@ -164,7 +164,7 @@
                             <div class="bt-flabels__wrapper bt-flabels--right">  
                                 <span class="select-label">* Localidad</span> 
                                 {!! Form::label('localidad_id', '* Localidad', ['for' => 'localidad_id'] ) !!}
-                                {!! Form::select('localidad_id', $localidades, $data->localidades_id, ['class' => 'form-control js-data-localidad select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'localidad_id',  'data-placeholder' => '* Localidad', 'style' => 'width:100%'] ) !!}
+                                {!! Form::select('localidad_id', [], $data->localidades_id, ['class' => 'form-control js-data-localidad select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'localidad_id',  'data-placeholder' => '* Localidad', 'style' => 'width:100%'] ) !!}
                                 <span class="bt-flabels__error-desc">Requerido</span>
                             </div>
                         </div>
@@ -223,7 +223,7 @@
                             <div class="bt-flabels__wrapper">
                                 <span class="select-label">Colonia</span>
                                 {!! Form::label('colonias_id', 'Colonia', ['for' => 'colonias_id'] ) !!}
-                                {!! Form::select('colonias_id', $colonias, $data->colonias_id, ['class' => 'form-control js-data-colonia select2', 'id' => 'colonias_id', 'data-placeholder' => 'Colonia', 'style' => 'width:100%'] ) !!}
+                                {!! Form::select('colonias_id', [], $data->colonias_id, ['class' => 'form-control js-data-colonia select2', 'id' => 'colonias_id', 'data-placeholder' => 'Colonia', 'style' => 'width:100%'] ) !!}
                             </div>
                         </div>
                         <div class="uk-width-1-2">
@@ -338,9 +338,216 @@
         var ultima_fecha_nacimiento = '{{$data->fecha_nacimiento}}';
         var original_fecha_nacimiento = '{{$data->fecha_nacimiento}}';
         // CARGA EL ESQUEMA CON BASE A LA FECHA 01-01-AÑO ACTUAL
+        var clues = [{'id':persona.clue.id,'clues':persona.clue.clues,'text':persona.clue.nombre}];
+        var colonias = [{ 'id': 0, 'text': 'Sin colonia' }];
+        var localidades = [{ 'id': persona.localidad.id, 'clave':'', 'text': persona.localidad.nombre }];
+        if(persona.colonia==null){
+            persona.colonia=colonias[0];
+        }
+        
         setTimeout(function() {  
             var anio = original_fecha_nacimiento.split("-");       
             conseguirEsquema(anio[2],ultima_fecha_nacimiento);
         }, 500);
+        
+        $(".js-data-clue").select2({
+            ajax: {
+                url: "../../catalogo/clue",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                return {
+                    q: params.term, // search term
+                    page: params.page
+                };
+                },
+                processResults: function (data, params) {            
+                // parse the results into the format expected by Select2
+                // since we are using custom formatting functions we do not need to
+                // alter the remote JSON data, except to indicate that infinite
+                // scrolling can be used
+                params.page = params.page || 1;
+
+                return {
+                    results: $.map(data.data, function (item) {  // hace un  mapeo de la respuesta JSON para presentarlo en el select
+                        return {
+                            id:        item.id,
+                            clues:     item.clues,
+                            text:      item.nombre
+                        }
+                    }),
+                    pagination: {
+                    more: (params.page * 30) < data.total_count
+                    }
+                };
+                },
+                cache: true
+            },
+            escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
+            minimumInputLength: 5,
+            language: "es",
+            placeholder: {
+                id: persona.clue.id, 
+                clues: persona.clue.clues,
+                text: persona.clue.nombre
+            },
+            cache: true,
+            templateResult: formatRepo, // omitted for brevity, see the source of this page
+            templateSelection: formatRepoSelection // omitted for brevity, see the source of this page
+        });
+
+        $(".js-data-clue").select2("trigger", "select", { 
+            data: clues[0] 
+        }); 
+
+
+        function formatRepo (clues) {
+            if (!clues.id) { return clues.text; }
+            var $clues = $(
+                '<span class="">' + clues.clues + ' - '+ clues.text +'</span>'
+            );
+            return $clues;
+        };
+        function formatRepoSelection (clues) {
+            if (!clues.id) { return clues.text; }
+            var $clues = $(
+                '<span class="results-select2"> ' + clues.clues+ ' - '+ clues.text +'</span>'
+            );
+            return $clues;
+        };
+
+        $(".js-data-colonia").select2({
+            ajax: {
+                url: "../../catalogo/colonia",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                return {
+                    q: params.term, // search term
+                    municipios_id: $(".js-data-municipio").val(),
+                    page: params.page
+                };
+                },
+                processResults: function (data, params) {            
+                // parse the results into the format expected by Select2
+                // since we are using custom formatting functions we do not need to
+                // alter the remote JSON data, except to indicate that infinite
+                // scrolling can be used
+                params.page = params.page || 1;
+
+                return {
+                    results: $.map(data.data, function (item) {  // hace un  mapeo de la respuesta JSON para presentarlo en el select
+                        return {
+                            id:        item.id,
+                            text:      item.nombre
+                        }
+                    }),
+                    pagination: {
+                    more: (params.page * 30) < data.total_count
+                    }
+                };
+                },
+                cache: true
+            },
+            escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
+            minimumInputLength: 5,
+            language: "es",
+            placeholder: {
+                id: colonias[0].id, 
+                text: colonias[0].nombre
+            },
+            cache: true,
+            templateResult: formatRepoColonia, // omitted for brevity, see the source of this page
+            templateSelection: formatRepoSelectionColonia // omitted for brevity, see the source of this page
+        });
+
+        function formatRepoColonia (colonias) {
+            if (!colonias.id) { return colonias.text; }
+            var $colonias = $(
+                '<span class="">'+ colonias.text +'</span>'
+            );
+            return $colonias;
+        };
+        function formatRepoSelectionColonia (colonias) {
+            if (!colonias.id) { return colonias.text; }
+            var $colonias = $(
+                '<span class="results-select2">'+ colonias.text +'</span>'
+            );
+            return $colonias;
+        };   
+        
+        $(".js-data-localidad").select2({
+            ajax: {
+                url: "../../catalogo/localidad",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                return {
+                    q: params.term, // search term
+                    municipios_id: $(".js-data-municipio").val(),
+                    page: params.page
+                };
+                },
+                processResults: function (data, params) {            
+                // parse the results into the format expected by Select2
+                // since we are using custom formatting functions we do not need to
+                // alter the remote JSON data, except to indicate that infinite
+                // scrolling can be used
+                params.page = params.page || 1;
+
+                return {
+                    results: $.map(data.data, function (item) {  // hace un  mapeo de la respuesta JSON para presentarlo en el select
+                        return {
+                            id:        item.id,
+                            clave:     item.clave,
+                            text:      item.nombre
+                        }
+                    }),
+                    pagination: {
+                    more: (params.page * 30) < data.total_count
+                    }
+                };
+                },
+                cache: true
+            },
+            escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
+            minimumInputLength: 5,
+            language: "es",
+            placeholder: {
+                id: persona.localidad.id, 
+                clave: persona.localidad.clave,
+                text: persona.localidad.nombre
+            },
+            cache: true,
+            templateResult: formatRepoLocalidad, // omitted for brevity, see the source of this page
+            templateSelection: formatRepoSelectionLocalidad // omitted for brevity, see the source of this page
+        });
+
+        $(".js-data-localidad").select2("trigger", "select", { 
+            data: localidades[0] 
+        });
+
+        function formatRepoLocalidad (localidades) {
+            if (!localidades.id) { return localidades.text; }
+            var $localidades = $(
+                '<span class="">' + localidades.clave + ' - '+ localidades.text +'</span>'
+            );
+            return $localidades;
+        };
+        function formatRepoSelectionLocalidad (localidades) {
+            if (!localidades.id) { return localidades.text; }
+            var $localidades = $(
+                '<span class="results-select2"> ' + localidades.clave+ ' - '+ localidades.text +'</span>'
+            );
+            return $localidades;
+        };
+
+        $(document).ready(function(){
+            //$(".js-data-clue").change();
+            
+            //$(".js-data-colonia").val(persona.colonia.id).trigger("change");
+            //$(".js-data-localidad").val(persona.localidad.id).trigger("change");
+        });
+
     </script>
 @endsection

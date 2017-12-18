@@ -14,12 +14,12 @@
             <ul class="nav navbar-right panel_toolbox">
                 <li>
                     <a class="" href="{{ route('persona.index') }}">
-                        <i class="fa fa-long-arrow-left"></i>
+                        <i class="fa fa-chevron-circle-left" style="font-size:30px;"></i>
                     </a>
                 </li>
                 <li>
                     <a class="collapse-link">
-                        <i class="fa fa-chevron-up"></i>
+                        
                     </a>
                 </li>
             </ul>
@@ -79,7 +79,7 @@
                     <div class="x_title">
                         <h2 id="title-esquema"><i class="fa fa-calendar text-success"></i> {{ $esquema->descripcion }} </h2>
                         <ul class="nav navbar-right panel_toolbox">
-                        <!--<li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                        <!--<li><a class="collapse-link"></a>
                         </li>
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>

@@ -17,12 +17,12 @@
             <ul class="nav navbar-right panel_toolbox">
                 <li>
                     <a class="" href="{{ route('temperatura.index') }}">
-                        <i class="fa fa-long-arrow-left"></i>
+                        <i class="fa fa-chevron-circle-left" style="font-size:30px;"></i>
                     </a>
                 </li>
                 <li>
                     <a class="collapse-link">
-                        <i class="fa fa-chevron-up"></i>
+                        
                     </a>
                 </li>
             </ul>
@@ -33,7 +33,7 @@
             <div class="row">
                 <div class="col-md-6">
                     {!! Form::label('clues_id', '* Unidad de salud', ['for' => 'clues_id'] ) !!}
-                    {!! Form::select('clues_id', $clues,  0, ['class' => 'form-control js-data-clues select2', 'data-parsley-required' => 'true', 'id' => 'clues_id', 'data-placeholder' => '* Unidad de salud', 'style' => 'width:100%'] ) !!}
+                    {!! Form::select('clues_id', [],  0, ['class' => 'form-control js-data-clues select2', 'data-parsley-required' => 'true', 'id' => 'clues_id', 'data-placeholder' => '* Unidad de salud', 'style' => 'width:100%'] ) !!}
                 </div>
                 <div class="col-md-6">
                     {!! Form::label('contenedores_id', '* Contenedor de biológico', ['for' => 'contenedores_id'] ) !!}
@@ -53,7 +53,9 @@
                     {!! Form::label('archivo', 'Archivo de temperaturas', ['for' => 'archivo'] ) !!}
                     {!! Form::file('archivo', null , ['class' => 'form-control', 'id' => 'archivo', 'accept' => '.txt'] ) !!}
                 </div>
-                <div class="col-md-4"><br>
+                <div class="col-md-4">
+                    <br>
+                    <span id="cargando"></span>
                     @permission('create.catalogos')<button type="submit" class="btn btn-primary btn-lg js-submit pull-right"> <i class="fa fa-save"></i> Guardar! </button>@endpermission
                 </div>
             </div> 
@@ -85,7 +87,8 @@
             setTimeout(function(){ $(".js-data-clues").change(); }, 1000);
         });
         var contenedores = [{ 'id': 0, 'text': 'Seleccionar contenedor' }];
-        $(".js-data-clues,.js-data-contenedores").select2();
+        var clues = [{ 'id': 0, 'clues':'', 'text': '* Unidad de salud' }];
+        $(".js-data-contenedores").select2();
         $('#desde_archivo').change(function() {
             if ($(this).is(':checked')){
                 $("#archivo").removeClass("hidden");
@@ -105,6 +108,67 @@
                 $("#archivo").val("") ;
             }
         });
+
+        $(".js-data-clues").select2({
+            ajax: {
+                url: "../catalogo/clue",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                return {
+                    q: params.term, // search term
+                    page: params.page
+                };
+                },
+                processResults: function (data, params) {            
+                // parse the results into the format expected by Select2
+                // since we are using custom formatting functions we do not need to
+                // alter the remote JSON data, except to indicate that infinite
+                // scrolling can be used
+                params.page = params.page || 1;
+
+                return {
+                    results: $.map(data.data, function (item) {  // hace un  mapeo de la respuesta JSON para presentarlo en el select
+                        return {
+                            id:        item.id,
+                            clues:     item.clues,
+                            text:      item.nombre
+                        }
+                    }),
+                    pagination: {
+                    more: (params.page * 30) < data.total_count
+                    }
+                };
+                },
+                cache: true
+            },
+            escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
+            minimumInputLength: 5,
+            language: "es",
+            placeholder: {
+                id: clues[0].id, 
+                clues: clues[0].clues,
+                text: clues[0].text
+            },
+            cache: true,
+            templateResult: formatRepo, // omitted for brevity, see the source of this page
+            templateSelection: formatRepoSelection // omitted for brevity, see the source of this page
+        });
+
+        function formatRepo (clues) {
+            if (!clues.id) { return clues.text; }
+            var $clues = $(
+                '<span class="">' + clues.clues + ' - '+ clues.text +'</span>'
+            );
+            return $clues;
+        };
+        function formatRepoSelection (clues) {
+            if (!clues.id) { return clues.text; }
+            var $clues = $(
+                '<span class="results-select2"> ' + clues.clues+ ' - '+ clues.text +'</span>'
+            );
+            return $clues;
+        };
 
         $(".js-data-clues").change(function(){
             var clue_id = $(this).val();
@@ -131,6 +195,10 @@
             data: contenedores
         });
 
+        $(".js-submit").click(function(){
+            $("#cargando").empty().html('<br><i class="fa fa-circle-o-notch fa-spin"></i> Guardando datos...');
+            $(this).addClass('hidden');
+        });
 
     </script>
 @endsection

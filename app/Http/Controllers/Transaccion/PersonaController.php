@@ -1398,7 +1398,7 @@ class PersonaController extends Controller
             $id_persona = $id;
             if($person) {                    
                 if (Auth::user()->is('root|admin')) {
-                    $clues = Clue::select('id','clues','nombre')->where('deleted_at',NULL)->where('estatus_id', 1)->get();
+                    //$clues = Clue::select('id','clues','nombre')->where('deleted_at',NULL)->where('estatus_id', 1)->get();
                     $municipios = Municipio::select('id','clave','nombre')->where('deleted_at',NULL)->get();
                     $localidades = Localidad::select('id','clave','nombre')->where('deleted_at',NULL)->get();
                     $colonias = Colonia::select('id','nombre','municipios_id')->where('deleted_at',NULL)->with('municipio')->get();
@@ -1408,7 +1408,7 @@ class PersonaController extends Controller
                     $localidades = collect();
                     $colonias = collect();
                     $agebs = collect();
-                    $clues = Clue::select('id','clues','nombre')->where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->where('estatus_id', 1)->get();
+                    //$clues = Clue::select('id','clues','nombre')->where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->where('estatus_id', 1)->get();
                     $municipios = Municipio::select('id','clave','nombre')->where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->get();
                     foreach($municipios as $key=> $mpio){
                         $localidades_temp = Localidad::select('id','clave','nombre')->where('municipios_id', $mpio->id)->where('deleted_at',NULL)->get(); 
@@ -1432,12 +1432,12 @@ class PersonaController extends Controller
                 $codigos = CodigoCenso::select('id','clave','nombre')->where('deleted_at',NULL)->get();
                 $tiposparto = TipoParto::select('id','clave','descripcion')->where('deleted_at',NULL)->get();
 
-                $clue_selected = [];
+                /*$clue_selected = [];
                 foreach ($clues as $cont=>$clue) {
                     $arrayclue[$clue->id] = $clue->clues .' - '.$clue->nombre;
                     if($cont==0)
                         $clue_selected = $clue;
-                }
+                }*/
                 
                 foreach ($municipios as $municipio) {
                     $arraymunicipio[$municipio->id] = $municipio->clave .' - '.$municipio->nombre;
@@ -1508,10 +1508,10 @@ class PersonaController extends Controller
                 $codigos = CodigoCenso::where('deleted_at',NULL)->get();
                 $tiposparto = TipoParto::where('deleted_at',NULL)->get();
 
-                $clue_selected = [];
+                /*$clue_selected = [];
                 foreach ($clues as $cont=>$clue) {
                     $arrayclue[$clue->id] = $clue->clues .' - '.$clue->nombre;
-                }
+                }*/
                 
                 foreach ($municipios as $municipio) {
                     $arraymunicipio[$municipio->id] = $municipio->clave .' - '.$municipio->nombre;
@@ -1559,7 +1559,7 @@ class PersonaController extends Controller
                 $fn_nino = explode("-",$persona->fecha_nacimiento);
                 $persona->fecha_nacimiento = date($fn_nino[2].'-'.$fn_nino[1].'-'.$fn_nino[0]);
 
-                return view('persona.edit')->with(['esquema' => $esquema, 'data' => $persona, 'agebs' => $arrayageb, 'instituciones' => $arrayinstitucion, 'localidades' => $arraylocalidad, 'colonias' => $arraycolonia, 'clues' => $arrayclue, 'municipios' => $arraymunicipio, 'estados' => $arrayestado, 'paises' => $arraypais, 'codigos' => $arraycodigo, 'partos' => $arraytipoparto ]);
+                return view('persona.edit')->with(['esquema' => $esquema, 'data' => $persona, 'agebs' => $arrayageb, 'instituciones' => $arrayinstitucion, 'municipios' => $arraymunicipio, 'estados' => $arrayestado, 'paises' => $arraypais, 'codigos' => $arraycodigo, 'partos' => $arraytipoparto ]);
             } else {
                 return response()->view('errors.allPagesError', ['icon' => 'search-minus', 'error' => '404', 'title' => 'Not found / No se encuentra', 'message' => 'El servidor no puede encontrar el recurso solicitado y no es posible determinar si esta ausencia es temporal o permanente.'], 404);
             }

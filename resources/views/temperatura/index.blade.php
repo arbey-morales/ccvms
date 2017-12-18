@@ -33,7 +33,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         {!! Form::label('clues_id', '* Unidad de salud', ['for' => 'clues_id'] ) !!}
-                        {!! Form::select('clues_id', $clues,  0, ['class' => 'form-control js-data-clues select2', 'data-parsley-required' => 'true', 'id' => 'clues_id', 'data-placeholder' => '* Unidad de salud', 'style' => 'width:100%'] ) !!}
+                        {!! Form::select('clues_id', [],  0, ['class' => 'form-control js-data-clues select2', 'data-parsley-required' => 'true', 'id' => 'clues_id', 'data-placeholder' => '* Unidad de salud', 'style' => 'width:100%'] ) !!}
                     </div>
                     <div class="col-md-6">
                         {!! Form::label('contenedores_id', '* Contenedor de biológico', ['for' => 'contenedores_id'] ) !!}
@@ -49,8 +49,10 @@
                         {!! Form::label('fecha_final', 'Fecha final', ['for' => 'fecha_final'] ) !!}
                         {!! Form::text('fecha_final', null, ['class' => 'form-control search', 'id' => 'fecha_final', 'autocomplete' => 'off', 'placeholder' => '2017-01-02' ]) !!}
                     </div>
-                    <div class="col-md-4"><br>
-                        @permission('show.catalogos')<button type="button" class="btn btn-primary js-buscar btn-lg pull-right"> <i class="fa fa-search"></i> Buscar! </button>@endpermission
+                    <div class="col-md-4">
+                        <br>
+                        <span id="cargando"></span>
+                        @permission('show.catalogos')<button type="button" class="btn btn-primary js-buscar btn-lg pull-right"> <i class="fa fa-search"></i> Buscar  </button>@endpermission
                     </div>
                 </div>
             {!! Form::close() !!} 
@@ -105,7 +107,8 @@
         });
         // valor iniicial del select contenedores
         var contenedores = [{ 'id': 0, 'text': 'Seleccionar contenedor' }];
-        $(".js-data-clues,.js-data-contenedores").select2();
+        var clues = [{ 'id': 0, 'clues':'', 'text': '* Unidad de salud' }];
+        $(".js-data-contenedores").select2();
         // Si la clues cambia debe  buscar sus contenedores
         $(".js-data-clues").change(function(){
             var clue_id = $(this).val();
@@ -125,29 +128,106 @@
                 notificar('Información','No se consultaron los contenedores de la unidad seleccionada','warning',2000);
             });
         });
+
+        $(".js-data-clues").select2({
+            ajax: {
+                url: "../catalogo/clue",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                return {
+                    q: params.term, // search term
+                    page: params.page
+                };
+                },
+                processResults: function (data, params) {            
+                // parse the results into the format expected by Select2
+                // since we are using custom formatting functions we do not need to
+                // alter the remote JSON data, except to indicate that infinite
+                // scrolling can be used
+                params.page = params.page || 1;
+
+                return {
+                    results: $.map(data.data, function (item) {  // hace un  mapeo de la respuesta JSON para presentarlo en el select
+                        return {
+                            id:        item.id,
+                            clues:     item.clues,
+                            text:      item.nombre
+                        }
+                    }),
+                    pagination: {
+                    more: (params.page * 30) < data.total_count
+                    }
+                };
+                },
+                cache: true
+            },
+            escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
+            minimumInputLength: 5,
+            language: "es",
+            placeholder: {
+                id: clues[0].id, 
+                clues: clues[0].clues,
+                text: clues[0].text
+            },
+            cache: true,
+            templateResult: formatRepo, // omitted for brevity, see the source of this page
+            templateSelection: formatRepoSelection // omitted for brevity, see the source of this page
+        });
+
+        function formatRepo (clues) {
+            if (!clues.id) { return clues.text; }
+            var $clues = $(
+                '<span class="">' + clues.clues + ' - '+ clues.text +'</span>'
+            );
+            return $clues;
+        };
+        function formatRepoSelection (clues) {
+            if (!clues.id) { return clues.text; }
+            var $clues = $(
+                '<span class="results-select2"> ' + clues.clues+ ' - '+ clues.text +'</span>'
+            );
+            return $clues;
+        };
+
+        var buscando = false;
         // Botón buscar
-        $(".js-buscar").click(function(){
-            var dato = $("#dato");
-            var url  = dato.attr('action');
-            var dato = $("#dato").serialize();
-            if($("#fecha_inicial").val()==null || $("#fecha_inicial").val()=="" || $("#fecha_final").val()==null || $("#fecha_final").val()=="" || $("#clues_id").val()==0 || $("#contenedores_id").val()==0){
-                notificar('Información','Debe agregar fecha inicial y final, además de seleccionar unidad de salud y contenedor','warning',2000);
-            } else{
-                $.get(url, dato, function(response, status){ // Consulta                      
-                    if(response.data.variacion.data.length>0){
-                        graficaVariacion(response.data.variacion.data, response.data.texto,response.data.sub_texto);
-                    } else {
-                        notificar('Información','Sin resultados en la gráfica de variación','info',2000);
-                    }
-                    
-                    if(response.data.variacion.data.length>0){
-                        graficaMaximaMinima(response.data.maxima_minima, response.data.texto,response.data.sub_texto);                    
-                    } else {
-                        notificar('Información','Sin resultados en la gráfica de máximas y mínimas','info',2000);
-                    }
-                }).fail(function(){  // Calcula CURP
-                    notificar('Información','No se consultaron los contenedores de la unidad seleccionada','warning',2000);
-                });
+        $(".js-buscar").click(function(){     
+            if(!buscando) {      
+                var dato = $("#dato");
+                var url  = dato.attr('action');
+                var dato = $("#dato").serialize();
+                $(".js-buscar").attr('disabled','disabled');                
+                //$(this).addClass('hidden');
+                if($("#fecha_inicial").val()==null || $("#fecha_inicial").val()=="" || $("#fecha_final").val()==null || $("#fecha_final").val()=="" || $("#clues_id").val()==0 || $("#contenedores_id").val()==0){
+                    notificar('Información','Debe agregar fecha inicial y final, además de seleccionar unidad de salud y contenedor','warning',2000);
+                    $(".js-buscar").removeAttr('disabled');
+                    $("#cargando").empty();
+                } else{                
+                    $("#cargando").empty().html('<br><i class="fa fa-circle-o-notch fa-spin"></i> Buscando...');
+                    buscando = true;
+                    $.get(url, dato, function(response, status){ // Consulta  
+                        buscando = false;  
+                        $("#cargando").empty();
+                        $(".js-buscar").removeAttr('disabled');                  
+                        if(response.data.variacion.data.length>0){
+                            graficaVariacion(response.data.variacion.data, response.data.texto,response.data.sub_texto);
+                        } else {
+                            notificar('Información','Sin resultados en la gráfica de variación','info',2000);
+                        }
+                        
+                        if(response.data.variacion.data.length>0){
+                            graficaMaximaMinima(response.data.maxima_minima, response.data.texto,response.data.sub_texto);                    
+                        } else {
+                            notificar('Información','Sin resultados en la gráfica de máximas y mínimas','info',2000);
+                        }
+                    }).fail(function(){  // Calcula CURP
+                        $(".js-buscar").removeAttr('disabled');
+                        $("#cargando").empty();
+                        buscando = false;
+                        notificar('Información','No se consultaron los contenedores de la unidad seleccionada','warning',2000);
+                    });
+                }
             }
         });        
         // Inicializa select contenedores

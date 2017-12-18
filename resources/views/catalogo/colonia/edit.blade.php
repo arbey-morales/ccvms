@@ -40,12 +40,12 @@
         <ul class="nav navbar-right panel_toolbox">
             <li>
                 <a class="" href="{{ route('catalogo.colonia.index') }}">
-                    <i class="fa fa-long-arrow-left"></i>
+                    <i class="fa fa-chevron-circle-left" style="font-size:30px;"></i>
                 </a>
             </li>
             <li>
                 <a class="collapse-link">
-                    <i class="fa fa-chevron-up"></i>
+                    
                 </a>
             </li>
         </ul>

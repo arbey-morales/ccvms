@@ -24,7 +24,7 @@ var estados_equivalencia = ["X","AS","BC","BS","CC","CL","CM","CS","CH","DF","DG
 var localidad = { 'id':null, 'nombre':'Localidad'};
 
 // INICIA SELECT2 PARA ESTOS SELECTORES
-$(".js-data-clue,.js-data-ageb,.js-data-colonia,.js-data-genero,.js-data-parto,.js-data-estado,.js-data-municipio,.js-data-codigo,.js-data-institucion,.js-data-localidad").select2();
+$(".js-data-ageb,.js-data-genero,.js-data-parto,.js-data-estado,.js-data-municipio,.js-data-codigo,.js-data-institucion").select2();
 
 // SI CAMBIAN ESTOS SELECTS VALIDAR LOS CAMPOS DE ENTRADA PARA VALIDAR CURP
 $(".js-data-estado,.js-data-genero").change(function(){
@@ -72,10 +72,12 @@ $("#fecha_nacimiento_tutor").blur(function(){
 // SI LA CLUE CAMBIA; SE SELECCIONAN SU LOCALIDAD Y MUNICIPIO
 $(".js-data-clue").change(function(){
     var clue_id = $(this).val();
+    if(clue_id==null || clue_id=="" || clue_id==0){
+        clue_id = persona.clue.id;
+    }
+    //console.log(88)
     $.get('../../catalogo/clue/'+clue_id, function(response, status){ // Consulta CURP
-        $(".js-data-estado").val(response.data.entidades_id).trigger("change");
         $(".js-data-municipio").val(response.data.municipios_id).trigger("change");
-        $(".js-data-localidad").val(response.data.localidades_id).trigger("change");
     }).fail(function(){  // Calcula CURP
         notificar('Información','No se consultaron los detalles de la unidad de salud','warning',2000);
     });
@@ -209,7 +211,7 @@ function comprobarFecha(fecha,texto,tipo_fecha,index){
                                 }
                             }  
                         } else { // No tiene fecha de dosis anterior
-                            errors++; mensaje='Debe agregar la fecha de aplicación para '+menor_mensaje+' de '+menor.clave;
+                            errors++; mensaje='Debe agregar la fecha de aplicación para '+menor_mensaje+' de '+aplicacion_actual.clave;
                             $("#fecha_aplicacion"+menor_siguiente).focus();
                             
                         }
@@ -298,7 +300,7 @@ function generarEsquema(aplicaciones){
     ultimo_esquema = aplicaciones; // LAS VALIDACIONES DEL ESQUEMA ESTÁN AQUÍ
     var key_plus = 0;
     $.each(aplicaciones, function( key, ve ) {
-        console.log(ve);           
+        //console.log(ve);           
         
         key_plus++;
         var placeholder = '';
@@ -308,7 +310,7 @@ function generarEsquema(aplicaciones){
         var fecha_aplicada    = ''; var es_aplicada = false;
         ultimo_esquema[key].es_ideal = false;
         $.each(aplicaciones_dosis, function( key_ad, ve_ad ) { 
-            console.log(ve_ad);           
+            //console.log(ve_ad);           
             if(ve.id==ve_ad.vacunas_esquemas_id){
                 es_aplicada = true;
                 var fa_temp = ve_ad.fecha_aplicacion;
@@ -329,46 +331,56 @@ function generarEsquema(aplicaciones){
         });
               
         if(aplicaciones.length - 1 > key){ // último registro de esquemasvacunas
-            $('#content-esquema').append('<div class="animated flipInY col-md-2 col-xs-12"><br> <div class="tile-stats" style="color:white; margin:0px; padding:3px; border:solid 2px #'+ve.color_rgb+'; background-color:#'+ve.color_rgb+' !important;"> <div class="row"> <div class="col-md-12" onClick="verDetalles('+key+')" data-toggle="modal" data-target=".bs-example-modal-lg"> <span style="font-size:large;font-weight:bold;"> '+ve.clave+' <small> '+tipoAplicacion(ve.tipo_aplicacion)+' </small> </span> <span style="font-size:large;" class="pull-right"> <span class="badge bg-white" style="color:#'+ve.color_rgb+'" id="intervalo_text'+ve.id+'">'+obtieneIntervalo(ve.etiqueta_ideal_anio,ve.etiqueta_ideal_mes,ve.etiqueta_ideal_dia)+'</span> </span> </div> </div> <div class="row"> <div class="bt-flabels__wrapper"> <input id="fecha_aplicacion'+ve.id+'" name="fecha_aplicacion'+ve.id+'" type="text" onBlur="validaAplicacion('+ve.id+','+key+')" placeholder="'+placeholder+'" data-placeholder="'+ve.clave+' '+tipoAplicacion(ve.tipo_aplicacion)+'('+obtieneIntervalo(ve.etiqueta_ideal_anio,ve.etiqueta_ideal_mes,ve.etiqueta_ideal_dia)+')" value="'+fecha_aplicada+'" class="form-control has-feedback-left" aria-describedby="inputSuccess2Status" autocomplete="off" style="font-size:x-large; text-align:center;"> </div> </div> </div> </div>');
+            if(ve.draw){
+                $('#content-esquema').append('<div class="animated flipInY col-md-2 col-xs-12"><br> <div class="tile-stats" style="color:white; margin:0px; padding:3px; border:solid 2px #'+ve.color_rgb+'; background-color:#'+ve.color_rgb+' !important;"> <div class="row"> <div class="col-md-12" onClick="verDetalles('+key+')" data-toggle="modal" data-target=".bs-example-modal-lg"> <span style="font-size:large;font-weight:bold;"> '+ve.clave+' <small> '+tipoAplicacion(ve.tipo_aplicacion)+' </small> </span> <span style="font-size:large;" class="pull-right"> <span class="badge bg-white" style="color:#'+ve.color_rgb+'" id="intervalo_text'+ve.id+'">'+obtieneIntervalo(ve.etiqueta_ideal_anio,ve.etiqueta_ideal_mes,ve.etiqueta_ideal_dia)+'</span> </span> </div> </div> <div class="row"> <div class="bt-flabels__wrapper"> <input id="fecha_aplicacion'+ve.id+'" name="fecha_aplicacion'+ve.id+'" type="text" onBlur="validaAplicacion('+ve.id+','+key+')" placeholder="'+placeholder+'" data-placeholder="'+ve.clave+' '+tipoAplicacion(ve.tipo_aplicacion)+'('+obtieneIntervalo(ve.etiqueta_ideal_anio,ve.etiqueta_ideal_mes,ve.etiqueta_ideal_dia)+')" value="'+fecha_aplicada+'" class="form-control has-feedback-left" aria-describedby="inputSuccess2Status" autocomplete="off" style="font-size:x-large; text-align:center;"> </div> </div> </div> </div>');
+            } else {
+                $('#content-esquema').append('<div class="animated flipInY col-md-2 col-xs-12"><br> <div class="tile-stats" style="color:#D8D8D8; margin:0px; padding:3px; border:solid 2px #F0F0F0; background-color:#F0F0F0 !important;"> <div class="row"> <div class="col-md-12" onClick="verDetalles('+key+')" data-toggle="modal" data-target=".bs-example-modal-lg"> <span style="font-size:large;font-weight:bold;"> '+ve.clave+' <small> '+tipoAplicacion(ve.tipo_aplicacion)+' </small> </span> <span style="font-size:large;" class="pull-right"> <span class="badge bg-white" style="color:#D8D8D8" id="intervalo_text'+ve.id+'">'+obtieneIntervalo(ve.etiqueta_ideal_anio,ve.etiqueta_ideal_mes,ve.etiqueta_ideal_dia)+'</span> </span> </div> </div> <div class="row" style="text-align:center;"> <i class="fa fa-clock-o" style="color:white; font-size:50px ;"></i>  </div> </div> </div>');
+            }
             if(aplicaciones[key_plus].fila != ve.fila){
                 $('#content-esquema').append('<div class="clearfix"></div>');
             }
         } else {
-            $('#content-esquema').append('<div class="animated flipInY col-md-2 col-xs-12"><br> <div class="tile-stats" style="color:white; margin:0px; padding:3px; border:solid 2px #'+ve.color_rgb+'; background-color:#'+ve.color_rgb+' !important;"> <div class="row"> <div class="col-md-12" onClick="verDetalles('+key+')" data-toggle="modal" data-target=".bs-example-modal-lg"> <span style="font-size:large;font-weight:bold;"> '+ve.clave+' <small> '+tipoAplicacion(ve.tipo_aplicacion)+' </small> </span> <span style="font-size:large;" class="pull-right"> <span class="badge bg-white" style="color:#'+ve.color_rgb+'" id="intervalo_text'+ve.id+'">'+obtieneIntervalo(ve.etiqueta_ideal_anio,ve.etiqueta_ideal_mes,ve.etiqueta_ideal_dia)+'</span> </span> </div> </div> <div class="row"> <div class="bt-flabels__wrapper"> <input id="fecha_aplicacion'+ve.id+'" name="fecha_aplicacion'+ve.id+'" type="text" onBlur="validaAplicacion('+ve.id+','+key+')" placeholder="'+placeholder+'" data-placeholder="'+ve.clave+' '+tipoAplicacion(ve.tipo_aplicacion)+'('+obtieneIntervalo(ve.etiqueta_ideal_anio,ve.etiqueta_ideal_mes,ve.etiqueta_ideal_dia)+')" value="'+fecha_aplicada+'" class="form-control has-feedback-left" aria-describedby="inputSuccess2Status" autocomplete="off" style="font-size:x-large; text-align:center;"> </div> </div> </div> </div>');
+            if(ve.draw) {
+                $('#content-esquema').append('<div class="animated flipInY col-md-2 col-xs-12"><br> <div class="tile-stats" style="color:white; margin:0px; padding:3px; border:solid 2px #'+ve.color_rgb+'; background-color:#'+ve.color_rgb+' !important;"> <div class="row"> <div class="col-md-12" onClick="verDetalles('+key+')" data-toggle="modal" data-target=".bs-example-modal-lg"> <span style="font-size:large;font-weight:bold;"> '+ve.clave+' <small> '+tipoAplicacion(ve.tipo_aplicacion)+' </small> </span> <span style="font-size:large;" class="pull-right"> <span class="badge bg-white" style="color:#'+ve.color_rgb+'" id="intervalo_text'+ve.id+'">'+obtieneIntervalo(ve.etiqueta_ideal_anio,ve.etiqueta_ideal_mes,ve.etiqueta_ideal_dia)+'</span> </span> </div> </div> <div class="row"> <div class="bt-flabels__wrapper"> <input id="fecha_aplicacion'+ve.id+'" name="fecha_aplicacion'+ve.id+'" type="text" onBlur="validaAplicacion('+ve.id+','+key+')" placeholder="'+placeholder+'" data-placeholder="'+ve.clave+' '+tipoAplicacion(ve.tipo_aplicacion)+'('+obtieneIntervalo(ve.etiqueta_ideal_anio,ve.etiqueta_ideal_mes,ve.etiqueta_ideal_dia)+')" value="'+fecha_aplicada+'" class="form-control has-feedback-left" aria-describedby="inputSuccess2Status" autocomplete="off" style="font-size:x-large; text-align:center;"> </div> </div> </div> </div>');
+            } else {
+                $('#content-esquema').append('<div class="animated flipInY col-md-2 col-xs-12"><br> <div class="tile-stats" style="color:#D8D8D8; margin:0px; padding:3px; border:solid 2px #F0F0F0; background-color:#F0F0F0 !important;"> <div class="row"> <div class="col-md-12" onClick="verDetalles('+key+')" data-toggle="modal" data-target=".bs-example-modal-lg"> <span style="font-size:large;font-weight:bold;"> '+ve.clave+' <small> '+tipoAplicacion(ve.tipo_aplicacion)+' </small> </span> <span style="font-size:large;" class="pull-right"> <span class="badge bg-white" style="color:#D8D8D8" id="intervalo_text'+ve.id+'">'+obtieneIntervalo(ve.etiqueta_ideal_anio,ve.etiqueta_ideal_mes,ve.etiqueta_ideal_dia)+'</span> </span> </div> </div> <div class="row" style="text-align:center;"> <i class="fa fa-clock-o" style="color:white; font-size:50px ;"></i>  </div> </div> </div>');
+            }
         }
 
         var id_primera = null;
         var primera = null;
-        if(ve.menores.length){ // SI TIENE DOSIS MAYORES VERIFICAR QUE ESTEN BIEN                                     
-            id_primera = ve.menores[(ve.menores.length - 1)].id;
-            $.each(ultimo_esquema, function( k, apl ) {
-                if(id_primera==apl.id){
-                    primera = apl;
-                    return false;
-                }                                        
-            });
-        } 
-        //console.log(id_primera, es_aplicada);
-        if(es_aplicada){ // Está aplicada                                                 
-            if(ve.menores.length){ //                                         
-                if(primera.es_ideal){ // Es segunda en adelante
-                    cambiaEtiqueta(ve.id,ve.etiqueta_ideal_anio,ve.etiqueta_ideal_mes,ve.etiqueta_ideal_dia);
+        if(ve.draw) {
+            if(ve.menores.length){ // SI TIENE DOSIS MAYORES VERIFICAR QUE ESTEN BIEN                                     
+                id_primera = ve.menores[(ve.menores.length - 1)].id;
+                $.each(ultimo_esquema, function( k, apl ) {
+                    if(id_primera==apl.id){
+                        primera = apl;
+                        return false;
+                    }                                        
+                });
+            } 
+            //console.log(id_primera, es_aplicada);
+            if(es_aplicada){ // Está aplicada                                                 
+                if(ve.menores.length){ //                                         
+                    if(primera.es_ideal){ // Es segunda en adelante
+                        cambiaEtiqueta(ve.id,ve.etiqueta_ideal_anio,ve.etiqueta_ideal_mes,ve.etiqueta_ideal_dia);
+                    } else {
+                        cambiaEtiqueta(ve.id,ve.etiqueta_no_ideal_anio,ve.etiqueta_no_ideal_mes,ve.etiqueta_no_ideal_dia);
+                    }
                 } else {
-                    cambiaEtiqueta(ve.id,ve.etiqueta_no_ideal_anio,ve.etiqueta_no_ideal_mes,ve.etiqueta_no_ideal_dia);
+                    if(ve.es_ideal){ // Es segunda en adelante
+                        cambiaEtiqueta(ve.id,ve.etiqueta_ideal_anio,ve.etiqueta_ideal_mes,ve.etiqueta_ideal_dia);
+                    } else {
+                        cambiaEtiqueta(ve.id,ve.etiqueta_no_ideal_anio,ve.etiqueta_no_ideal_mes,ve.etiqueta_no_ideal_dia);
+                    }
                 }
             } else {
-                if(ve.es_ideal){ // Es segunda en adelante
-                    cambiaEtiqueta(ve.id,ve.etiqueta_ideal_anio,ve.etiqueta_ideal_mes,ve.etiqueta_ideal_dia);
-                } else {
-                    cambiaEtiqueta(ve.id,ve.etiqueta_no_ideal_anio,ve.etiqueta_no_ideal_mes,ve.etiqueta_no_ideal_dia);
-                }
-            }
-        } else {
-            if(ve.menores.length){
-                if(primera.es_ideal){ // Es segunda en adelante
-                    cambiaEtiqueta(ve.id,ve.etiqueta_ideal_anio,ve.etiqueta_ideal_mes,ve.etiqueta_ideal_dia);
-                } else {
-                    cambiaEtiqueta(ve.id,ve.etiqueta_no_ideal_anio,ve.etiqueta_no_ideal_mes,ve.etiqueta_no_ideal_dia);
+                if(ve.menores.length){
+                    if(primera.es_ideal){ // Es segunda en adelante
+                        cambiaEtiqueta(ve.id,ve.etiqueta_ideal_anio,ve.etiqueta_ideal_mes,ve.etiqueta_ideal_dia);
+                    } else {
+                        cambiaEtiqueta(ve.id,ve.etiqueta_no_ideal_anio,ve.etiqueta_no_ideal_mes,ve.etiqueta_no_ideal_dia);
+                    }
                 }
             }
         }

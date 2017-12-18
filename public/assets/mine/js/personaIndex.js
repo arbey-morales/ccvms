@@ -106,7 +106,7 @@ $(".js-ajax-buscar").click(function(e){
     e.preventDefault();
     $("#contenido").empty();        
     var dato = $("#form").serialize();
-    $(".no-resultados").empty().html('<i class="fa fa-spinner fa-spin"></i> Buscando');
+    $(".no-resultados").empty().html('<i class="fa fa-circle-o-notch fa-spin"></i> Buscando');
     $.get('persona/reporte/buscar', dato, function(response, status){       
         if(response.data==null){
             notificar('Sin resultados','warning',2000);
@@ -124,6 +124,15 @@ $(".js-ajax-buscar").click(function(e){
                 $("#contenido").empty();
                 $.each(response.data, function( i, cont ) {
                     var icono = '';
+                    if (cont.loc_nombre==null) {
+                        cont.loc_nombre='';
+                    }
+                    if (cont.mun_nombre==null) {
+                        cont.mun_nombre='';
+                    }
+                    if (cont.col_nombre==null) {
+                        cont.col_nombre='';
+                    }
                     if(cont.genero=='M'){
                         icono = '<i class="fa fa-male" style="color:#4d81bf; font-size:x-large;"></i>';
                     }
@@ -421,7 +430,7 @@ $(".js-ajax-seguimiento").click(function(e){
     e.preventDefault();
     $("#contenido").empty();        
     var dato = $("#form-seguimiento").serialize();
-    $(".no-resultados").empty().html('<i class="fa fa-spinner fa-spin"></i> Buscando');
+    $(".no-resultados").empty().html('<i class="fa fa-circle-o-notch fa-spin"></i> Buscando');
     $.get('persona/reporte/seguimiento', dato, function(response, status){       
         if(response.data==null){
             notificar('Sin resultados','warning',2000);
@@ -439,6 +448,15 @@ $(".js-ajax-seguimiento").click(function(e){
                 $("#contenido").empty();
                 $.each(response.data, function( i, cont ) {
                     var icono = '';
+                    if (cont.loc_nombre==null) {
+                        cont.loc_nombre='';
+                    }
+                    if (cont.mun_nombre==null) {
+                        cont.mun_nombre='';
+                    }
+                    if (cont.col_nombre==null) {
+                        cont.col_nombre='';
+                    }
                     if(cont.genero=='M'){
                         icono = '<i class="fa fa-male" style="color:#4d81bf; font-size:x-large;"></i>';
                     }
@@ -630,7 +648,7 @@ $(".js-ajax-actividad").click(function(e){
     $("#contenido").empty();        
     var dato = $("#form-actividad").serialize(); 
     
-        $(".no-resultados").empty().html('<i class="fa fa-spinner fa-spin"></i> Buscando');
+        $(".no-resultados").empty().html('<i class="fa fa-circle-o-notch fa-spin"></i> Buscando');
         $.get('persona/reporte/actividad', dato, function(response, status){       
         if(response.data==null){
             notificar('Sin resultados','warning',2000);
@@ -668,15 +686,17 @@ $(".js-ajax-actividad").click(function(e){
                 $.each(data_actividad, function( i, cont ) { 
                     tabla+= '<tr>';
                     var concidencia = Math.round((100/cont.poblacion.oficial) * cont.poblacion.nominal);
-                    var nominal_ec = Math.round((cont.poblacion.nominal/100) * cont.esquema_completo.total);
+                    var nominal_ec = Math.round((100/cont.poblacion.nominal) * cont.esquema_completo.total);
                     if(isNaN(nominal_ec)) {
-                        nominal_ec = 0.00;
+                        nominal_ec = 0;
                     }
-                    var oficial_ec = Math.round((cont.poblacion.oficial/100) * cont.esquema_completo.total);
+                    var oficial_ec = Math.round((100/ cont.poblacion.oficial) * cont.esquema_completo.total);
                     if(isNaN(oficial_ec)) {
-                        oficial_ec = 0.00;
+                        oficial_ec = 0;
                     }
                     concidencia=parseFloat(concidencia).toFixed(2);
+                    nominal_ec=parseFloat(nominal_ec).toFixed(2);
+                    oficial_ec=parseFloat(oficial_ec).toFixed(2);
                     tabla+= '<td>'+cont.parametros.edad+'</td><td>'+Math.round(cont.poblacion.oficial)+'</td><td>'+cont.poblacion.nominal+'</td><td>'+concidencia+'</td>';
                     //$.each(cont.dosis, function( d, dosis ) {
                         $.each(cont.da, function( ap, apli ) {

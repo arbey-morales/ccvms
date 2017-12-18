@@ -5,11 +5,11 @@ var ultimo_esquema = '';
 var ultima_fecha_nacimiento = '';
 // EQUIVALENCIA DE CLAVES ESTADOS
 var estados_equivalencia = ["X","AS","BC","BS","CC","CL","CM","CS","CH","DF","DG","GT","GR","HG","JC","MC","MN","MS","NT","NL","OC","PL","QT","QR","SP","SL","SR","TC","TS","TL","VZ","YN","ZS"];
-var clues = [{ 'id': 0, 'text': '* Unidad de salud' }];
+var clues = [{ 'id': 0, 'clues':'', 'text': '* Unidad de salud' }];
 var clue_actual = {municipios_id:0, localidades_id:0};
-var municipios = [{ 'id': 0, 'text': '* Municipio' }];
+var municipios = [{ 'id': 0, 'text': '* Municipio/domicilio' }];
 var estados = [{ 'id': 0, 'text': '* Entidad federativa de nacimiento' }];
-var localidades = [{ 'id': 0, 'text': '* Localidad' }];
+var localidades = [{ 'id': 0, 'text': '* Localidad/domicilio' }];
 var colonias = [{ 'id': 0, 'text': 'Sin colonia' }];
 var agebs = [{ 'id': 0, 'text': 'AGEB' }];
 var afiliaciones = [{ 'id': 0, 'text': 'Ninguna afiliación' }];
@@ -87,7 +87,7 @@ function validaAplicacion(id_vacuna_esquema, index){ //id_esquema y key del arre
         } 
     }           
 }
-
+/*
 function iniciarClue(){
     $('.js-data-clue').empty();
     clues = [{ 'id': 0, 'text': '* Unidad de salud' }];
@@ -118,17 +118,17 @@ function iniciarClue(){
             data:clues
         }); 
     });
-}
+}*/
 
 function iniciarMunicipio(){
     $('.js-data-municipio').empty();
-    municipios = [{ 'id': 0, 'text': '* Municipio' }];
+    municipios = [{ 'id': 0, 'text': '* Municipio/domicilio' }];
     $.get('../catalogo/municipio', {}, function(response, status){
         if(response.data==null){
             notificar('Sin resultados','warning',2000);
         } else {      
             while (municipios.length) { municipios.pop(); }                
-            municipios.push({ 'id': 0, 'text': '* Municipio' });           
+            municipios.push({ 'id': 0, 'text': '* Municipio/domicilio' });           
             if(response.data.length<=0){
                // notificar('Información','No existen municipios','warning',2000);
             } else {
@@ -329,6 +329,67 @@ $(".js-data-clue").change(function(){
     }
 });
 
+$(".js-data-clue").select2({
+    ajax: {
+        url: "../catalogo/clue",
+        dataType: 'json',
+        delay: 250,
+        data: function (params) {
+        return {
+            q: params.term, // search term
+            page: params.page
+        };
+        },
+        processResults: function (data, params) {            
+        // parse the results into the format expected by Select2
+        // since we are using custom formatting functions we do not need to
+        // alter the remote JSON data, except to indicate that infinite
+        // scrolling can be used
+        params.page = params.page || 1;
+
+        return {
+            results: $.map(data.data, function (item) {  // hace un  mapeo de la respuesta JSON para presentarlo en el select
+                return {
+                    id:        item.id,
+                    clues:     item.clues,
+                    text:      item.nombre
+                }
+            }),
+            pagination: {
+            more: (params.page * 30) < data.total_count
+            }
+        };
+        },
+        cache: true
+    },
+    escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
+    minimumInputLength: 5,
+    language: "es",
+    placeholder: {
+        id: clues[0].id, 
+        clues: clues[0].clues,
+        text: clues[0].text
+    },
+    cache: true,
+    templateResult: formatRepo, // omitted for brevity, see the source of this page
+    templateSelection: formatRepoSelection // omitted for brevity, see the source of this page
+});
+
+function formatRepo (clues) {
+    if (!clues.id) { return clues.text; }
+    var $clues = $(
+        '<span class="">' + clues.clues + ' - '+ clues.text +'</span>'
+    );
+    return $clues;
+};
+function formatRepoSelection (clues) {
+    if (!clues.id) { return clues.text; }
+    var $clues = $(
+        '<span class="results-select2"> ' + clues.clues+ ' - '+ clues.text +'</span>'
+    );
+    return $clues;
+};
+
 $(".js-data-municipio").change(function(){
     if($('.js-data-municipio').val()==0){ } else {
         cargarLocalidad($('.js-data-municipio').val());
@@ -439,10 +500,10 @@ function cargarLocalidad(municipio){
 }
 
 $(document).ready(function(){
-    $(".js-data-clue").select2({
+    /*$(".js-data-clue").select2({
         language: "es",
         data: clues
-    });
+    });*/
     $(".js-data-municipio").select2({
         language: "es",
         data: municipios
@@ -473,7 +534,7 @@ $(document).ready(function(){
     });
 
     var clue_id = $(".js-data-clue").val();
-    iniciarClue();  
+    //iniciarClue();  
     iniciarMunicipio(); 
     iniciarEstado();  
     iniciarCodigo();
@@ -614,7 +675,7 @@ function comprobarFecha(fecha,texto,tipo_fecha,index){
                                 }
                             }  
                         } else { // No tiene fecha de dosis anterior
-                            errors++; mensaje='Debe agregar la fecha de aplicación para '+menor_mensaje+' de '+menor.clave;
+                            errors++; mensaje='Debe agregar la fecha de aplicación para '+menor_mensaje+' de '+aplicacion_actual.clave;
                             $("#fecha_aplicacion"+menor_siguiente).focus();
                             
                         }
@@ -708,14 +769,23 @@ function generarEsquema(aplicaciones){
         if(ve.etiqueta_ideal<30){
             placeholder = ultima_fecha_nacimiento;
         }
+        console.log(ve.clave+' '+ve.draw)
         ultimo_esquema[key].es_ideal = false;         
         if(aplicaciones.length - 1 > key){ // último registro de esquemasvacunas
-            $('#content-esquema').append('<div class="animated flipInY col-md-2 col-xs-12"><br> <div class="tile-stats" style="color:white; margin:0px; padding:3px; border:solid 2px #'+ve.color_rgb+'; background-color:#'+ve.color_rgb+' !important;"> <div class="row"> <div class="col-md-12" onClick="verDetalles('+key+')" data-toggle="modal" data-target=".bs-example-modal-lg"> <span style="font-size:large;font-weight:bold;"> '+ve.clave+' <small> '+tipoAplicacion(ve.tipo_aplicacion)+' </small> </span> <span style="font-size:large;" class="pull-right"> <span class="badge bg-white" style="color:#'+ve.color_rgb+'" id="intervalo_text'+ve.id+'">'+obtieneIntervalo(ve.etiqueta_ideal_anio,ve.etiqueta_ideal_mes,ve.etiqueta_ideal_dia)+'</span> </span> </div> </div> <div class="row"> <div class="bt-flabels__wrapper"> <input id="fecha_aplicacion'+ve.id+'" name="fecha_aplicacion'+ve.id+'" type="text" onBlur="validaAplicacion('+ve.id+','+key+')" placeholder="'+placeholder+'" data-placeholder="'+ve.clave+' '+tipoAplicacion(ve.tipo_aplicacion)+'('+obtieneIntervalo(ve.etiqueta_ideal_anio,ve.etiqueta_ideal_mes,ve.etiqueta_ideal_dia)+')" value="" class="form-control has-feedback-left" aria-describedby="inputSuccess2Status" autocomplete="off" style="font-size:x-large; text-align:center;"> </div> </div> </div> </div>');
+            if(ve.draw){
+                $('#content-esquema').append('<div class="animated flipInY col-md-2 col-xs-12"><br> <div class="tile-stats" style="color:white; margin:0px; padding:3px; border:solid 2px #'+ve.color_rgb+'; background-color:#'+ve.color_rgb+' !important;"> <div class="row"> <div class="col-md-12" onClick="verDetalles('+key+')" data-toggle="modal" data-target=".bs-example-modal-lg"> <span style="font-size:large;font-weight:bold;"> '+ve.clave+' <small> '+tipoAplicacion(ve.tipo_aplicacion)+' </small> </span> <span style="font-size:large;" class="pull-right"> <span class="badge bg-white" style="color:#'+ve.color_rgb+'" id="intervalo_text'+ve.id+'">'+obtieneIntervalo(ve.etiqueta_ideal_anio,ve.etiqueta_ideal_mes,ve.etiqueta_ideal_dia)+'</span> </span> </div> </div> <div class="row"> <div class="bt-flabels__wrapper"> <input id="fecha_aplicacion'+ve.id+'" name="fecha_aplicacion'+ve.id+'" type="text" onBlur="validaAplicacion('+ve.id+','+key+')" placeholder="'+placeholder+'" data-placeholder="'+ve.clave+' '+tipoAplicacion(ve.tipo_aplicacion)+'('+obtieneIntervalo(ve.etiqueta_ideal_anio,ve.etiqueta_ideal_mes,ve.etiqueta_ideal_dia)+')" value="" class="form-control has-feedback-left" aria-describedby="inputSuccess2Status" autocomplete="off" style="font-size:x-large; text-align:center;"> </div> </div> </div> </div>');
+            } else {
+                $('#content-esquema').append('<div class="animated flipInY col-md-2 col-xs-12"><br> <div class="tile-stats" style="color:#D8D8D8; margin:0px; padding:3px; border:solid 2px #F0F0F0; background-color:#F0F0F0 !important;"> <div class="row"> <div class="col-md-12" onClick="verDetalles('+key+')" data-toggle="modal" data-target=".bs-example-modal-lg"> <span style="font-size:large;font-weight:bold;"> '+ve.clave+' <small> '+tipoAplicacion(ve.tipo_aplicacion)+' </small> </span> <span style="font-size:large;" class="pull-right"> <span class="badge bg-white" style="color:#D8D8D8" id="intervalo_text'+ve.id+'">'+obtieneIntervalo(ve.etiqueta_ideal_anio,ve.etiqueta_ideal_mes,ve.etiqueta_ideal_dia)+'</span> </span> </div> </div> <div class="row" style="text-align:center;"> <i class="fa fa-clock-o" style="color:white; font-size:50px ;"></i>  </div> </div> </div>');
+            }
             if(aplicaciones[key_plus].fila != ve.fila){
                 $('#content-esquema').append('<div class="clearfix"></div>');
             }
         } else {
-            $('#content-esquema').append('<div class="animated flipInY col-md-2 col-xs-12"><br> <div class="tile-stats" style="color:white; margin:0px; padding:3px; border:solid 2px #'+ve.color_rgb+'; background-color:#'+ve.color_rgb+' !important;"> <div class="row"> <div class="col-md-12" onClick="verDetalles('+key+')" data-toggle="modal" data-target=".bs-example-modal-lg"> <span style="font-size:large;font-weight:bold;"> '+ve.clave+' <small> '+tipoAplicacion(ve.tipo_aplicacion)+' </small> </span> <span style="font-size:large;" class="pull-right"> <span class="badge bg-white" style="color:#'+ve.color_rgb+'" id="intervalo_text'+ve.id+'">'+obtieneIntervalo(ve.etiqueta_ideal_anio,ve.etiqueta_ideal_mes,ve.etiqueta_ideal_dia)+'</span> </span> </div> </div> <div class="row"> <div class="bt-flabels__wrapper"> <input id="fecha_aplicacion'+ve.id+'" name="fecha_aplicacion'+ve.id+'" type="text" onBlur="validaAplicacion('+ve.id+','+key+')" placeholder="'+placeholder+'" data-placeholder="'+ve.clave+' '+tipoAplicacion(ve.tipo_aplicacion)+'('+obtieneIntervalo(ve.etiqueta_ideal_anio,ve.etiqueta_ideal_mes,ve.etiqueta_ideal_dia)+')" value="" class="form-control has-feedback-left" aria-describedby="inputSuccess2Status" autocomplete="off" style="font-size:x-large; text-align:center;"> </div> </div> </div> </div>');
+            if(ve.draw){
+                $('#content-esquema').append('<div class="animated flipInY col-md-2 col-xs-12"><br> <div class="tile-stats" style="color:white; margin:0px; padding:3px; border:solid 2px #'+ve.color_rgb+'; background-color:#'+ve.color_rgb+' !important;"> <div class="row"> <div class="col-md-12" onClick="verDetalles('+key+')" data-toggle="modal" data-target=".bs-example-modal-lg"> <span style="font-size:large;font-weight:bold;"> '+ve.clave+' <small> '+tipoAplicacion(ve.tipo_aplicacion)+' </small> </span> <span style="font-size:large;" class="pull-right"> <span class="badge bg-white" style="color:#'+ve.color_rgb+'" id="intervalo_text'+ve.id+'">'+obtieneIntervalo(ve.etiqueta_ideal_anio,ve.etiqueta_ideal_mes,ve.etiqueta_ideal_dia)+'</span> </span> </div> </div> <div class="row"> <div class="bt-flabels__wrapper"> <input id="fecha_aplicacion'+ve.id+'" name="fecha_aplicacion'+ve.id+'" type="text" onBlur="validaAplicacion('+ve.id+','+key+')" placeholder="'+placeholder+'" data-placeholder="'+ve.clave+' '+tipoAplicacion(ve.tipo_aplicacion)+'('+obtieneIntervalo(ve.etiqueta_ideal_anio,ve.etiqueta_ideal_mes,ve.etiqueta_ideal_dia)+')" value="" class="form-control has-feedback-left" aria-describedby="inputSuccess2Status" autocomplete="off" style="font-size:x-large; text-align:center;"> </div> </div> </div> </div>');
+            } else {
+                $('#content-esquema').append('<div class="animated flipInY col-md-2 col-xs-12"><br> <div class="tile-stats" style="color:#D8D8D8; margin:0px; padding:3px; border:solid 2px #F0F0F0; background-color:#F0F0F0 !important;"> <div class="row"> <div class="col-md-12" onClick="verDetalles('+key+')" data-toggle="modal" data-target=".bs-example-modal-lg"> <span style="font-size:large;font-weight:bold;"> '+ve.clave+' <small> '+tipoAplicacion(ve.tipo_aplicacion)+' </small> </span> <span style="font-size:large;" class="pull-right"> <span class="badge bg-white" style="color:#D8D8D8" id="intervalo_text'+ve.id+'">'+obtieneIntervalo(ve.etiqueta_ideal_anio,ve.etiqueta_ideal_mes,ve.etiqueta_ideal_dia)+'</span> </span> </div> </div> <div class="row" style="text-align:center;"> <i class="fa fa-clock-o" style="color:white; font-size:50px ;"></i>  </div> </div> </div>');
+            }
         }
     });
 

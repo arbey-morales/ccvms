@@ -337,50 +337,59 @@ function generarEsquema(aplicaciones){
         });
               
         if(aplicaciones.length - 1 > key){ // último registro de esquemasvacunas
-            $('#content-esquema').append('<div class="animated flipInY col-md-2 col-xs-12"><br> <div class="tile-stats" style="color:white; margin:0px; padding:3px; border:solid 2px #'+ve.color_rgb+'; background-color:#'+ve.color_rgb+' !important;"> <div class="row"> <div class="col-md-12" onClick="verDetalles('+key+')" data-toggle="modal" data-target=".bs-example-modal-lg"> <span style="font-size:large;font-weight:bold;"> '+ve.clave+' <small> '+tipoAplicacion(ve.tipo_aplicacion)+' </small> </span> <span style="font-size:large;" class="pull-right"> <span class="badge bg-white" style="color:#'+ve.color_rgb+'" id="intervalo_text'+ve.id+'">'+obtieneIntervalo(ve.etiqueta_ideal_anio,ve.etiqueta_ideal_mes,ve.etiqueta_ideal_dia)+'</span> </span> </div> </div> <div class="row"> <div class="bt-flabels__wrapper"> <span class="col-md-12 text-primary" style="text-align:center; padding:3px; background-color:white; font-size:x-large;">'+fecha_aplicada+'</span> </div> </div> </div> </div>');
+            if(ve.draw){
+                $('#content-esquema').append('<div class="animated flipInY col-md-2 col-xs-12"><br> <div class="tile-stats" style="color:white; margin:0px; padding:3px; border:solid 2px #'+ve.color_rgb+'; background-color:#'+ve.color_rgb+' !important;"> <div class="row"> <div class="col-md-12" onClick="verDetalles('+key+')" data-toggle="modal" data-target=".bs-example-modal-lg"> <span style="font-size:large;font-weight:bold;"> '+ve.clave+' <small> '+tipoAplicacion(ve.tipo_aplicacion)+' </small> </span> <span style="font-size:large;" class="pull-right"> <span class="badge bg-white" style="color:#'+ve.color_rgb+'" id="intervalo_text'+ve.id+'">'+obtieneIntervalo(ve.etiqueta_ideal_anio,ve.etiqueta_ideal_mes,ve.etiqueta_ideal_dia)+'</span> </span> </div> </div> <div class="row"> <div class="bt-flabels__wrapper"> <span class="col-md-12 text-primary" style="text-align:center; padding:3px; background-color:white; font-size:x-large;">'+fecha_aplicada+'</span> </div> </div> </div> </div>');
+            } else {
+                $('#content-esquema').append('<div class="animated flipInY col-md-2 col-xs-12"><br> <div class="tile-stats" style="color:#D8D8D8; margin:0px; padding:3px; border:solid 2px #F0F0F0; background-color:#F0F0F0 !important;"> <div class="row"> <div class="col-md-12" onClick="verDetalles('+key+')" data-toggle="modal" data-target=".bs-example-modal-lg"> <span style="font-size:large;font-weight:bold;"> '+ve.clave+' <small> '+tipoAplicacion(ve.tipo_aplicacion)+' </small> </span> <span style="font-size:large;" class="pull-right"> <span class="badge bg-white" style="color:#D8D8D8" id="intervalo_text'+ve.id+'">'+obtieneIntervalo(ve.etiqueta_ideal_anio,ve.etiqueta_ideal_mes,ve.etiqueta_ideal_dia)+'</span> </span> </div> </div> <div class="row" style="text-align:center;"> <i class="fa fa-clock-o" style="color:white; font-size:50px ;"></i>  </div> </div> </div>');
+            }
             if(aplicaciones[key_plus].fila != ve.fila){
                 $('#content-esquema').append('<div class="clearfix"></div>');
             }
         } else {
-            $('#content-esquema').append('<div class="animated flipInY col-md-2 col-xs-12"><br> <div class="tile-stats" style="color:white; margin:0px; padding:3px; border:solid 2px #'+ve.color_rgb+'; background-color:#'+ve.color_rgb+' !important;"> <div class="row"> <div class="col-md-12" onClick="verDetalles('+key+')" data-toggle="modal" data-target=".bs-example-modal-lg"> <span style="font-size:large;font-weight:bold;"> '+ve.clave+' <small> '+tipoAplicacion(ve.tipo_aplicacion)+' </small> </span> <span style="font-size:large;" class="pull-right"> <span class="badge bg-white" style="color:#'+ve.color_rgb+'" id="intervalo_text'+ve.id+'">'+obtieneIntervalo(ve.etiqueta_ideal_anio,ve.etiqueta_ideal_mes,ve.etiqueta_ideal_dia)+'</span> </span> </div> </div> <div class="row"> <div class="bt-flabels__wrapper"> <span class="col-md-12 text-primary" style="text-align:center; padding:3px; background-color:white; font-size:x-large;">'+fecha_aplicada+'</span> </div> </div> </div> </div>');
+            if(ve.draw){
+                $('#content-esquema').append('<div class="animated flipInY col-md-2 col-xs-12"><br> <div class="tile-stats" style="color:white; margin:0px; padding:3px; border:solid 2px #'+ve.color_rgb+'; background-color:#'+ve.color_rgb+' !important;"> <div class="row"> <div class="col-md-12" onClick="verDetalles('+key+')" data-toggle="modal" data-target=".bs-example-modal-lg"> <span style="font-size:large;font-weight:bold;"> '+ve.clave+' <small> '+tipoAplicacion(ve.tipo_aplicacion)+' </small> </span> <span style="font-size:large;" class="pull-right"> <span class="badge bg-white" style="color:#'+ve.color_rgb+'" id="intervalo_text'+ve.id+'">'+obtieneIntervalo(ve.etiqueta_ideal_anio,ve.etiqueta_ideal_mes,ve.etiqueta_ideal_dia)+'</span> </span> </div> </div> <div class="row"> <div class="bt-flabels__wrapper"> <span class="col-md-12 text-primary" style="text-align:center; padding:3px; background-color:white; font-size:x-large;">'+fecha_aplicada+'</span> </div> </div> </div> </div>');
+            } else {
+                $('#content-esquema').append('<div class="animated flipInY col-md-2 col-xs-12"><br> <div class="tile-stats" style="color:#D8D8D8; margin:0px; padding:3px; border:solid 2px #F0F0F0; background-color:#F0F0F0 !important;"> <div class="row"> <div class="col-md-12" onClick="verDetalles('+key+')" data-toggle="modal" data-target=".bs-example-modal-lg"> <span style="font-size:large;font-weight:bold;"> '+ve.clave+' <small> '+tipoAplicacion(ve.tipo_aplicacion)+' </small> </span> <span style="font-size:large;" class="pull-right"> <span class="badge bg-white" style="color:#D8D8D8" id="intervalo_text'+ve.id+'">'+obtieneIntervalo(ve.etiqueta_ideal_anio,ve.etiqueta_ideal_mes,ve.etiqueta_ideal_dia)+'</span> </span> </div> </div> <div class="row" style="text-align:center;"> <i class="fa fa-clock-o" style="color:white; font-size:50px ;"></i>  </div> </div> </div>');
+            }
         }
 
         var id_primera = null;
         var primera = null;
-        if(ve.menores.length){ // SI TIENE DOSIS MAYORES VERIFICAR QUE ESTEN BIEN                                     
-            id_primera = ve.menores[(ve.menores.length - 1)].id;
-            $.each(ultimo_esquema, function( k, apl ) {
-                if(id_primera==apl.id){
-                    primera = apl;
-                    return false;
-                }                                        
-            });
-        } 
-        //console.log(id_primera, es_aplicada);
-        if(es_aplicada){ // Está aplicada                                                 
-            if(ve.menores.length){ //                                         
-                if(primera.es_ideal){ // Es segunda en adelante
-                    cambiaEtiqueta(ve.id,ve.etiqueta_ideal_anio,ve.etiqueta_ideal_mes,ve.etiqueta_ideal_dia);
+        if(ve.draw){
+            if(ve.menores.length){ // SI TIENE DOSIS MAYORES VERIFICAR QUE ESTEN BIEN                                     
+                id_primera = ve.menores[(ve.menores.length - 1)].id;
+                $.each(ultimo_esquema, function( k, apl ) {
+                    if(id_primera==apl.id){
+                        primera = apl;
+                        return false;
+                    }                                        
+                });
+            } 
+            //console.log(id_primera, es_aplicada);
+            if(es_aplicada){ // Está aplicada                                                 
+                if(ve.menores.length){ //                                         
+                    if(primera.es_ideal){ // Es segunda en adelante
+                        cambiaEtiqueta(ve.id,ve.etiqueta_ideal_anio,ve.etiqueta_ideal_mes,ve.etiqueta_ideal_dia);
+                    } else {
+                        cambiaEtiqueta(ve.id,ve.etiqueta_no_ideal_anio,ve.etiqueta_no_ideal_mes,ve.etiqueta_no_ideal_dia);
+                    }
                 } else {
-                    cambiaEtiqueta(ve.id,ve.etiqueta_no_ideal_anio,ve.etiqueta_no_ideal_mes,ve.etiqueta_no_ideal_dia);
+                    if(ve.es_ideal){ // Es segunda en adelante
+                        cambiaEtiqueta(ve.id,ve.etiqueta_ideal_anio,ve.etiqueta_ideal_mes,ve.etiqueta_ideal_dia);
+                    } else {
+                        cambiaEtiqueta(ve.id,ve.etiqueta_no_ideal_anio,ve.etiqueta_no_ideal_mes,ve.etiqueta_no_ideal_dia);
+                    }
                 }
             } else {
-                if(ve.es_ideal){ // Es segunda en adelante
-                    cambiaEtiqueta(ve.id,ve.etiqueta_ideal_anio,ve.etiqueta_ideal_mes,ve.etiqueta_ideal_dia);
-                } else {
-                    cambiaEtiqueta(ve.id,ve.etiqueta_no_ideal_anio,ve.etiqueta_no_ideal_mes,ve.etiqueta_no_ideal_dia);
+                if(ve.menores.length){
+                    if(primera.es_ideal){ // Es segunda en adelante
+                        cambiaEtiqueta(ve.id,ve.etiqueta_ideal_anio,ve.etiqueta_ideal_mes,ve.etiqueta_ideal_dia);
+                    } else {
+                        cambiaEtiqueta(ve.id,ve.etiqueta_no_ideal_anio,ve.etiqueta_no_ideal_mes,ve.etiqueta_no_ideal_dia);
+                    }
                 }
             }
-        } else {
-            if(ve.menores.length){
-                if(primera.es_ideal){ // Es segunda en adelante
-                    cambiaEtiqueta(ve.id,ve.etiqueta_ideal_anio,ve.etiqueta_ideal_mes,ve.etiqueta_ideal_dia);
-                } else {
-                    cambiaEtiqueta(ve.id,ve.etiqueta_no_ideal_anio,ve.etiqueta_no_ideal_mes,ve.etiqueta_no_ideal_dia);
-                }
-            }
-        }
-        
+        }        
     });
 
     // APLICA MASCARA DD-MM-AAAA PARA LAS FECHAS DE APLICACIÓN

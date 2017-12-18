@@ -28,10 +28,6 @@ class TemperaturaContenedorController extends Controller
     public function index(Request $request)
     {
         if (Auth::user()->is('root|red-frio') && Auth::user()->can('show.catalogos') && Auth::user()->activo==1) {
-            $clues   = Clue::select('id','clues','nombre')->where('instituciones_id',13)->where('deleted_at',NULL)->where('estatus_id', 1)->get();
-            foreach ($clues as $clue) {
-                $arrayclue[$clue->id] = $clue->clues.' - '.$clue->nombre;
-            } 
             
             $parametros = Input::only('fecha_inicial','fecha_final','contenedores_id'); // REQUEST
             $data = collect();
@@ -94,7 +90,7 @@ class TemperaturaContenedorController extends Controller
             if ($request->ajax()) {
                 return Response::json([ 'data' => ['texto' => $texto, 'sub_texto' => $sub_texto, 'variacion' => ['data' => $data], 'maxima_minima' => ['estampas' => $estampas, 'maximas' => $maximas, 'minimas' => $minimas], 'otra_grafica' => array(0 => 0)]], HttpResponse::HTTP_OK);
             } else {            
-                return view('temperatura.index')->with(['data' => $data, 'clues' => $arrayclue, 'estampas' => $estampas, 'maximas' => $maximas, 'minimas' => $minimas]);
+                return view('temperatura.index')->with(['data' => $data, 'estampas' => $estampas, 'maximas' => $maximas, 'minimas' => $minimas]);
             }
             } else {
             return response()->view('errors.allPagesError', ['icon' => 'user-secret', 'error' => '403', 'title' => 'Forbidden / Prohibido', 'message' => 'No tiene autorización para acceder al recurso. Se ha negado el acceso.'], 403);
@@ -109,12 +105,7 @@ class TemperaturaContenedorController extends Controller
      public function create()
      {
         if (Auth::user()->can('create.catalogos') && Auth::user()->activo==1) { 
-            $clues   = Clue::select('id','clues','nombre')->where('instituciones_id',13)->where('deleted_at',NULL)->where('estatus_id', 1)->get();
-            foreach ($clues as $clue) {
-                $arrayclue[$clue->id] = $clue->clues.' - '.$clue->nombre;
-            }
-
-            return view('temperatura.create')->with(['clues' => $arrayclue]);
+            return view('temperatura.create');
         } else {
             return response()->view('errors.allPagesError', ['icon' => 'user-secret', 'error' => '403', 'title' => 'Forbidden / Prohibido', 'message' => 'No tiene autorización para acceder al recurso. Se ha negado el acceso.'], 403);
         }

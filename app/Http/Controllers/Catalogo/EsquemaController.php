@@ -127,6 +127,10 @@ class EsquemaController extends Controller
                     }
                       
                     $value->menores = $collect_menores;
+                    $value->draw = true;
+                    $collect_esquema_detalle->push($value);
+                } else {
+                    $value->draw = false;
                     $collect_esquema_detalle->push($value);
                 }
             } // End foreach principal

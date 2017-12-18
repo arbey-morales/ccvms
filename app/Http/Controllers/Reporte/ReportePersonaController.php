@@ -418,31 +418,13 @@ class ReportePersonaController extends Controller
                     }
                     if (isset($parametros['manzana']) && trim($parametros['manzana'])!="" && trim($parametros['manzana'])!=NULL) {
                         $pob_nom = $pob_nom->where('p.manzana',$parametros['manzana']);
-                    }
+                    }   
 
                     $pob_nom_esq = $pob_nom;
-                    if($pob_nom_esq->count()>0) {
-                        $pp = $pob_nom_esq->get();
-                        foreach ($pp as $es => $esquema) {
-                            $nino_va_es = DB::table('vacunas_esquemas AS ve')
-                            ->select('ve.vacunas_id','v.clave')
-                            ->leftJoin('vacunas AS v','v.id','=','ve.vacunas_id')
-                            ->where('ve.esquemas_id', 2017)
-                            ->where('ve.deleted_at', NULL) 
-                            ->groupBy('ve.vacunas_id')               
-                            ->orderBy('v.orden_esquema')                
-                            ->get();
-                            
-                        }
-                        $data[$key]['esquema_completo']['total'] = $pob_nom_esq->count();
-                    } else {
-                        $data[$key]['esquema_completo']['total'] = 0;
-                    }
-                    
-
                     $data[$key]['poblacion']['nominal'] = $pob_nom->count();
-                    
+                    $menos_uno = 0;                    
                     $apk = [];
+
                     foreach ($value['dosis'] as $k => $dosis) {
                         foreach ($dosis->aplicacion as $ka => $aplicacion) {
                             $pob_real = DB::table('personas AS p')
@@ -457,6 +439,7 @@ class ReportePersonaController extends Controller
                             ->where('ve.tipo_aplicacion', $aplicacion)
                             ->where('pve.deleted_at', NULL)
                             ->where('p.deleted_at', NULL);
+                            $other = $pob_real;                            
 
                             if (isset($parametros['municipios_id']) && $parametros['municipios_id']!=0) {
                                 $pob_real = $pob_real->where('p.municipios_id',$parametros['municipios_id']);
@@ -482,17 +465,34 @@ class ReportePersonaController extends Controller
                             $pob_real = $pob_real->count();
                             if($pob_real>0){
                                 array_push($apk, $pob_real);
+                                // a estos infantes hay que ver cuales son esquemas completos
+                                if($menos_uno<$pob_real){
+                                    foreach ($other->get() as $kec => $ec) {
+                                        $aec = DB::table('personas_vacunas_esquemas as pve')/** Un niño */
+                                            ->select('pve.id','pve.fecha_aplicacion','ve.edad_ideal_anio','ve.edad_ideal_mes','ve.edad_ideal_dia')
+                                            ->leftJoin('vacunas_esquemas as ve','ve.id','=','pve.vacunas_esquemas_id')
+                                            ->where('pve.personas_id', $ec->id)
+                                            ->where('pve.deleted_at', NULL)
+                                            ->get();
+                                        foreach ($aec as $kaec => $vaec) {
+                                            $ideal_aplicacion = Carbon::parse($ec->fecha_nacimiento,"America/Mexico_City")->addYears($vaec->edad_ideal_anio)->addMonths($vaec->edad_ideal_mes)->addDays($vaec->edad_ideal_dia)->format("Y-m-d H:i:s");
+                                            if($vaec->fecha_aplicacion>=$ideal_aplicacion){
+                                                $menos_uno++;
+                                                break 2;
+                                            }
+                                        }
+                                    }
+                                }
                             } else {
                                 array_push($apk, 0);
                             }
 
-
                         }                        
                     }  
+                    $data[$key]['esquema_completo']['total'] = ($pob_nom_esq->count() - $menos_uno);
                     $data[$key]['da'] = $apk;                      
                 }
             //} 
-
 
             $usuario = User::with('jurisdiccion')->find(Auth::user()->id);
             return response()->json(['text' => $text, 'data' => $data, 'usuario' => $usuario]);
