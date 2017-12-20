@@ -8,7 +8,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach($agebs as $key=>$item)
+        @foreach($data as $key=>$item)
             <tr>
                 <td class="text-center"><strong> {{ ++$key }} </strong></td>
                 <td class="text-left">{{ $item->id }}</td>

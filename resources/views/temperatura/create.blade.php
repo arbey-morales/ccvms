@@ -84,7 +84,7 @@
 
     <script>
         $(document).ready(function(){
-            setTimeout(function(){ $(".js-data-clues").change(); }, 1000);
+            //setTimeout(function(){ $(".js-data-clues").change(); }, 1000);
         });
         var contenedores = [{ 'id': 0, 'text': 'Seleccionar contenedor' }];
         var clues = [{ 'id': 0, 'clues':'', 'text': '* Unidad de salud' }];

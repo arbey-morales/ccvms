@@ -686,11 +686,11 @@ $(".js-ajax-actividad").click(function(e){
                 $.each(data_actividad, function( i, cont ) { 
                     tabla+= '<tr>';
                     var concidencia = Math.round((100/cont.poblacion.oficial) * cont.poblacion.nominal);
-                    var nominal_ec = Math.round((100/cont.poblacion.nominal) * cont.esquema_completo.total);
+                    var nominal_ec = Math.round((100/cont.poblacion.nominal) * cont.esquema_completo);
                     if(isNaN(nominal_ec)) {
                         nominal_ec = 0;
                     }
-                    var oficial_ec = Math.round((100/ cont.poblacion.oficial) * cont.esquema_completo.total);
+                    var oficial_ec = Math.round((100/ cont.poblacion.oficial) * cont.esquema_completo);
                     if(isNaN(oficial_ec)) {
                         oficial_ec = 0;
                     }
@@ -703,7 +703,7 @@ $(".js-ajax-actividad").click(function(e){
                             tabla+='<td>'+apli+'</td>'; 
                         }); 
                     //}); 
-                    tabla+= '<td>'+cont.esquema_completo.total+'</td><td>'+oficial_ec+'</td><td>'+nominal_ec+'</td>';
+                    tabla+= '<td>'+cont.esquema_completo+'</td><td>'+oficial_ec+'</td><td>'+nominal_ec+'</td>';
                     tabla+= '</tr>';
                 });
                 tabla+='</table>';

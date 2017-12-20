@@ -17,15 +17,46 @@ use App\Catalogo\Municipio;
 class AgebController extends Controller
 {
     /**
-     * @api {get} /catalogo/ageb/:id Devuelve detalles de AGEB's
-     * @apiName GetAgeb
-     * @apiGroup Ageb
+	 * @api {get} /catalogo/ageb/ Lista de AGEB's 
+	 * @apiVersion 0.1.0
+	 * @apiName Ageb
+	 * @apiGroup Ageb
+	 *
+	 * @apiParam {String} q id o número de Ageb (Opcional).
+     * @apiParam {Number} localidades_id id de municipio (Opcional).
      *
-     * @apiParam {String} id Agebs único.
-     *
-     * @apiSuccess {String} firstname Firstname of the Ageb.
-     * @apiSuccess {String} lastname  Lastname of the Ageb.
-     */
+     * @apiSuccess {View} index  Vista de Ageb (Se omite si la petición es ajax).
+     * @apiSuccess {Json} data
+	 *
+	 * @apiSuccessExample Ejemplo de respuesta exitosa:
+	 *     HTTP/1.1 200 OK
+	 *     {
+	 *       "data": [{'id','municipios_id','localidades_id','usuario_id','created_at','updated_at'}]
+	 *     }
+	 *
+	 * @apiError AgebBadRequest Petición errónea
+     * @apiError AgebUnauthorized No autorizado
+     * @apiError AgebForbidden Prohibido
+     * @apiError AgebNotFound No se encuentra
+     * @apiError AgebMethodNotAllowed Método no permitido
+     * @apiError AgebNotAceptable No aceptable
+     * @apiError AgebConflict Conflicto
+     * @apiError AgebGone Recurso ya no existe
+     * @apiError AgebURITooLong Dirección demasiado larga
+     * @apiError AgebInternalServerError Error interno del servidor
+     * @apiError AgebNotImplement No implementado
+     * @apiError AgebServiceUnavailable Servicio no disponible
+     * 
+	 *
+	 * @apiErrorExample Ejemplo de repuesta fallida:
+	 *     HTTP/1.1 404 No encontrado
+	 *     {
+	 *       "icon": String icono a utilizar en la vista,
+     *       "error": String número de error,
+     *       "title": String titulo del mensaje,
+     *       "message": String descripción del error
+	 *     }
+	 */
     public function index(Request $request)
     {
         if (Auth::user()->can('show.catalogos') && Auth::user()->activo==1) {
@@ -50,37 +81,35 @@ class AgebController extends Controller
             if ($request->ajax()) {
                 return response()->json([ 'data' => $data]);
             } else {      
-                return view('catalogo.ageb.index')->with('agebs', $data);
+                return view('catalogo.ageb.index')->with('data', $data);
             }
         } else {
             return response()->view('errors.allPagesError', ['icon' => 'user-secret', 'error' => '403', 'title' => 'Forbidden / Prohibido', 'message' => 'No tiene autorización para acceder al recurso. Se ha negado el acceso.'], 403);
         }
     }
-
+    
     /**
-	 * @api {get} /catalogo/ageb/ Devuelve detalles de AGEB's 
+	 * @api {get} /catalogo/ageb/:id Detalles de AGEB 
 	 * @apiVersion 0.1.0
 	 * @apiName GetAgeb
 	 * @apiGroup Ageb
 	 *
-	 * @apiParam {Number} id Agebs unique ID.
 	 *
-	 * @apiSuccess {Number} code  Código 0 conforme todo ha ido bien.
-	 * @apiSuccess {Bool} true/false  True o false dependiendo del resultado.
+	 * @apiSuccess {View} index  Vista de Ageb (Se omite si la petición es ajax).
+     * @apiSuccess {Json} data
 	 *
-	 * @apiSuccessExample Success-Response:
+	 * @apiSuccessExample Ejemplo de respuesta exitosa:
 	 *     HTTP/1.1 200 OK
 	 *     {
-	 *       "code": 0,
-	 *       "response": true
+	 *       "data": {'id','municipios_id','localidades_id','usuario_id','created_at','updated_at'}
 	 *     }
 	 *
-	 * @apiError AgebNotFound The id of the Ageb was not found.
-	 *
-	 * @apiErrorExample Error-Response:
-	 *     HTTP/1.1 404 Not Found
+     * @apiError AgebNotFound No se encuentra
+     * 
+	 * @apiErrorExample Ejemplo de repuesta fallida:
+	 *     HTTP/1.1 200 No encontrado
 	 *     {
-	 *       "error": "AgebNotFound"
+     *       "error": No se encuentra el recurso que esta buscando
 	 *     }
 	 */
     public function show($id)

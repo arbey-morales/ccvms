@@ -28,6 +28,7 @@ $("#personas-form").submit(function(e){
             notificar(response.titulo,response.texto,response.estatus,5000);
             if(response.estatus=='success'){
                 var clue_id = $(".js-data-clue").val();
+                console.log(clue_id)
                 verClue(clues[clue_id]);
                 $("#nombre,#paterno,#materno,#fecha_nacimiento,#curp,#sector,#manzana,#descripcion_domicilio,#calle,#numero,#codigo_postal,#fecha_nacimiento_tutor,#tutor").val('');
                 conseguirEsquema(moment().format('YYYY'),"01-01-"+moment().format('YYYY'));
@@ -61,14 +62,14 @@ $("input#curp").change(function(){
 });
 
 function curpRepetida(curp){
-    console.log(curp.length)
+    //console.log(curp.length)
     $.get('../persona/curp-repetida?curp='+curp, {}, function(response, status){
         if(response.data.length>0){
             $("input#curp").focus();
             var p = response.data;
             notificar('Información','* Verifique la CURP <strong>'+curp+'</strong> \n \n  - Datos: '+p[0].nombre+' '+p[0].apellido_paterno+' '+p[0].apellido_materno+' \n - Agregad@ el '+p[0].created_at,'error',8000);
         } else {
-            console.log(55)
+            //console.log(55)
         }
     }).fail(function(){ 
         notificar('Información','Falló comprobación de CURP','danger',2000);
@@ -769,7 +770,7 @@ function generarEsquema(aplicaciones){
         if(ve.etiqueta_ideal<30){
             placeholder = ultima_fecha_nacimiento;
         }
-        console.log(ve.clave+' '+ve.draw)
+        //console.log(ve.clave+' '+ve.draw)
         ultimo_esquema[key].es_ideal = false;         
         if(aplicaciones.length - 1 > key){ // último registro de esquemasvacunas
             if(ve.draw){

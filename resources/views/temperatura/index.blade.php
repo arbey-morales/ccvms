@@ -101,7 +101,7 @@
     <script>
         // Al segundo busca los contenedores de la clue seleccionada
         $(document).ready(function(){
-            setTimeout(function(){ $(".js-data-clues").change(); }, 1000);
+            //setTimeout(function(){ $(".js-data-clues").change(); }, 1000);
             $("#fecha_inicial").val(moment(new Date()).add(-1, 'days').format('Y-M-D'));
             $("#fecha_final").val(moment(new Date()).format('Y-M-D'));
         });
@@ -262,10 +262,10 @@
                     }
                 },
                 toolbox: {
-                    left: 'center',
+                    left: 'right',
                     feature: {
-                        restore: {},
-                        saveAsImage: {}
+                        restore : {show: true, title:'Restaurar'},
+                        saveAsImage : {show: true, title:'Guardar imagen'}
                     }
                 },
                 dataZoom: [{
@@ -273,7 +273,7 @@
                 }, {
                     type: 'inside'
                 }],
-                visualMap: {
+                /*visualMap: {
                     top: 10,
                     right: 10,
                     pieces: [{
@@ -291,7 +291,7 @@
                     outOfRange: {
                         color: '#999'
                     }
-                },
+                },*/
                 series: {
                     name: 'Temp',
                     type: 'line',
@@ -329,9 +329,12 @@
                 toolbox: {
                     show: true,
                     feature: {
-                        magicType: {type: ['line', 'bar']},
-                        restore: {},
-                        saveAsImage: {}
+                        magicType: {
+                            title:{line:'lineas',bar:'Barras',stack:'lines',tiled:'lines',force:'lines',pie:'lines',chord:'lines',funnel:'lines'},
+                            type: ['line', 'bar']
+                        },
+                        restore : {show: true, title:'Restaurar'},
+                        saveAsImage : {show: true, title:'Guardar imagen'}
                     }
                 },
                 xAxis:  {

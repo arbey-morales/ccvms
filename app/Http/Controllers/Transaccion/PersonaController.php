@@ -1400,17 +1400,17 @@ class PersonaController extends Controller
                 if (Auth::user()->is('root|admin')) {
                     //$clues = Clue::select('id','clues','nombre')->where('deleted_at',NULL)->where('estatus_id', 1)->get();
                     $municipios = Municipio::select('id','clave','nombre')->where('deleted_at',NULL)->get();
-                    $localidades = Localidad::select('id','clave','nombre')->where('deleted_at',NULL)->get();
-                    $colonias = Colonia::select('id','nombre','municipios_id')->where('deleted_at',NULL)->with('municipio')->get();
+                    //$localidades = Localidad::select('id','clave','nombre')->where('deleted_at',NULL)->get();
+                    //$colonias = Colonia::select('id','nombre','municipios_id')->where('deleted_at',NULL)->with('municipio')->get();
                     $agebs = Ageb::select('id','municipios_id','localidades_id')->where('deleted_at',NULL)->with('municipio','localidad')->get();
                     $persona = Persona::where('id', $id_persona)->where('deleted_at', NULL)->with('clue','pais','entidadNacimiento','entidadDomicilio','municipio','localidad','colonia','ageb','afiliacion','codigo','tipoParto','personasVacunasEsquemas')->first();
                 } else {
-                    $localidades = collect();
-                    $colonias = collect();
+                    //$localidades = collect();
+                    //$colonias = collect();
                     $agebs = collect();
                     //$clues = Clue::select('id','clues','nombre')->where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->where('estatus_id', 1)->get();
-                    $municipios = Municipio::select('id','clave','nombre')->where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->get();
-                    foreach($municipios as $key=> $mpio){
+                    //$municipios = Municipio::select('id','clave','nombre')->where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->get();
+                    /*foreach($municipios as $key=> $mpio){
                         $localidades_temp = Localidad::select('id','clave','nombre')->where('municipios_id', $mpio->id)->where('deleted_at',NULL)->get(); 
                         $colonias_temp = Colonia::select('id','nombre','municipios_id')->where('municipios_id', $mpio->id)->where('deleted_at',NULL)->with('municipio')->get();
                         foreach($localidades_temp as $id=> $item){
@@ -1423,7 +1423,7 @@ class PersonaController extends Controller
                         foreach($agebs_temp as $k=> $i){
                             $agebs->push($i);
                         }
-                    }
+                    }*/
                     $persona = Persona::select('personas.*')->join('clues','clues.id','=','personas.clues_id')->where('personas.id', $id_persona)->where('clues.jurisdicciones_id', Auth::user()->idJurisdiccion)->where('personas.deleted_at', NULL)->with('clue','pais','entidadNacimiento','entidadDomicilio','municipio','localidad','colonia','ageb','afiliacion','codigo','tipoParto','personasVacunasEsquemas')->first();
                 }
                 
@@ -1452,14 +1452,14 @@ class PersonaController extends Controller
                     $arrayestado[$estado->id] = $estado->clave .' - '.$estado->nombre;
                 }
                 
-                foreach ($localidades as $localidad) {
+                /*foreach ($localidades as $localidad) {
                     $arraylocalidad[$localidad->id] = $localidad->clave .' - '.$localidad->nombre;
                 }
 
                 $arraycolonia[0] = 'Sin colonia';
                 foreach ($colonias as $colonia) {
                     $arraycolonia[$colonia->id] = $colonia->nombre.', '.$colonia->municipio->nombre;
-                }			
+                }*/			
 
                 $arraycodigo = array();
                 $arraycodigo[0] = 'Ningún código';
@@ -1530,9 +1530,9 @@ class PersonaController extends Controller
                     $arraypais[$pais->id] = $pais->claveA3 .' - '.$pais->descripcion;
                 }
                 
-                foreach ($localidades as $localidad) {
+                /*foreach ($localidades as $localidad) {
                     $arraylocalidad[$localidad->id] = $localidad->clave .' - '.$localidad->nombre;
-                }			
+                }	*/		
 
                 $arraycodigo = array();
                 $arraycodigo[0] = 'Ningún código';

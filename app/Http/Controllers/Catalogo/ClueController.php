@@ -37,6 +37,10 @@ class ClueController extends Controller
                 $data = $data->where('jurisdicciones_id', Auth::user()->idJurisdiccion);                
             }            
             if ($parametros['q']) {
+                /*$data = $data->orWhere(function ($query) {
+                    $query->where('votes', '>', 100)
+                          ->where('title', '<>', 'Admin');
+                });*/
                 $data = $data->where('clues','LIKE',"%".$parametros['q']."%")->orWhere('nombre','LIKE',"%".$parametros['q']."%");
             } 
             if ($parametros['municipios_id']) {

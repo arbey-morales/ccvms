@@ -273,19 +273,19 @@ class ReportePersonaController extends Controller
                         ["edad"=>"9 mes","entre"=>11,"pom"=>0,"cuenta"=>1,"im"=>9,"is"=>9,"fs"=>9,"fm"=>10],
                         ["edad"=>"10 mes","entre"=>11,"pom"=>0,"cuenta"=>1,"im"=>10,"is"=>10,"fs"=>10,"fm"=>11],
                         ["edad"=>"11 mes","entre"=>11,"pom"=>0,"cuenta"=>1,"im"=>11,"is"=>11,"fs"=>11,"fm"=>12],
-                        ["edad"=>"< 1 año","entre"=>0,"pom"=>0,"cuenta"=>0,"im"=>0,"is"=>0,"fs"=>11,"fm"=>12],
+                        /*12*/["edad"=>"< 1 año","entre"=>0,"pom"=>0,"cuenta"=>0,"im"=>0,"is"=>0,"fs"=>11,"fm"=>12],
                         ["edad"=>"12-17 meses","entre"=>2,"pom"=>1,"cuenta"=>1,"im"=>12,"is"=>13,"fs"=>13,"fm"=>18],
                         ["edad"=>"18-24 meses","entre"=>2,"pom"=>1,"cuenta"=>1,"im"=>18,"is"=>14,"fs"=>14,"fm"=>24],
                         ["edad"=>"1 año","entre"=>0,"pom"=>1,"cuenta"=>1,"im"=>12,"is"=>13,"fs"=>14,"fm"=>24],
                         ["edad"=>"2 años","entre"=>0,"pom"=>2,"cuenta"=>1,"im"=>24,"is"=>16,"fs"=>16,"fm"=>36],
                         ["edad"=>"3 años","entre"=>0,"pom"=>3,"cuenta"=>1,"im"=>36,"is"=>17,"fs"=>17,"fm"=>48],
                         ["edad"=>"4 años","entre"=>0,"pom"=>4,"cuenta"=>1,"im"=>48,"is"=>18,"fs"=>18,"fm"=>60],
-                        ["edad"=>"1-4 años","entre"=>0,"pom"=>[1,2,3,4],"cuenta"=>0,"im"=>12,"is"=>16,"fs"=>18,"fm"=>60],
+                        /*19*/["edad"=>"1-4 años","entre"=>0,"pom"=>[1,2,3,4],"cuenta"=>0,"im"=>12,"is"=>16,"fs"=>18,"fm"=>60],
                         ["edad"=>"5 años","entre"=>0,"pom"=>5,"cuenta"=>1,"im"=>60,"is"=>20,"fs"=>20,"fm"=>72],
                         ["edad"=>"6 años","entre"=>0,"pom"=>6,"cuenta"=>1,"im"=>72,"is"=>21,"fs"=>21,"fm"=>84],
                         ["edad"=>"7 años","entre"=>0,"pom"=>7,"cuenta"=>1,"im"=>84,"is"=>22,"fs"=>22,"fm"=>96],
-                        ["edad"=>"5-7 años","entre"=>0,"pom"=>[5,6,7],"cuenta"=>0,"im"=>60,"is"=>20,"fs"=>22,"fm"=>96],
-                        ["edad"=>"0-7 años","entre"=>0,"pom"=>[0,1,2,3,4,5,6,7],"cuenta"=>0,"im"=>0,"is"=>0,"fs"=>22,"fm"=>96]
+                        /*23*/["edad"=>"5-7 años","entre"=>0,"pom"=>[5,6,7],"cuenta"=>0,"im"=>60,"is"=>20,"fs"=>22,"fm"=>96],
+                        /*24*/["edad"=>"0-7 años","entre"=>0,"pom"=>[0,1,2,3,4,5,6,7],"cuenta"=>0,"im"=>0,"is"=>0,"fs"=>22,"fm"=>96]
                     ];
 
             $data = collect();  
@@ -367,7 +367,7 @@ class ReportePersonaController extends Controller
                 }
                 
                 foreach ($fila as $key => $value) { // Agrega todas posiciones del reporte               
-                    $data->push(["parametros"=> $value, "poblacion"=>[ "oficial"=>0, "nominal"=>0, "conc"=>0], "dosis"=>$va_es, "esquema_completo"=>["total"=>0, "oficial"=>0, "nominal"=>0]]);
+                    $data->push(["parametros"=> $value, "poblacion"=>[ "oficial"=>0, "nominal"=>0, "conc"=>0], "dosis"=>$va_es, "esquema_completo"=>0]);
                 }
                 
                 $data = $data->toArray();
@@ -391,7 +391,8 @@ class ReportePersonaController extends Controller
                     //$data[$key]['poblacion']['conc']= 58;
                     $im = Carbon::today("America/Mexico_City")->subMonths($value['parametros']['im'])->format("Y-m-d");
                     $fm = Carbon::today("America/Mexico_City")->subMonths($value['parametros']['fm'])->format("Y-m-d");
-                    
+                                 
+
                     $pob_nom = DB::table('personas as p')
                     ->leftJoin('clues as c','c.id','=','p.clues_id')
                     ->where('c.jurisdicciones_id',$parametros['jurisdicciones_id'])
@@ -422,8 +423,9 @@ class ReportePersonaController extends Controller
 
                     $pob_nom_esq = $pob_nom;
                     $data[$key]['poblacion']['nominal'] = $pob_nom->count();
-                    $menos_uno = 0;                    
+                    $esquema_completo = 0;                    
                     $apk = [];
+                    $ninos = [];
 
                     foreach ($value['dosis'] as $k => $dosis) {
                         foreach ($dosis->aplicacion as $ka => $aplicacion) {
@@ -439,7 +441,7 @@ class ReportePersonaController extends Controller
                             ->where('ve.tipo_aplicacion', $aplicacion)
                             ->where('pve.deleted_at', NULL)
                             ->where('p.deleted_at', NULL);
-                            $other = $pob_real;                            
+                                                        
 
                             if (isset($parametros['municipios_id']) && $parametros['municipios_id']!=0) {
                                 $pob_real = $pob_real->where('p.municipios_id',$parametros['municipios_id']);
@@ -462,38 +464,74 @@ class ReportePersonaController extends Controller
                             if (isset($parametros['manzana']) && trim($parametros['manzana'])!="" && trim($parametros['manzana'])!=NULL) {
                                 $pob_real = $pob_real->where('p.manzana',$parametros['manzana']);
                             }
+
+                            $other = $pob_real;
                             $pob_real = $pob_real->count();
                             if($pob_real>0){
-                                array_push($apk, $pob_real);
-                                // a estos infantes hay que ver cuales son esquemas completos
-                                if($menos_uno<$pob_real){
-                                    foreach ($other->get() as $kec => $ec) {
-                                        $aec = DB::table('personas_vacunas_esquemas as pve')/** Un niño */
-                                            ->select('pve.id','pve.fecha_aplicacion','ve.edad_ideal_anio','ve.edad_ideal_mes','ve.edad_ideal_dia')
-                                            ->leftJoin('vacunas_esquemas as ve','ve.id','=','pve.vacunas_esquemas_id')
-                                            ->where('pve.personas_id', $ec->id)
-                                            ->where('pve.deleted_at', NULL)
-                                            ->get();
-                                        foreach ($aec as $kaec => $vaec) {
-                                            $ideal_aplicacion = Carbon::parse($ec->fecha_nacimiento,"America/Mexico_City")->addYears($vaec->edad_ideal_anio)->addMonths($vaec->edad_ideal_mes)->addDays($vaec->edad_ideal_dia)->format("Y-m-d H:i:s");
-                                            if($vaec->fecha_aplicacion>=$ideal_aplicacion){
-                                                $menos_uno++;
-                                                break 2;
-                                            }
+                                array_push($apk, $pob_real); 
+                                
+                                $query_debe_tener = DB::table('vacunas_esquemas')
+                                ->select('id','edad_ideal_anio','edad_ideal_mes','edad_ideal_dia')
+                                ->where('esquemas_id', 2017)
+                                ->where('deleted_at', NULL)
+                                ->get();
+                                $debe_tener =  0;
+                                foreach ($other->get() as $oth => $voth) {                                   
+                                    if(in_array($voth->id, $ninos)){
+                                    } else {
+                                        array_push($ninos, $voth->id);
+                                        foreach ($query_debe_tener as $et => $vet) {
+                                            $ideal = Carbon::parse($voth->fecha_nacimiento,"America/Mexico_City")->addYears($vet->edad_ideal_anio)->addMonths($vet->edad_ideal_mes)->addDays($vet->edad_ideal_dia)->format("Y-m-d");
+                                            if($ideal>$fm && $ideal<=$im)
+                                                $debe_tener++;
                                         }
+                                        $query_tiene = DB::table('personas_vacunas_esquemas')
+                                            ->where('personas_id', $voth->id)
+                                            ->where('deleted_at', NULL)
+                                            ->count();
+                                        if($query_tiene>=$debe_tener)
+                                            $esquema_completo++;
                                     }
-                                }
+                                }  
+                                
                             } else {
                                 array_push($apk, 0);
                             }
 
                         }                        
                     }  
-                    $data[$key]['esquema_completo']['total'] = ($pob_nom_esq->count() - $menos_uno);
+
+                    if(($key>=0 && $key<=11) || ($key>=13 && $key<=18) || ($key>=20 && $key<=22)){
+                        $data[$key]['esquema_completo'] = $esquema_completo;
+                    }
+                    if($key==12){
+                        $sss = 0;
+                        for ($i12=0; $i12 < 12; $i12++) { 
+                            $sss+=$data[$i12]['esquema_completo'];
+                        }
+                        $data[$key]['esquema_completo'] = $sss;
+                    } 
+                    if($key==19){
+                        $sss = 0;
+                        for ($i19=13; $i19 < 19; $i19++) { 
+                            $sss+=$data[$i19]['esquema_completo'];
+                        }
+                        $data[$key]['esquema_completo'] = $sss;
+                    }
+                    if($key==23){
+                        $sss = 0;
+                        for ($i23=20; $i23 < 23; $i23++) { 
+                            $sss+=$data[$i23]['esquema_completo'];
+                        }
+                        $data[$key]['esquema_completo'] = $sss;
+                    }
+                    if($key==24){
+                        $data[$key]['esquema_completo'] = $data[12]['esquema_completo']+$data[19]['esquema_completo']+$data[23]['esquema_completo'];
+                    }
+                    
                     $data[$key]['da'] = $apk;                      
                 }
             //} 
-
             $usuario = User::with('jurisdiccion')->find(Auth::user()->id);
             return response()->json(['text' => $text, 'data' => $data, 'usuario' => $usuario]);
         } else {
