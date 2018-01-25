@@ -13,22 +13,22 @@ class Clue extends Model
 	public $timestamps = false;
 
     public function entidad(){
-		  return $this->belongsTo('App\Catalogo\Entidad', 'entidades_id', 'id');
+		  return $this->belongsTo('App\Catalogo\Entidad', 'entidades_id', 'id')->select('id','clave','nombre');
 	}
 
     public function municipio(){
-		  return $this->belongsTo('App\Catalogo\Municipio', 'municipios_id', 'id');
+		  return $this->belongsTo('App\Catalogo\Municipio', 'municipios_id', 'id')->select('id','clave','nombre');
 	}
 
     public function localidad(){
-		  return $this->belongsTo('App\Catalogo\Localidad', 'localidades_id', 'id');
+		  return $this->belongsTo('App\Catalogo\Localidad', 'localidades_id', 'id')->select('id','clave','nombre');
 	}
 
     public function jurisdiccion(){
-		  return $this->belongsTo('App\Catalogo\Jurisdiccion', 'jurisdicciones_id', 'id');
+		  return $this->belongsTo('App\Catalogo\Jurisdiccion', 'jurisdicciones_id', 'id')->select('id','clave','nombre');
 	}
 
     public function institucion(){
-		  return $this->belongsTo('App\Catalogo\Institucion', 'instituciones_id', 'id');
+		  return $this->belongsTo('App\Catalogo\Institucion', 'instituciones_id', 'id')->select('id','nombreCorto','clave','nombre');
 	}
 }

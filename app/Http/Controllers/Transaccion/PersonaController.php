@@ -95,11 +95,37 @@ class PersonaController extends Controller
             return 'Refuerzo';
         }
     }
+    
     /**
-     * Display a listing of the resource.
+	 * @api {get}  /persona/  1. Lista de personas(censo nominal) 
+	 * @apiVersion  0.1.0
+	 * @apiName     IndexPersona
+	 * @apiGroup    Transaccion/Persona
+	 *
+	 * @apiParam    {String}        q               Cadena de texto para búsqueda en personas. Se espera nombre de infante/tutor o CURP.
+     * @apiParam    {Number}        municipios_id   Id de  Municipio seleccionado
+     * @apiParam    {Number}        edad            Edad  del infante, valores; 1-10
+     * @apiParam    {Number}        clues_id        Id de  Clue seleccionada
+     * @apiParam    {Number}        rep             Determina el tipo de reporte: valores 1, 2 y 3
      *
-     * @return \Illuminate\Http\Response
-     */
+     * @apiSuccess  {Json}          data            Lista de personas en formato JSON
+	 *
+	 * @apiSuccessExample Ejemplo de respuesta exitosa:
+	 *     HTTP/1.1 200 OK
+	 *     {
+     *       "user": {'id', 'idJurisdiccion', 'direccion', 'nombre', 'paterno', 'materno', 'email', 'foto', 'activo', 'borrado', 'asRoot', 'creadoAl', 'creadoUsuario', 'modificadoAl', 'modificadoUsuario', 'borradoAl', 'borradoUsuario', 'jurisdiccion':{'id', 'entidades_id', 'clues_id', 'clave', 'nombre', 'created_at', 'updated_at', 'deleted_at'}},
+	 *       "data": [{'id', 'servidor_id', 'incremento', 'clues_id', 'paises_id', 'entidades_federativas_nacimiento_id', 'entidades_federativas_domicilio_id', 'municipios_id', 'localidades_id', 'colonias_id', 'agebs_id', 'instituciones_id', 'codigos_censos_id', 'tipos_partos_id', 'folio_certificado_nacimiento', 'nombre', 'apellido_paterno', 'apellido_materno', 'curp', 'genero', 'fecha_nacimiento', 'descripcion_domicilio', 'calle', 'numero', 'codigo_postal', 'sector', 'manzana', 'telefono_casa', 'telefono_celular', 'tutor', 'fecha_nacimiento_tutor', 'usuario_id', 'created_at', 'updated_at', 'deleted_at'}...]
+	 *     } 
+	 *
+	 * @apiErrorExample Ejemplo de repuesta fallida:
+	 *     HTTP/1.1 404 No encontrado
+	 *     {
+	 *       "icon"     :   String icono a utilizar en la vista,
+     *       "error"    :   String número de error,
+     *       "title"    :   String titulo del mensaje,
+     *       "message"  :   String descripción del error
+	 *     }
+	 */
     public function index()
     {
         $parametros = Input::only(['q','municipios_id','edad','clues_id','rep','todo']);
@@ -691,7 +717,7 @@ class PersonaController extends Controller
      */
     public function curp_repetida(Request $request)
     {
-       $data = Persona::where('curp', $request->curp)->where('deleted_at', NULL)->get();
+        $data = Persona::where('curp', $request->curp)->where('deleted_at', NULL)->get();
         return response()->json([ 'data' => $data]);
     }
 
@@ -869,9 +895,13 @@ class PersonaController extends Controller
     }
 
 	/**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
+	 * @api {get}   /persona/create   2. Crear vista de nueva Persona/Infante
+	 * @apiVersion  0.1.0
+	 * @apiName     CreatePersona
+	 * @apiGroup    Transaccion/Persona
+     * 
+     * @apiSuccess  {View}    create                 Vista alojada en: \resources\views\persona\create   
+     * 
      */
 	public function create()
     {
@@ -883,11 +913,40 @@ class PersonaController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+	 * @api {post} /persona/store     3. Crear Persona/Infante
+	 * @apiVersion  0.1.0
+	 * @apiName     StorePersona
+	 * @apiGroup    Transaccion/Persona
+	 *
+     * @apiParam    {Request}       request                     Cabeceras de la petición.
+	 *
+	 * @apiSuccess  {View}          /persona/create             Vista para crear Persona
+     * 
+     * @apiSuccess  {String}        estatus                  Valores: info, success
+     * @apiSuccess  {String}        titulo                   Titulo del mensaje
+     * @apiSuccess  {String}        texto                    Mensaje descriptivo de la operación realizada
+	 *
+	 * @apiSuccessExample Ejemplo de respuesta exitosa:
+	 *     HTTP/1.1 200 OK
+	 *     {	   
+     *       'titulo'   :  'Perfecto!',
+     *       'texto'    :  'Operación realizada con éxito',
+     *       'estatus'  :  'success'
+	 *     }
+	 *
+     * @apiError  {String}        estatus                  Valores: warning, error
+     * @apiError  {String}        titulo                   Titulo del mensaje de error
+     * @apiError  {String}        texto                    Mensaje descriptivo de la operación fallida
+     * @apiError  PersonaNotFound No se encuentra
+     * 
+	 * @apiErrorExample Ejemplo de repuesta fallida:
+	 *     HTTP/1.1 409 Conflicto
+	 *     {
+     *       'titulo'   :  'Error!',
+     *       'texto'    :  'Operación fallida, -- Mensaje de error -- ',
+     *       'estatus'  :  'error'
+	 *     }
+	 */
     public function store(Request $request)
     {
         $msgGeneral = '';
@@ -1246,11 +1305,29 @@ class PersonaController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+	 * @api {get}   /persona/:id  4. Consultar Persona/Infante 
+	 * @apiVersion  0.1.0
+	 * @apiName     ShowPersona
+	 * @apiGroup    Transaccion/Persona
+	 *
+	 *
+	 * @apiSuccess  {View}       show       Vista de Persona(Se omite si la petición es ajax).
+     * @apiSuccess  {Json}       data       Detalles de persona en formato JSON
+	 *
+	 * @apiSuccessExample Ejemplo de respuesta exitosa:
+	 *     HTTP/1.1 200 OK
+	 *     {
+	 *       "data": {'id', 'servidor_id', 'incremento', 'clues_id', 'paises_id', 'entidades_federativas_nacimiento_id', 'entidades_federativas_domicilio_id', 'municipios_id', 'localidades_id', 'colonias_id', 'agebs_id', 'instituciones_id', 'codigos_censos_id', 'tipos_partos_id', 'folio_certificado_nacimiento', 'nombre', 'apellido_paterno', 'apellido_materno', 'curp', 'genero', 'fecha_nacimiento', 'descripcion_domicilio', 'calle', 'numero', 'codigo_postal', 'sector', 'manzana', 'telefono_casa', 'telefono_celular', 'tutor', 'fecha_nacimiento_tutor', 'usuario_id', 'created_at', 'updated_at', 'deleted_at'}
+	 *     }
+	 *
+     * @apiError PersonaNotFound No se encuentra
+     * 
+	 * @apiErrorExample Ejemplo de repuesta fallida:
+	 *     HTTP/1.1 200 No encontrado
+	 *     {
+     *       "error": No se encuentra el recurso que esta buscando
+	 *     }
+	 */
     public function show($id)
     {
         if (Auth::user()->can('show.personas') && Auth::user()->activo==1) {
@@ -1386,11 +1463,27 @@ class PersonaController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+	 * @api {get}   /persona/:id/edit     5. Editar Persona
+	 * @apiVersion  0.1.0
+	 * @apiName     EditPersona
+	 * @apiGroup    Transaccion/Persona
+     * 
+     * @apiParam    {Number}    id  Persona id único.
+     * 
+	 * @apiSuccessExample Ejemplo de respuesta exitosa:
+	 *     HTTP/1.1 200 OK
+	 *     {
+	 *       "data": {'id', 'servidor_id', 'incremento', 'clues_id', 'paises_id', 'entidades_federativas_nacimiento_id', 'entidades_federativas_domicilio_id', 'municipios_id', 'localidades_id', 'colonias_id', 'agebs_id', 'instituciones_id', 'codigos_censos_id', 'tipos_partos_id', 'folio_certificado_nacimiento', 'nombre', 'apellido_paterno', 'apellido_materno', 'curp', 'genero', 'fecha_nacimiento', 'descripcion_domicilio', 'calle', 'numero', 'codigo_postal', 'sector', 'manzana', 'telefono_casa', 'telefono_celular', 'tutor', 'fecha_nacimiento_tutor', 'usuario_id', 'created_at', 'updated_at', 'deleted_at'}
+	 *     }
+	 *
+     * @apiError PersonaNotFound No se encuentra
+     * 
+	 * @apiErrorExample Ejemplo de repuesta fallida:
+	 *     HTTP/1.1 200 No encontrado
+	 *     {
+     *       "error":   No se encuentra el recurso que esta buscando
+	 *     }
+	 */
     public function edit($id)
     {
         if (Auth::user()->can('show.personas') && Auth::user()->activo==1) {
@@ -1409,7 +1502,7 @@ class PersonaController extends Controller
                     //$colonias = collect();
                     $agebs = collect();
                     //$clues = Clue::select('id','clues','nombre')->where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->where('estatus_id', 1)->get();
-                    //$municipios = Municipio::select('id','clave','nombre')->where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->get();
+                    $municipios = Municipio::select('id','clave','nombre')->where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->get();
                     /*foreach($municipios as $key=> $mpio){
                         $localidades_temp = Localidad::select('id','clave','nombre')->where('municipios_id', $mpio->id)->where('deleted_at',NULL)->get(); 
                         $colonias_temp = Colonia::select('id','nombre','municipios_id')->where('municipios_id', $mpio->id)->where('deleted_at',NULL)->with('municipio')->get();
@@ -1502,53 +1595,53 @@ class PersonaController extends Controller
                     $letra_total_dias = 'Día';           
                 $persona->edad = $total_anios.' '.$letra_total_anios.' '.$total_meses.' '.$letra_total_meses.' '.$total_dias.' '.$letra_total_dias; 
 
-                $estados = Entidad::where('deleted_at',NULL)->get();
-                $paises = Pais::all();
-                $instituciones = Institucion::where('deleted_at',NULL)->get();
-                $codigos = CodigoCenso::where('deleted_at',NULL)->get();
-                $tiposparto = TipoParto::where('deleted_at',NULL)->get();
+                // $estados = Entidad::where('deleted_at',NULL)->get();
+                // $paises = Pais::all();
+                // $instituciones = Institucion::where('deleted_at',NULL)->get();
+                // $codigos = CodigoCenso::where('deleted_at',NULL)->get();
+                // $tiposparto = TipoParto::where('deleted_at',NULL)->get();
 
-                /*$clue_selected = [];
-                foreach ($clues as $cont=>$clue) {
-                    $arrayclue[$clue->id] = $clue->clues .' - '.$clue->nombre;
-                }*/
+                // /*$clue_selected = [];
+                // foreach ($clues as $cont=>$clue) {
+                //     $arrayclue[$clue->id] = $clue->clues .' - '.$clue->nombre;
+                // }*/
                 
-                foreach ($municipios as $municipio) {
-                    $arraymunicipio[$municipio->id] = $municipio->clave .' - '.$municipio->nombre;
-                }
+                // foreach ($municipios as $municipio) {
+                //     $arraymunicipio[$municipio->id] = $municipio->clave .' - '.$municipio->nombre;
+                // }
 
-                $arrayageb[0] = 'Seleccionar AGEB';
-                foreach ($agebs as $ageb) {
-                    $arrayageb[$ageb->id] = substr($ageb->id, -4).' - '.$ageb->localidad->nombre.', '.$ageb->municipio->nombre;
-                }
+                // $arrayageb[0] = 'Seleccionar AGEB';
+                // foreach ($agebs as $ageb) {
+                //     $arrayageb[$ageb->id] = substr($ageb->id, -4).' - '.$ageb->localidad->nombre.', '.$ageb->municipio->nombre;
+                // }
                 
-                foreach ($estados as $estado) {
-                    $arrayestado[$estado->id] = $estado->clave .' - '.$estado->nombre;
-                }
+                // foreach ($estados as $estado) {
+                //     $arrayestado[$estado->id] = $estado->clave .' - '.$estado->nombre;
+                // }
                 
-                foreach ($paises as $pais) {
-                    $arraypais[$pais->id] = $pais->claveA3 .' - '.$pais->descripcion;
-                }
+                // foreach ($paises as $pais) {
+                //     $arraypais[$pais->id] = $pais->claveA3 .' - '.$pais->descripcion;
+                // }
                 
-                /*foreach ($localidades as $localidad) {
-                    $arraylocalidad[$localidad->id] = $localidad->clave .' - '.$localidad->nombre;
-                }	*/		
+                // /*foreach ($localidades as $localidad) {
+                //     $arraylocalidad[$localidad->id] = $localidad->clave .' - '.$localidad->nombre;
+                // }	*/		
 
-                $arraycodigo = array();
-                $arraycodigo[0] = 'Ningún código';
-                foreach ($codigos as $codigo) {
-                    $arraycodigo[$codigo->id] = $codigo->clave .' - '.$codigo->nombre;
-                }
+                // $arraycodigo = array();
+                // $arraycodigo[0] = 'Ningún código';
+                // foreach ($codigos as $codigo) {
+                //     $arraycodigo[$codigo->id] = $codigo->clave .' - '.$codigo->nombre;
+                // }
 
-                foreach ($tiposparto as $tipoparto) {
-                    $arraytipoparto[$tipoparto->id] = $tipoparto->clave .' - '.$tipoparto->descripcion;
-                }
+                // foreach ($tiposparto as $tipoparto) {
+                //     $arraytipoparto[$tipoparto->id] = $tipoparto->clave .' - '.$tipoparto->descripcion;
+                // }
 
-                $arrayinstitucion = array();
-                $arrayinstitucion[0] = 'Ninguna afiliación';
-                foreach ($instituciones as $institucion) {
-                    $arrayinstitucion[$institucion->id] = $institucion->clave .' - '.$institucion->nombre;
-                }
+                // $arrayinstitucion = array();
+                // $arrayinstitucion[0] = 'Ninguna afiliación';
+                // foreach ($instituciones as $institucion) {
+                //     $arrayinstitucion[$institucion->id] = $institucion->clave .' - '.$institucion->nombre;
+                // }
             
                 $fn_tutor = explode("-",$persona->fecha_nacimiento_tutor);
                 if(array_key_exists(0, $fn_tutor) && array_key_exists(1, $fn_tutor) && array_key_exists(2, $fn_tutor)){
@@ -1559,7 +1652,7 @@ class PersonaController extends Controller
                 $fn_nino = explode("-",$persona->fecha_nacimiento);
                 $persona->fecha_nacimiento = date($fn_nino[2].'-'.$fn_nino[1].'-'.$fn_nino[0]);
 
-                return view('persona.edit')->with(['esquema' => $esquema, 'data' => $persona, 'agebs' => $arrayageb, 'instituciones' => $arrayinstitucion, 'municipios' => $arraymunicipio, 'estados' => $arrayestado, 'paises' => $arraypais, 'codigos' => $arraycodigo, 'partos' => $arraytipoparto ]);
+                return view('persona.edit')->with(['esquema' => $esquema, 'data' => $persona, 'agebs' => $arrayageb, 'instituciones' => $arrayinstitucion, 'municipios' => $arraymunicipio, 'estados' => $arrayestado, 'codigos' => $arraycodigo, 'partos' => $arraytipoparto ]);
             } else {
                 return response()->view('errors.allPagesError', ['icon' => 'search-minus', 'error' => '404', 'title' => 'Not found / No se encuentra', 'message' => 'El servidor no puede encontrar el recurso solicitado y no es posible determinar si esta ausencia es temporal o permanente.'], 404);
             }
@@ -1569,12 +1662,33 @@ class PersonaController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+	 * @api {PUT}   /persona/update   6. Actualizar Persona 
+	 * @apiVersion  0.1.0
+	 * @apiName     UpdatePersona
+	 * @apiGroup    Transaccion/Persona
+     * 
+     * @apiParam    {Number}       id                      Persona id único.
+     * @apiParam    {Request}      request                 Cabeceras de la petición.
+	 
+	 * @apiSuccess  {String}        msgGeneral             Mensaje descriptivo de la operación realizada
+     * @apiSuccess  {String}        type                   Tipos válidos: success, error, warning e info
+	 *
+	 * @apiSuccessExample Ejemplo de respuesta exitosa:
+	 *     HTTP/1.1 200 OK
+	 *     {	   
+     *       'msgGeneral'   :   'Operación realizada con éxito',
+     *       'type'         :   'success'
+	 *     }
+	 *
+     * @apiError PersonaNotFound No se encuentra
+     * 
+	 * @apiErrorExample Ejemplo de repuesta fallida:
+	 *     HTTP/1.1 200 No encontrado
+	 *     {
+     *       'msgGeneral'   :  'Ocurrió un error al intentar guardar los datos enviados.',
+     *       'type'         :  'error'
+	 *     }
+	 */
     public function update(Request $request, $id)
     {
         $msgGeneral = '';
@@ -1946,11 +2060,39 @@ class PersonaController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+	 * @api {DELETE}    /persona/:id  7. Borrar Persona 
+	 * @apiVersion  0.1.0
+	 * @apiName     DestroyPersona
+	 * @apiGroup    Transaccion/Persona
+     * 
+     * @apiParam    {Number}       id              Persona id único.
+     * @apiParam    {Request}      request         Cabeceras de la petición.
+	 
+	 * @apiSuccess  {String}       msgGeneral      Mensaje descriptivo de la operación realizada
+     * @apiSuccess  {String}       type            Tipos válidos: success, error, warning e info
+	 *
+	 * @apiSuccessExample Ejemplo de respuesta exitosa:
+	 *     HTTP/1.1 200 OK
+	 *     {	   
+     *       'code'    : 1,
+     *       'title'   : 'Información',
+     *       'text'    : 'Se borraron los datos',
+     *       'type'    : 'success',
+     *       'styling' : 'bootstrap3'
+	 *     }
+	 *
+     * @apiError PersonaNotFound No se encuentra
+     * 
+	 * @apiErrorExample Ejemplo de repuesta fallida:
+	 *     HTTP/1.1 200 No encontrado
+	 *     {
+     *       'code'    : 1,
+     *       'title'   : 'Información',
+     *       'text'    : 'Ocurrió un error al intentar eliminar los datos.',
+     *       'type'    : 'error',
+     *       'styling' : 'bootstrap3'
+	 *     }
+	 */
     public function destroy($id, Request $request)
     {
         $msgGeneral     = '';

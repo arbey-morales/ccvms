@@ -111,7 +111,7 @@
 
         $(".js-data-clues").select2({
             ajax: {
-                url: "../catalogo/clue",
+                url: "../catalogo/clue-contenedor",
                 dataType: 'json',
                 delay: 250,
                 data: function (params) {
@@ -129,6 +129,7 @@
 
                 return {
                     results: $.map(data.data, function (item) {  // hace un  mapeo de la respuesta JSON para presentarlo en el select
+                       // console.log(item)
                         return {
                             id:        item.id,
                             clues:     item.clues,

@@ -20,28 +20,50 @@ use App\Catalogo\Tipologia;
 use App\Catalogo\TipoUnidad;
 use App\Catalogo\Estatus;
 use App\Catalogo\Servidor;
+use App\Catalogo\ContenedorBiologico;
 
 class ClueController extends Controller
 {
     /**
-     * Display a listing of the resource.
+	 * @api {get}   /catalogo/clue/     1. Listar CLUE's 
+	 * @apiVersion  0.1.0
+	 * @apiName     IndexClue
+	 * @apiGroup    Catalogo/Clue
+	 *
+	 * @apiParam    {String}        q                   Id o número de Clue (Opcional).
+     * @apiParam    {Number}        localidades_id      Id de municipio (Opcional).
+     * @apiParam    {Request}       request             Cabeceras de la petición.
      *
-     * @return \Illuminate\Http\Response
-     */
+     * @apiSuccess  {View}          index               Vista de Clue (Se omite si la petición es ajax).
+     * @apiSuccess  {Json}          data                Lista de clues en formato JSON
+	 *
+	 * @apiSuccessExample Ejemplo de respuesta exitosa:
+	 *     HTTP/1.1 200 OK
+	 *     {
+	 *       "data": [{'id', 'clues', 'nombre', 'domicilio', 'codigoPostal', 'numeroLongitud', 'numeroLatitud', 'idEntidad', 'idMunicipio', 'idLocalidad', 'idJurisdiccion', 'idInstitucion', 'idTipoUnidad', 'idTipologia', 'idEstatus', 'consultorios', 'camas', 'fechaConstruccion', 'fechaInicioOperacion', 'telefono1', 'telefono2', 'idRegion', 'idEstrato', 'creadoPor', 'actualizadoPor', 'creadoAl', 'modificadoAl', 'borradoAl'}...]
+	 *     } 
+	 *
+	 * @apiErrorExample Ejemplo de repuesta fallida:
+	 *     HTTP/1.1 404 No encontrado
+	 *     {
+	 *       "icon"     :   String icono a utilizar en la vista,
+     *       "error"    :   String número de error,
+     *       "title"    :   String titulo del mensaje,
+     *       "message"  :   String descripción del error
+	 *     }
+	 */
     public function index(Request $request)
     {
         $parametros = Input::only('q','municipios_id');
         if (Auth::user()->can('show.catalogos') && Auth::user()->activo==1) {
-            $data = Clue::with('municipio','localidad','jurisdiccion')->where('instituciones_id',13)->where('deleted_at',NULL);
+            $data = Clue::select('id','clues','nombre','municipios_id','localidades_id','jurisdicciones_id')->with('municipio','localidad','jurisdiccion')->where('instituciones_id',13)->where('deleted_at',NULL);
             if (Auth::user()->is('root|admin|red-frio')) { } else {
                 $data = $data->where('jurisdicciones_id', Auth::user()->idJurisdiccion);                
             }            
             if ($parametros['q']) {
-                /*$data = $data->orWhere(function ($query) {
-                    $query->where('votes', '>', 100)
-                          ->where('title', '<>', 'Admin');
-                });*/
-                $data = $data->where('clues','LIKE',"%".$parametros['q']."%")->orWhere('nombre','LIKE',"%".$parametros['q']."%");
+                $data = $data->where(function($query) use ($parametros){
+                    $query->where('clues','LIKE',"%".$parametros['q']."%")->orWhere('nombre','LIKE',"%".$parametros['q']."%");
+                });
             } 
             if ($parametros['municipios_id']) {
                 $data = $data->where('municipios_id', $parametros['municipios_id']);
@@ -59,9 +81,21 @@ class ClueController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
+	 * @api {get}   /catalogo/clue/create   2. Crear vista de nueva CLUE
+	 * @apiVersion  0.1.0
+	 * @apiName     CreateClue
+	 * @apiGroup    Catalogo/Clue
+     * 
+     * @apiSuccess  {View}    create                 Vista alojada en: \resources\views\catalogo\clue\create
+     * @apiSuccess  {Array}   municipios             Arreglo del catálogo de municipios
+     * @apiSuccess  {Array}   municipio_selected     Id de  Municipio seleccionado 
+     * @apiSuccess  {Array}   instituciones          Arreglo del catálogo de instituciones
+     * @apiSuccess  {Array}   tipos_unidades         Arreglo del catálogo de tipos de unidades
+     * @apiSuccess  {Array}   jurisdicciones         Arreglo del catálogo de jurisdicciones
+     * @apiSuccess  {Array}   municipios             Arreglo del catálogo de municiíos
+     * @apiSuccess  {Array}   tipologias             Arreglo del catálogo de tipologías
+     * @apiSuccess  {Array}   estatus                Arreglo del catálogo de estatus     
+     * 
      */
 	public function create()
     {
@@ -99,11 +133,34 @@ class ClueController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+	 * @api {post} /catalogo/clue/store     3. Crear CLUE
+	 * @apiVersion  0.1.0
+	 * @apiName     StoreClue
+	 * @apiGroup    Catalogo/Clue
+	 *
+     * @apiParam    {Request}       request                     Cabeceras de la petición.
+	 *
+	 * @apiSuccess  {View}          /catalogo/clue/create       Vista para crear Clue
+     * 
+     * @apiSuccess  {String}        msgGeneral                  Mensaje descriptivo de la operación realizada
+     * @apiSuccess  {String}        type                        Tipos válidos: success, error, warning e info
+	 *
+	 * @apiSuccessExample Ejemplo de respuesta exitosa:
+	 *     HTTP/1.1 200 OK
+	 *     {	   
+     *       'msgGeneral'   :  'Operación realizada con éxito',
+     *       'type'         :   'success'
+	 *     }
+	 *
+     * @apiError ClueNotFound No se encuentra
+     * 
+	 * @apiErrorExample Ejemplo de repuesta fallida:
+	 *     HTTP/1.1 200 No encontrado
+	 *     {
+     *       'msgGeneral'   :  'Ocurrió un error al intentar guardar los datos enviados.',
+     *       'type'         :   'error'
+	 *     }
+	 */
     public function store(Request $request)
     {
         $msgGeneral = '';
@@ -195,11 +252,29 @@ class ClueController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+	 * @api {get}   /catalogo/clue/:id  4. Consultar CLUE 
+	 * @apiVersion  0.1.0
+	 * @apiName     ShowClue
+	 * @apiGroup    Catalogo/Clue
+	 *
+	 *
+	 * @apiSuccess  {View}       show      Vista de Clue (Se omite si la petición es ajax).
+     * @apiSuccess  {Json}       data       Detalles de clue en formato JSON
+	 *
+	 * @apiSuccessExample Ejemplo de respuesta exitosa:
+	 *     HTTP/1.1 200 OK
+	 *     {
+	 *       "data": {'id', 'clues', 'nombre', 'domicilio', 'codigoPostal', 'numeroLongitud', 'numeroLatitud', 'idEntidad', 'idMunicipio', 'idLocalidad', 'idJurisdiccion', 'idInstitucion', 'idTipoUnidad', 'idTipologia', 'idEstatus', 'consultorios', 'camas', 'fechaConstruccion', 'fechaInicioOperacion', 'telefono1', 'telefono2', 'idRegion', 'idEstrato', 'creadoPor', 'actualizadoPor', 'creadoAl', 'modificadoAl', 'borradoAl'}
+	 *     }
+	 *
+     * @apiError ClueNotFound No se encuentra
+     * 
+	 * @apiErrorExample Ejemplo de repuesta fallida:
+	 *     HTTP/1.1 200 No encontrado
+	 *     {
+     *       "error": No se encuentra el recurso que esta buscando
+	 *     }
+	 */
     public function show($id)
     {
         $data = Clue::with('municipio','localidad','jurisdiccion')->find($id);        
@@ -214,11 +289,27 @@ class ClueController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+	 * @api {get}   /catalogo/clue/:id/edit     5. Editar CLUE
+	 * @apiVersion  0.1.0
+	 * @apiName     EditClue
+	 * @apiGroup    Catalogo/Clue
+     * 
+     * @apiParam    {Number}    id  Clue id único.
+     * 
+	 * @apiSuccessExample Ejemplo de respuesta exitosa:
+	 *     HTTP/1.1 200 OK
+	 *     {
+	 *       "data": {'id', 'clues', 'nombre', 'domicilio', 'codigoPostal', 'numeroLongitud', 'numeroLatitud', 'idEntidad', 'idMunicipio', 'idLocalidad', 'idJurisdiccion', 'idInstitucion', 'idTipoUnidad', 'idTipologia', 'idEstatus', 'consultorios', 'camas', 'fechaConstruccion', 'fechaInicioOperacion', 'telefono1', 'telefono2', 'idRegion', 'idEstrato', 'creadoPor', 'actualizadoPor', 'creadoAl', 'modificadoAl', 'borradoAl'}
+	 *     }
+	 *
+     * @apiError ClueNotFound No se encuentra
+     * 
+	 * @apiErrorExample Ejemplo de repuesta fallida:
+	 *     HTTP/1.1 200 No encontrado
+	 *     {
+     *       "error":   No se encuentra el recurso que esta buscando
+	 *     }
+	 */
      public function edit($id)
      {
          if (Auth::user()->is('admin|root') && Auth::user()->can('show.catalogos') && Auth::user()->activo==1) {
@@ -259,13 +350,34 @@ class ClueController extends Controller
          }
      }
 
-     /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    /**
+	 * @api {PUT}   /catalogo/clue/update   6. Actualizar CLUE 
+	 * @apiVersion  0.1.0
+	 * @apiName     UpdateClue
+	 * @apiGroup    Catalogo/Clue
+     * 
+     * @apiParam    {Number}       id                      Clue id único.
+     * @apiParam    {Request}      request                 Cabeceras de la petición.
+	 
+	 * @apiSuccess  {String}        msgGeneral             Mensaje descriptivo de la operación realizada
+     * @apiSuccess  {String}        type                   Tipos válidos: success, error, warning e info
+	 *
+	 * @apiSuccessExample Ejemplo de respuesta exitosa:
+	 *     HTTP/1.1 200 OK
+	 *     {	   
+     *       'msgGeneral'   :   'Operación realizada con éxito',
+     *       'type'         :   'success'
+	 *     }
+	 *
+     * @apiError ClueNotFound No se encuentra
+     * 
+	 * @apiErrorExample Ejemplo de repuesta fallida:
+	 *     HTTP/1.1 200 No encontrado
+	 *     {
+     *       'msgGeneral'   :  'Ocurrió un error al intentar guardar los datos enviados.',
+     *       'type'         :  'error'
+	 *     }
+	 */
     public function update(Request $request, $id)
     {
         $msgGeneral = '';
@@ -347,11 +459,39 @@ class ClueController extends Controller
     }
 
     /**
-    * Remove the specified resource from storage.
-    *
-    * @param  int  $id
-    * @return \Illuminate\Http\Response
-    */
+	 * @api {DELETE}    /catalogo/clue/:id  7. Borrar CLUE 
+	 * @apiVersion  0.1.0
+	 * @apiName     DestroyClue
+	 * @apiGroup    Catalogo/Clue
+     * 
+     * @apiParam    {Number}       id              Clue id único.
+     * @apiParam    {Request}      request         Cabeceras de la petición.
+	 
+	 * @apiSuccess  {String}       msgGeneral      Mensaje descriptivo de la operación realizada
+     * @apiSuccess  {String}       type            Tipos válidos: success, error, warning e info
+	 *
+	 * @apiSuccessExample Ejemplo de respuesta exitosa:
+	 *     HTTP/1.1 200 OK
+	 *     {	   
+     *       'code'    : 1,
+     *       'title'   : 'Información',
+     *       'text'    : 'Se borraron los datos',
+     *       'type'    : 'success',
+     *       'styling' : 'bootstrap3'
+	 *     }
+	 *
+     * @apiError ClueNotFound No se encuentra
+     * 
+	 * @apiErrorExample Ejemplo de repuesta fallida:
+	 *     HTTP/1.1 200 No encontrado
+	 *     {
+     *       'code'    : 1,
+     *       'title'   : 'Información',
+     *       'text'    : 'Ocurrió un error al intentar eliminar los datos.',
+     *       'type'    : 'error',
+     *       'styling' : 'bootstrap3'
+	 *     }
+	 */
     public function destroy($id, Request $request)
     {
         $msgGeneral     = '';
@@ -393,6 +533,64 @@ class ClueController extends Controller
         } else {
             Session::flash('flash_message_error', 'No submit!');
             return redirect()->back();
+        }
+    }
+
+    /**
+	 * @api {PUT}   /catalogo/clue/update   6. Actualizar CLUE 
+	 * @apiVersion  0.1.0
+	 * @apiName     UpdateClue
+	 * @apiGroup    Catalogo/Clue
+     * 
+     * @apiParam    {Number}       id                      Clue id único.
+     * @apiParam    {Request}      request                 Cabeceras de la petición.
+	 
+	 * @apiSuccess  {String}        msgGeneral             Mensaje descriptivo de la operación realizada
+     * @apiSuccess  {String}        type                   Tipos válidos: success, error, warning e info
+	 *
+	 * @apiSuccessExample Ejemplo de respuesta exitosa:
+	 *     HTTP/1.1 200 OK
+	 *     {	   
+     *       'msgGeneral'   :   'Operación realizada con éxito',
+     *       'type'         :   'success'
+	 *     }
+	 *
+     * @apiError ClueNotFound No se encuentra
+     * 
+	 * @apiErrorExample Ejemplo de repuesta fallida:
+	 *     HTTP/1.1 200 No encontrado
+	 *     {
+     *       'msgGeneral'   :  'Ocurrió un error al intentar guardar los datos enviados.',
+     *       'type'         :  'error'
+	 *     }
+	 */
+    public function cluecontenedor(Request $request)
+    {
+        $parametros = Input::only('q','municipios_id');
+        if (Auth::user()->can('show.catalogos') && Auth::user()->activo==1) {
+            $data = Clue::select('id','clues','nombre')->where('instituciones_id',13)->where('deleted_at',NULL);
+            if (Auth::user()->is('root|admin|red-frio')) { } else {
+                $data = $data->where('jurisdicciones_id', Auth::user()->idJurisdiccion);                
+            }            
+            if ($parametros['q']) {
+                $data = $data->where(function($query) use ($parametros){
+                    $query->where('clues','LIKE',"%".$parametros['q']."%")->orWhere('nombre','LIKE',"%".$parametros['q']."%");
+                });
+            } 
+            if ($parametros['municipios_id']) {
+                $data = $data->where('municipios_id', $parametros['municipios_id']);
+            }
+            $data = $data->get();
+
+            foreach ($data as $key => $value) {
+                $contenedores = ContenedorBiologico::where('clues_id',$value->id)->count();
+                if($contenedores<=0)
+                    $data->forget($key);
+            }
+
+            return response()->json([ 'data' => $data]);
+        } else {
+            return response()->json([ 'data' => []]);
         }
     }
 }

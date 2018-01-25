@@ -40,6 +40,28 @@ class Handler extends ExceptionHandler
      * @param  \Exception  $e
      * @return \Illuminate\Http\Response
      */
+
+        /**
+         * @api {get} / Renderiza una excepción dentro de una respuesta Http, Ejemplo:
+         * @apiVersion 0.1.0
+         * @apiName Sistema
+         * @apiGroup Handler
+         * 
+         * @apiError BadRequest Petición errónea
+         * @apiError Unauthorized No autorizado
+         * @apiError Forbidden Prohibido
+         * @apiError NotFound No se encuentra
+         * @apiError MethodNotAllowed Método no permitido
+         * @apiError NotAceptable No aceptable
+         * @apiError Conflict Conflicto
+         * @apiError Gone Recurso ya no existe
+         * @apiError URITooLong Dirección demasiado larga
+         * @apiError InternalServerError Error interno del servidor
+         * @apiError NotImplement No implementado
+         * @apiError ServiceUnavailable Servicio no disponible
+         * 
+         */
+
     public function render($request, Exception $e)
     {
         if ($e instanceof ModelNotFoundException) {

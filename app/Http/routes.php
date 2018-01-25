@@ -55,6 +55,7 @@ Route::group(['middleware' => 'auth'], function () {
         // Catalogos vacunación
         Route::resource('ageb',                 'AgebController',                   ['only' => ['index', 'show']]);
         Route::resource('clue',                 'ClueController');
+        Route::get('clue-contenedor',          'ClueController@cluecontenedor');
         Route::resource('codigo',               'CodigoCensoController',            ['only' => ['index', 'show']]);
         Route::resource('entidad',              'EntidadController',                ['only' => ['index', 'show']]);
         Route::resource('esquema',              'EsquemaController',                ['only' => ['index', 'show']]);

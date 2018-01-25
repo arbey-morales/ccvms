@@ -34,7 +34,7 @@ $(".js-data-estado,.js-data-genero").change(function(){
 // OBTIENE VALUE DE FECHA DE APLICACIÓN Y SE ENVÍA A VALIDACIÓN
 function validaAplicacion(id_vacuna_esquema, index){ //id_esquema y key del arreglo en js
     if($("#fecha_aplicacion"+id_vacuna_esquema).val()!="" && $("#fecha_aplicacion"+id_vacuna_esquema).val()!="__-__-____" && $("#fecha_aplicacion"+id_vacuna_esquema).val()!=null){
-        if (moment($("#fecha_aplicacion"+id_vacuna_esquema).val(),'DD-MM-YYYY').isValid()) {
+        if (moment($("#fecha_aplicacion"+id_vacuna_esquema).val(),'DD-MM-YYYY',true).isValid()) {
             comprobarFecha($("#fecha_aplicacion"+id_vacuna_esquema).val(), $("#fecha_aplicacion"+id_vacuna_esquema).attr('data-placeholder'), 3, index);
             /* @params: (fecha de aplicaión, texto que describe la aplicación, 3 = pertenece a aplicaciones, index del arreglo de vacunas esquemas )*/
         } else {
@@ -46,7 +46,7 @@ function validaAplicacion(id_vacuna_esquema, index){ //id_esquema y key del arre
 
 // CADA QUE SE COLOCA UNA FECHA DE  NACIMIENTO DEL INFANTE SE ENVÍA A VALIDACIÓN
 $("#fecha_nacimiento").blur(function(){
-    if (moment($(this).val(),'DD-MM-YYYY').isValid()) {
+    if (moment($(this).val(),'DD-MM-YYYY',true).isValid()) {
         if(moment($(this).val(),'DD-MM-YYYY').format('YYYY')==esquema.id){                    
             comprobarFecha($(this).val(), $(this).attr('placeholder'), 1, null);
         } else {
@@ -62,7 +62,7 @@ $("#fecha_nacimiento").blur(function(){
 
 // CADA QUE SE COLOCA UNA FECHA DE  DEL TUTOR SE ENVÍA A VALIDACIÓN
 $("#fecha_nacimiento_tutor").blur(function(){
-    if (moment($(this).val(),'DD-MM-YYYY').isValid()) {
+    if (moment($(this).val(),'DD-MM-YYYY',true).isValid()) {
             comprobarFecha($(this).val(), $(this).attr('placeholder'), 2, null);
     } else {
         $(this).val('');
@@ -110,7 +110,7 @@ function comprobarFecha(fecha,texto,tipo_fecha,index){
         }
     }
     if(tipo_fecha==3){ // APLICACIONES-DOSIS
-        if (moment(ultima_fecha_nacimiento,'DD-MM-YYYY').isValid()) {
+        if (moment(ultima_fecha_nacimiento,'DD-MM-YYYY',true).isValid()) {
             if(moment(fecha,'DD-MM-YYYY')>= moment(ultima_fecha_nacimiento,'DD-MM-YYYY') && moment(fecha,'DD-MM-YYYY') <= moment()){ // SI ES MAYOR QUE EL MACIMIENTO Y MENOR A MAÑANA
                 if (ultimo_esquema[index]) { // sabemos que tiene un esquema y tiene datos a validar
                     var aplicacion_actual = ultimo_esquema[index]; 
@@ -147,7 +147,7 @@ function comprobarFecha(fecha,texto,tipo_fecha,index){
                                 menor_siguiente = apl.id;
                                 menor_mensaje = '<strong style="text-transform: uppercase;">'+tipoAplicacion(apl.tipo_aplicacion)+'</strong>, ';
                                 if($("#fecha_aplicacion"+apl.id).val()!="" && $("#fecha_aplicacion"+apl.id).val()!="__-__-____" && $("#fecha_aplicacion"+apl.id).val()!=null){
-                                    if (moment($("#fecha_aplicacion"+apl.id).val(),'DD-MM-YYYY').isValid()) {
+                                    if (moment($("#fecha_aplicacion"+apl.id).val(),'DD-MM-YYYY',true).isValid()) {
                                     } else { 
                                         menores_bien = false;                                               
                                         return false;

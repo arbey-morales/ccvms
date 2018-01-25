@@ -24,10 +24,33 @@ use App\Catalogo\TipoContenedor;
 class ContenedorBiologicoController extends Controller
 {
     /**
-     * Display a listing of the resource.
+	 * @api {get}   /catalogo/contenedor-biologico/     1. Listar Contenedores de biológico  
+	 * @apiVersion  0.1.0
+	 * @apiName     ContenedorBiologico
+	 * @apiGroup    Catalogo/Contenedor-Biologico
+	 *
+	 * @apiParam    {String}        q           Folio o serie del contenedor de biológico (Opcional).
+     * @apiParam    {Number}        clues_id    Id de clue (Opcional).
+     * @apiParam    {Request}       request     Cabeceras de la petición.
      *
-     * @return \Illuminate\Http\Response
-     */
+     * @apiSuccess  {View}          index       Vista de ContenedorBiologico (Se omite si la petición es ajax).
+     * @apiSuccess  {Json}          data
+	 *
+	 * @apiSuccessExample Ejemplo de respuesta exitosa:
+	 *     HTTP/1.1 200 OK
+	 *     {
+	 *       "data": [{'id', 'clues_id', 'servidor_id', 'incremento', 'tipos_contenedores_id', 'marcas_id', 'modelos_id', 'estatus_contenedor_id', 'serie', 'folio', 'tipos_mantenimiento', 'temperatura_minima', 'temperatura_maxima', 'usuario_id', 'created_at', 'updated_at', 'deleted_at'}...]
+	 *     } 
+	 *
+	 * @apiErrorExample Ejemplo de repuesta fallida:
+	 *     HTTP/1.1 404 No encontrado
+	 *     {
+	 *       "icon"     :   String icono a utilizar en la vista,
+     *       "error"    :   String número de error,
+     *       "title"    :   String titulo del mensaje,
+     *       "message"  :   String descripción del error
+	 *     }
+	 */
     public function index(Request $request)
     {
         $parametros = Input::only('q','clues_id');
@@ -55,9 +78,27 @@ class ContenedorBiologicoController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
+	 * @api {get}   /catalogo/contenedor-biologico/create   2. Crear vista de nuevo Vontenedor de biológico
+	 * @apiVersion  0.1.0
+	 * @apiName     CreateContenedorBiologico
+	 * @apiGroup    Catalogo/Contenedor-Biologico
+     * 
+     * @apiSuccess  {View}       create               Vista alojada en: \resources\views\catalogo\contenedor-biologico\create
+     * @apiSuccess  {Array}      clues                Arreglo del catálogo de clues
+     * @apiSuccess  {Array}      marcas               Arreglo del catálogo de marcas
+     * @apiSuccess  {Array}      modelos              Arreglo del catálogo de modelos
+     * @apiSuccess  {Array}      tipos_contenedores   Arreglo del catálogo de tipos de contenedores
+     * @apiSuccess  {Array}      estatus              Arreglo del catálogo de estatus   
+     * 
+     * @apiErrorExample Ejemplo de repuesta fallida:
+	 *     HTTP/1.1 200 No encontrado
+	 *     {
+     *       'code'    : 1,
+     *       'title'   : 'Información',
+     *       'text'    : 'Ocurrió un error al intentar eliminar los datos.',
+     *       'type'    : 'error',
+     *       'styling' : 'bootstrap3'
+	 *     }
      */
 	public function create()
     {
@@ -93,11 +134,33 @@ class ContenedorBiologicoController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+	 * @api {post}  /catalogo/contenedor-biologico/store    3. Crear Contenedor de biológico
+	 * @apiVersion  0.1.0
+	 * @apiName     StoreContenedorBiologico
+	 * @apiGroup    Catalogo/Contenedor-Biologico
+	 *
+     * @apiParam    {Request}    request                                    Cabeceras de la petición.
+	 *
+	 * @apiSuccess  {View}       /catalogo/contenedor-biologico/create      Vista para crear nuevos Contenedores de biólogico
+     * 
+     * @apiSuccess  {String}     msgGeneral                                 Devuelve mensaje de éxito
+     * @apiSuccess  {String}     type                                       Tipos válidos: success, error, warning e info
+	 *
+	 * @apiSuccessExample Ejemplo de respuesta exitosa:
+	 *     HTTP/1.1 200 OK
+	 *     {	   
+     *       'msgGeneral'   :   'Operación realizada con éxito',
+     *       'type'         :   'success'
+	 *     }
+	 *
+     * @apiError ContenedorBiologicoNotFound No se encuentra
+     * 
+	 * @apiErrorExample Ejemplo de repuesta fallida:
+	 *     HTTP/1.1 200 No encontrado
+	 *     {
+     *       'msgGeneral'   :   'Ocurrió un error al intentar guardar los datos enviados.',
+     *       'type'         :   'error'
+	 */ 
     public function store(Request $request)
     {
         $msgGeneral = '';
@@ -187,11 +250,27 @@ class ContenedorBiologicoController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+	 * @api {get}   /catalogo/contenedor-biologico/:id  4. Consultar Contenedor de biológico 
+	 * @apiVersion  0.1.0
+	 * @apiName     GetContenedorBiologico
+	 * @apiGroup    Catalogo/Contenedor-Biologico
+	 *
+     * @apiSuccess      {Json}      data        Contiene los detalles de la consulta de una Contenedores de biológico 
+	 *
+	 * @apiSuccessExample Ejemplo de respuesta exitosa:
+	 *     HTTP/1.1 200 OK
+	 *     {
+	 *       "data": {'id', 'clues_id', 'servidor_id', 'incremento', 'tipos_contenedores_id', 'marcas_id', 'modelos_id', 'estatus_contenedor_id', 'serie', 'folio', 'tipos_mantenimiento', 'temperatura_minima', 'temperatura_maxima', 'usuario_id', 'created_at', 'updated_at', 'deleted_at'}
+	 *     }
+	 *
+     * @apiError ContenedorBiologicoNotFound No se encuentra
+     * 
+	 * @apiErrorExample Ejemplo de repuesta fallida:
+	 *     HTTP/1.1 200 No encontrado
+	 *     {
+     *       "error": No se encuentra el recurso que esta buscando
+	 *     }
+	 */
     public function show($id)
     {
         $data = ContenedorBiologico::with('clue','tipoContenedor','marca','modelo','estatus')->find($id);
@@ -202,11 +281,34 @@ class ContenedorBiologicoController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+	 * @api {get}   /catalogo/contenedor-biologico/:id/edit     5. Editar Contenedor de biológico
+	 * @apiVersion  0.1.0
+	 * @apiName     EditContenedorBiologico
+	 * @apiGroup    Catalogo/Contenedor-Biologico
+     * 
+     * @apiParam    {Number}        id                  Contenedor de biológico id único.
+     * 
+     * @apiSuccess  {View}          edit                 Vista alojada en: \resources\views\catalogo\contenedor-biologico\edit
+     * @apiSuccess  {Array}         clues                Arreglo del catálogo de clues
+     * @apiSuccess  {Array}         marcas               Arreglo del catálogo de marcas
+     * @apiSuccess  {Array}         modelos              Arreglo del catálogo de modelos
+     * @apiSuccess  {Array}         tipos_contenedores   Arreglo del catálogo de tipos de contenedores
+     * @apiSuccess  {Array}         estatus              Arreglo del catálogo de estatus  	 *
+	 *
+	 * @apiSuccessExample Ejemplo de respuesta exitosa:
+	 *     HTTP/1.1 200 OK
+	 *     {
+	 *       "data": {'id', 'clues_id', 'servidor_id', 'incremento', 'tipos_contenedores_id', 'marcas_id', 'modelos_id', 'estatus_contenedor_id', 'serie', 'folio', 'tipos_mantenimiento', 'temperatura_minima', 'temperatura_maxima', 'usuario_id', 'created_at', 'updated_at', 'deleted_at'}
+	 *     }
+	 *
+     * @apiError ContenedorBiologicoNotFound No se encuentra
+     * 
+	 * @apiErrorExample Ejemplo de repuesta fallida:
+	 *     HTTP/1.1 200 No encontrado
+	 *     {
+     *       "error": No se encuentra el recurso que esta buscando
+	 *     }
+	 */
      public function edit($id)
      {
          if (Auth::user()->is('root|red-frio') && Auth::user()->can('show.catalogos') && Auth::user()->activo==1) {
@@ -242,13 +344,34 @@ class ContenedorBiologicoController extends Controller
          }
      }
 
-     /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    /**
+	 * @api {PUT}   /catalogo/contenedor-biologic/update    6. Actualizar Contenedor de biológico 
+	 * @apiVersion  0.1.0
+	 * @apiName     UpdateContenedorBiologico
+	 * @apiGroup    Catalogo/Contenedor-Biologico
+     * 
+     * @apiParam    {Number}    id          Contenedor de biologico id único.
+     * @apiParam    {Request}   request     Cabeceras de la petición.
+	 
+	 * @apiSuccess  {String}    msgGeneral  Devuelve mensaje de éxito
+     * @apiSuccess  {String}    type        Tipos válidos: success, error, warning e info
+	 *
+	 * @apiSuccessExample Ejemplo de respuesta exitosa:
+	 *     HTTP/1.1 200 OK
+	 *     {	   
+     *       'msgGeneral'   :   'Operación realizada con éxito',
+     *       'type'         :   'success'
+	 *     }
+	 *
+     * @apiError ContenedorBiologicoNotFound No se encuentra
+     * 
+	 * @apiErrorExample Ejemplo de repuesta fallida:
+	 *     HTTP/1.1 200 No encontrado
+	 *     {
+     *       'msgGeneral'   :   'Ocurrió un error al intentar guardar los datos enviados.',
+     *       'type'         :   'error'
+	 *     }
+	 */
     public function update(Request $request, $id)
     {
         $msgGeneral = '';
@@ -354,11 +477,39 @@ class ContenedorBiologicoController extends Controller
     }
 
     /**
-    * Remove the specified resource from storage.
-    *
-    * @param  int  $id
-    * @return \Illuminate\Http\Response
-    */
+	 * @api {DELETE}    /catalogo/contenedor-biologic/:id   7. Borrar Contenedor de biológico 
+	 * @apiVersion  0.1.0
+	 * @apiName     DestroyContenedorBiologico
+	 * @apiGroup    Catalogo/Contenedor-Biologico
+     * 
+     * @apiParam    {Number}    id          ContenedorBiologico id único.
+     * @apiParam    {Request}   request     Cabeceras de la petición.
+	 
+	 * @apiSuccess  {String}    msgGeneral  Mensaje descriptivo de la operación realizada
+     * @apiSuccess  {String}    type        Tipos válidos: success, error, warning e info
+	 *
+	 * @apiSuccessExample Ejemplo de respuesta exitosa:
+	 *     HTTP/1.1 200 OK
+	 *     {	   
+     *       'code'    : 1,
+     *       'title'   : 'Información',
+     *       'text'    : 'Se borraron los datos',
+     *       'type'    : 'success',
+     *       'styling' : 'bootstrap3'
+	 *     }
+	 *
+     * @apiError ContenedorBiologicoNotFound No se encuentra
+     * 
+	 * @apiErrorExample Ejemplo de repuesta fallida:
+	 *     HTTP/1.1 200 No encontrado
+	 *     {
+     *       'code'    : 1,
+     *       'title'   : 'Información',
+     *       'text'    : 'Ocurrió un error al intentar eliminar los datos.',
+     *       'type'    : 'error',
+     *       'styling' : 'bootstrap3'
+	 *     }
+	 */
     public function destroy($id, Request $request)
     {
         $msgGeneral     = '';

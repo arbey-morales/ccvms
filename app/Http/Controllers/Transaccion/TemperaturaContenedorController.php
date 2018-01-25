@@ -21,10 +21,44 @@ use App\Catalogo\ContenedorBiologico;
 class TemperaturaContenedorController extends Controller
 {
     /**
-     * Display a listing of the resource.
+	 * @api {get}  /temperatura/  1. Index de Temperaturas 
+	 * @apiVersion  0.1.0
+	 * @apiName     IndexTemperatura/
+	 * @apiGroup    Transaccion/Temperatura
+	 *
+     * @apiParam    {Number}        contenedores_id             Id de  Contenedor seleccionado
+     * @apiParam    {Number}        fecha_inicial               Valor tipo fecha: YYYY-MM-DD
+     * @apiParam    {Number}        clues_id                    Id de  Clue seleccionada
+     * @apiParam    {Number}        fecha_final                 Valor tipo fecha: YYYY-MM-DD
      *
-     * @return \Illuminate\Http\Response
-     */
+     * @apiSuccess  {Json}          data                        Valores en formato JSON
+	 *
+	 * @apiSuccessExample Ejemplo de respuesta exitosa:
+	 *     HTTP/1.1 200 OK
+	 *     {
+     *       "texto": "Titulo gráfica",
+     *       "sub_texto": "Subtitulo gráfica",
+     *       "variacion": {"data":[]},
+     *       "maxima_minima": {
+	 *          "estampas": ['2017-12-26','2017-12-27'],
+     *          "maximas": [6,5]
+     *          "minimas": [2,1]
+     *       }
+	 *     } 
+	 *
+	 * @apiErrorExample Ejemplo de repuesta fallida:
+	 *     HTTP/1.1 404 No encontrado
+	 *     {
+	 *       "texto": "Titulo gráfica",
+     *       "sub_texto": "Subtitulo gráfica",
+     *       "variacion": {"data":[]},
+     *       "maxima_minima": {
+	 *          "estampas": [],
+     *          "maximas": []
+     *          "minimas": []
+     *       }
+	 *     }
+	 */
     public function index(Request $request)
     {
         if (Auth::user()->is('root|red-frio') && Auth::user()->can('show.catalogos') && Auth::user()->activo==1) {
@@ -98,9 +132,13 @@ class TemperaturaContenedorController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
+	 * @api {get}   /temperatura/create   2. Crear vista de nueva carga de Temperatura
+	 * @apiVersion  0.1.0
+	 * @apiName     CreateTemperatura
+	 * @apiGroup    Transaccion/Temperatura
+     * 
+     * @apiSuccess  {View}    create                 Vista alojada en: \resources\views\temperatura\create   
+     * 
      */
      public function create()
      {
@@ -112,11 +150,34 @@ class TemperaturaContenedorController extends Controller
      }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+	 * @api {post} /temperatura/store     3. Crear Temperatura desde archivo .txt
+	 * @apiVersion  0.1.0
+	 * @apiName     StoreTemperatura
+	 * @apiGroup    Transaccion/Temperatura
+	 *
+     * @apiParam    {Request}       request                     Cabeceras de la petición.
+	 *
+	 * @apiSuccess  {View}          /temperatura/create         Vista para crear Clue
+     * 
+     * @apiSuccess  {String}        msgGeneral                  Mensaje descriptivo de la operación realizada
+     * @apiSuccess  {String}        type                        Tipos válidos: success, error, warning e info
+	 *
+	 * @apiSuccessExample Ejemplo de respuesta exitosa:
+	 *     HTTP/1.1 200 OK
+	 *     {	   
+     *       'msgGeneral'   :  'Operación realizada con éxito',
+     *       'type'         :   'success'
+	 *     }
+	 *
+     * @apiError TemperaturaNotFound No se encuentra
+     * 
+	 * @apiErrorExample Ejemplo de repuesta fallida:
+	 *     HTTP/1.1 200 No encontrado
+	 *     {
+     *       'msgGeneral'   :  'Ocurrió un error al intentar guardar los datos enviados.',
+     *       'type'         :   'error'
+	 *     }
+	 */
     public function store(Request $request)
     {
         $msgGeneral = '';

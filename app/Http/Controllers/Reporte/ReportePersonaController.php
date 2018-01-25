@@ -34,8 +34,7 @@ use App\Catalogo\PoblacionConapo;
 class ReportePersonaController extends Controller
 {
     public $tipo_aplicacion = array("X","Dosis única","1a Dosis","2a Dosis","3a Dosis","4a Dosis","Refuerzo");
-    public $ta_abreviatura = array("X","Ú","1a","2a","3a","4a","R");
-    
+    public $ta_abreviatura = array("X","Ú","1a","2a","3a","4a","R");    
     public $estados = array("X","AS","BC","BS","CC","CL","CM","CS","CH","DF","DG","GT","GR","HG","JC","MC","MN","MS","NT","NL","OC","PL","QT","QR","SP","SL","SR","TC","TS","TL","VZ","YN","ZS");
     
     /**
@@ -98,12 +97,35 @@ class ReportePersonaController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
-     * @param   string  q               Cadena de texto para búsqueda en personas. Se espera nombre de infante/tutor o CURP
-     * @param   int     todo            Determina si la busqueda es de todo lo registrado, valor esperado: 1
-     * @return \Illuminate\Http\Response
-     */
-    public function buscar(Request $request)
+	 * @api {get}  /persona/reporte/buscar/  1. Buscar inafante(texto libre y lista completa) 
+	 * @apiVersion  0.1.0
+	 * @apiName     BuscarPersona
+	 * @apiGroup    Reporte/Persona
+	 *
+	 * @apiParam    {String}        q           Cadena de texto para búsqueda en p. Se espera nombre de infante/tutor o CURP.
+     * @apiParam    {Number}        todo        Determina si la busqueda es de todo lo registrado, valor esperado: 1
+     * @apiParam    {Request}       request     Cabeceras de la petición.
+     *
+     * @apiSuccess {Json} data
+	 *
+	 * @apiSuccessExample Ejemplo de respuesta exitosa:
+	 *     HTTP/1.1 200 OK
+	 *     {
+     *       "text": 'Texto descriptivo del reporte',
+     *       "user": {'id', 'idJurisdiccion', 'direccion', 'nombre', 'paterno', 'materno', 'email', 'foto', 'activo', 'borrado', 'asRoot', 'creadoAl', 'creadoUsuario', 'modificadoAl', 'modificadoUsuario', 'borradoAl', 'borradoUsuario', 'jurisdiccion':{'id', 'entidades_id', 'clues_id', 'clave', 'nombre', 'created_at', 'updated_at', 'deleted_at'}},
+	 *       "data": [{'id', 'servidor_id', 'incremento', 'clues_id', 'paises_id', 'entidades_federativas_nacimiento_id', 'entidades_federativas_domicilio_id', 'municipios_id', 'localidades_id', 'colonias_id', 'agebs_id', 'instituciones_id', 'codigos_censos_id', 'tipos_partos_id', 'folio_certificado_nacimiento', 'nombre', 'apellido_paterno', 'apellido_materno', 'curp', 'genero', 'fecha_nacimiento', 'descripcion_domicilio', 'calle', 'numero', 'codigo_postal', 'sector', 'manzana', 'telefono_casa', 'telefono_celular', 'tutor', 'fecha_nacimiento_tutor', 'usuario_id', 'created_at', 'updated_at', 'deleted_at'}...]
+	 *     } 
+	 *
+	 * @apiErrorExample Ejemplo de repuesta fallida:
+	 *     HTTP/1.1 404 No encontrado
+	 *     {
+	 *       "icon"     :   String icono a utilizar en la vista,
+     *       "error"    :   String número de error,
+     *       "title"    :   String titulo del mensaje,
+     *       "message"  :   String descripción del error
+	 *     }
+	 */
+    public function buscar()
     {
         $parametros = Input::only(['q','todo']);
         $text = '';
@@ -111,8 +133,8 @@ class ReportePersonaController extends Controller
         $today = Carbon::today("America/Mexico_City");
 		if (Auth::user()->can('show.personas') && Auth::user()->activo==1) { 
             $anios_atras = Carbon::today("America/Mexico_City")->subYears(10)->format('Y-m-d'); 
-            $personas = DB::table('personas')
-                ->select('personas.*','clu.clues AS clu_clues','clu.jurisdicciones_id AS clu_jurisdiccion_id','clu.nombre AS clu_nombre','col.nombre AS col_nombre','loc.nombre AS loc_nombre','mun.nombre AS mun_nombre','tp.clave AS tp_clave','tp.descripcion AS tp_descripcion');  
+            $personas = DB::table('personas as p')
+                ->select('p.*','clu.clues AS clu_clues','clu.jurisdicciones_id AS clu_jurisdiccion_id','clu.nombre AS clu_nombre','col.nombre AS col_nombre','loc.nombre AS loc_nombre','mun.nombre AS mun_nombre','tp.clave AS tp_clave','tp.descripcion AS tp_descripcion');  
             
             if (Auth::user()->is('root|admin')) { } else {            
                 $personas = $personas->where('clu.jurisdicciones_id', Auth::user()->idJurisdiccion);
@@ -121,25 +143,25 @@ class ReportePersonaController extends Controller
             if ($parametros['todo']==NULL){ // La búsqueda usa filtros
                 $text = 'Nombre del infante/tutor o CURP: '.$parametros['q'];
                 $personas = $personas->where(function($query) use ($parametros) {
-                    $query->where('personas.curp','LIKE',"%".$parametros['q']."%")
-                    ->orWhere('personas.tutor','LIKE',"%".$parametros['q']."%")
-                    ->orWhere(\DB::raw("CONCAT(personas.nombre,' ',personas.apellido_paterno,' ',personas.apellido_materno)"),'LIKE',"%".$parametros['q']."%");
+                    $query->where('p.curp','LIKE',"%".$parametros['q']."%")
+                    ->orWhere('p.tutor','LIKE',"%".$parametros['q']."%")
+                    ->orWhere(\DB::raw("CONCAT(p.nombre,' ',p.apellido_paterno,' ',p.apellido_materno)"),'LIKE',"%".$parametros['q']."%");
                 });
             }
 
-            $data = $personas->where('personas.fecha_nacimiento', '>=', $anios_atras)
-                ->where('personas.deleted_at', NULL)
-                ->leftJoin('clues AS clu','clu.id','=','personas.clues_id')
-                ->leftJoin('municipios AS mun','mun.id','=','personas.municipios_id')
-                ->leftJoin('localidades AS loc','loc.id','=','personas.localidades_id')
-                ->leftJoin('colonias AS col','col.id','=','personas.colonias_id')
-                ->leftJoin('tipos_partos AS tp','tp.id','=','personas.tipos_partos_id')
+            $data = $personas->where('p.fecha_nacimiento', '>=', $anios_atras)
+                ->where('p.deleted_at', NULL)
+                ->leftJoin('clues AS clu','clu.id','=','p.clues_id')
+                ->leftJoin('municipios AS mun','mun.id','=','p.municipios_id')
+                ->leftJoin('localidades AS loc','loc.id','=','p.localidades_id')
+                ->leftJoin('colonias AS col','col.id','=','p.colonias_id')
+                ->leftJoin('tipos_partos AS tp','tp.id','=','p.tipos_partos_id')
                 ->orderBy('clu_jurisdiccion_id', 'ASC')
-                ->orderBy('personas.municipios_id', 'ASC')
-                ->orderBy('personas.clues_id', 'ASC')
-                ->orderBy('personas.apellido_paterno', 'ASC')
-                ->orderBy('personas.apellido_materno', 'ASC')
-                ->orderBy('personas.nombre', 'ASC')
+                ->orderBy('p.municipios_id', 'ASC')
+                ->orderBy('p.clues_id', 'ASC')
+                ->orderBy('p.apellido_paterno', 'ASC')
+                ->orderBy('p.apellido_materno', 'ASC')
+                ->orderBy('p.nombre', 'ASC')
                 ->get(); 
 
             $usuario = User::with('jurisdiccion')->find(Auth::user()->id);
@@ -150,17 +172,31 @@ class ReportePersonaController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
-     * @param   int     jurisdicciones_id   Id del lista de jurisdicciones solo para root|admin
-     * @param   int     municipios_id       Id del lista de municipios  
-     * @param   int     localidaddes_id     Id del lista de localidades 
-     * @param   int     clues_id            Id del lista de unidades de salud 
-     * @param   int     agebs_id            Id del lista de agebs 
-     * @param   string  sector              cadena de texto sector  
-     * @param   string  manzana             cadena de texto manzana     
-     * @return \Illuminate\Http\Response
-     */
-    public function seguimiento(Request $request)
+	 * @api {get}  /persona/reporte/seguimiento/  2. Buscar infante(Reporte seguimiento) 
+	 * @apiVersion  0.1.0
+	 * @apiName     SeguimientoPersona
+	 * @apiGroup    Reporte/Persona
+	 *
+     * @apiParam    {Number}     jurisdicciones_id   Id de la lista de jurisdicciones solo para root|admin
+     * @apiParam    {Number}     municipios_id       Id de la lista de municipios  
+     * @apiParam    {Number}     localidaddes_id     Id de la lista de localidades 
+     * @apiParam    {Number}     colonias_id         Id de la lista de colonias
+     * @apiParam    {Number}     clues_id            Id de la lista de unidades de salud 
+     * @apiParam    {Number}     agebs_id            Id de la lista de agebs 
+     * @apiParam    {String}     sector              cadena de texto sector  
+     * @apiParam    {String}     manzana             cadena de texto manzana
+     *
+     * @apiSuccess {Json} data
+	 *
+	 * @apiSuccessExample Ejemplo de respuesta exitosa:
+	 *     HTTP/1.1 200 OK
+	 *     {
+     *       "text": 'Texto descriptivo del reporte',
+     *       "user": {'id', 'idJurisdiccion', 'direccion', 'nombre', 'paterno', 'materno', 'email', 'foto', 'activo', 'borrado', 'asRoot', 'creadoAl', 'creadoUsuario', 'modificadoAl', 'modificadoUsuario', 'borradoAl', 'borradoUsuario', 'jurisdiccion':{'id', 'entidades_id', 'clues_id', 'clave', 'nombre', 'created_at', 'updated_at', 'deleted_at'}},
+	 *       "data": [{'id', 'servidor_id', 'incremento', 'clues_id', 'paises_id', 'entidades_federativas_nacimiento_id', 'entidades_federativas_domicilio_id', 'municipios_id', 'localidades_id', 'colonias_id', 'agebs_id', 'instituciones_id', 'codigos_censos_id', 'tipos_partos_id', 'folio_certificado_nacimiento', 'nombre', 'apellido_paterno', 'apellido_materno', 'curp', 'genero', 'fecha_nacimiento', 'descripcion_domicilio', 'calle', 'numero', 'codigo_postal', 'sector', 'manzana', 'telefono_casa', 'telefono_celular', 'tutor', 'fecha_nacimiento_tutor', 'usuario_id', 'created_at', 'updated_at', 'deleted_at'}...]
+	 *     } 
+	 */
+    public function seguimiento()
     {
         $parametros = Input::only(['jurisdicciones_id','municipios_id','localidades_id','clues_id','agebs_id','sector','manzana']);
         $ta_abreviatura = $this->ta_abreviatura;
@@ -168,8 +204,8 @@ class ReportePersonaController extends Controller
         $today = Carbon::today("America/Mexico_City");
 		if (Auth::user()->can('show.personas') && Auth::user()->activo==1) { 
             $anios_atras = Carbon::today("America/Mexico_City")->subYears(10)->format('Y-m-d');
-            $personas = DB::table('personas')
-                ->select('personas.*','clu.clues AS clu_clues','clu.jurisdicciones_id AS clu_jurisdiccion_id','clu.nombre AS clu_nombre','col.nombre AS col_nombre','loc.nombre AS loc_nombre','mun.nombre AS mun_nombre','tp.clave AS tp_clave','tp.descripcion AS tp_descripcion');  
+            $personas = DB::table('personas as p')
+                ->select('p.id','p.nombre','p.apellido_paterno','p.apellido_materno','p.fecha_nacimiento','p.genero','p.curp','p.calle','p.numero','p.municipios_id','p.clues_id','clu.clues AS clu_clues','clu.jurisdicciones_id AS clu_jurisdiccion_id','clu.nombre AS clu_nombre','col.nombre AS col_nombre','loc.nombre AS loc_nombre','mun.nombre AS mun_nombre','tp.clave AS tp_clave','tp.descripcion AS tp_descripcion');  
 
             if (Auth::user()->is('captura'))          
                 $personas = $personas->where('clu.jurisdicciones_id', Auth::user()->idJurisdiccion);
@@ -179,42 +215,42 @@ class ReportePersonaController extends Controller
                 $personas = $personas->where('clu.jurisdicciones_id', $parametros['jurisdicciones_id']);
             }
             if(isset($parametros['municipios_id']) && $parametros['municipios_id']!=0){
-                $personas = $personas->where('personas.municipios_id', $parametros['municipios_id']);
+                $personas = $personas->where('p.municipios_id', $parametros['municipios_id']);
             }
             if(isset($parametros['clues_id']) && $parametros['clues_id']!=0){
-                $personas = $personas->where('personas.clues_id', $parametros['clues_id']);
+                $personas = $personas->where('p.clues_id', $parametros['clues_id']);
             }
             if(isset($parametros['localidades_id']) && $parametros['localidades_id']!=0){
-                $personas = $personas->where('personas.localidades_id', $parametros['localidades_id']);
+                $personas = $personas->where('p.localidades_id', $parametros['localidades_id']);
             }
             if(isset($parametros['colonias_id']) && $parametros['colonias_id']!=0){
-                $personas = $personas->where('personas.colonias_id', $parametros['colonias_id']);
+                $personas = $personas->where('p.colonias_id', $parametros['colonias_id']);
             }
             if(isset($parametros['agebs_id']) && $parametros['agebs_id']!=0){
-                $personas = $personas->where('personas.agebs_id', $parametros['agebs_id']);
+                $personas = $personas->where('p.agebs_id', $parametros['agebs_id']);
             }
             if(isset($parametros['sector']) && $parametros['sector']!="" && $parametros['sector']!=NULL){
-                $personas = $personas->where('personas.sector', $parametros['sector']);
+                $personas = $personas->where('p.sector', $parametros['sector']);
             }
             if(isset($parametros['manzana']) && $parametros['manzana']!="" && $parametros['manzana']!=NULL){
-                $personas = $personas->where('personas.manzana', $parametros['manzana']);
+                $personas = $personas->where('p.manzana', $parametros['manzana']);
             }
                
             
-            $data = $personas->where('personas.fecha_nacimiento', '>=', $anios_atras)
-                ->where('personas.deleted_at', NULL)
-                ->leftJoin('clues AS clu','clu.id','=','personas.clues_id')
-                ->leftJoin('municipios AS mun','mun.id','=','personas.municipios_id')
-                ->leftJoin('localidades AS loc','loc.id','=','personas.localidades_id')
-                ->leftJoin('colonias AS col','col.id','=','personas.colonias_id')
-                ->leftJoin('tipos_partos AS tp','tp.id','=','personas.tipos_partos_id')
+            $data = $personas->where('p.fecha_nacimiento', '>=', $anios_atras)
+                ->where('p.deleted_at', NULL)
+                ->leftJoin('clues AS clu','clu.id','=','p.clues_id')
+                ->leftJoin('municipios AS mun','mun.id','=','p.municipios_id')
+                ->leftJoin('localidades AS loc','loc.id','=','p.localidades_id')
+                ->leftJoin('colonias AS col','col.id','=','p.colonias_id')
+                ->leftJoin('tipos_partos AS tp','tp.id','=','p.tipos_partos_id')
                 ->orderBy('clu_jurisdiccion_id', 'ASC')
-                ->orderBy('personas.municipios_id', 'ASC')
-                ->orderBy('personas.clues_id', 'ASC')
-                ->orderBy('personas.apellido_paterno', 'ASC')
-                ->orderBy('personas.apellido_materno', 'ASC')
-                ->orderBy('personas.nombre', 'ASC')
-                ->get();            
+                ->orderBy('p.municipios_id', 'ASC')
+                ->orderBy('p.clues_id', 'ASC')
+                ->orderBy('p.apellido_paterno', 'ASC')
+                ->orderBy('p.apellido_materno', 'ASC')
+                ->orderBy('p.nombre', 'ASC')
+                ->get();
                 
             foreach ($data as $cont=>$value) { 
                 $value->seguimientos = collect();
@@ -252,8 +288,32 @@ class ReportePersonaController extends Controller
             return response()->json([ 'data' => [$data]]);
         }
     }
-
-    public function actividad(Request $request)
+    /**
+	 * @api {get}   /persona/reporte/actividad/     3. Buscar infante(Reporte de actividades) 
+	 * @apiVersion  0.1.0
+	 * @apiName     ActividadPersona
+	 * @apiGroup    Reporte/Persona
+	 *
+     * @apiParam    {Number}     jurisdicciones_id   Id de la lista de jurisdicciones solo para root|admin
+     * @apiParam    {Number}     municipios_id       Id de la lista de municipios  
+     * @apiParam    {Number}     localidaddes_id     Id de la lista de localidades 
+     * @apiParam    {Number}     colonias_id         Id de la lista de colonias
+     * @apiParam    {Number}     clues_id            Id de la lista de unidades de salud 
+     * @apiParam    {Number}     agebs_id            Id de la lista de agebs 
+     * @apiParam    {String}     sector              cadena de texto sector  
+     * @apiParam    {String}     manzana             cadena de texto manzana
+     *
+     * @apiSuccess {Json} data
+	 *
+	 * @apiSuccessExample Ejemplo de respuesta exitosa:
+	 *     HTTP/1.1 200 OK
+	 *     {
+     *       "text": 'Texto descriptivo del reporte',
+     *       "user": {'id', 'idJurisdiccion', 'direccion', 'nombre', 'paterno', 'materno', 'email', 'foto', 'activo', 'borrado', 'asRoot', 'creadoAl', 'creadoUsuario', 'modificadoAl', 'modificadoUsuario', 'borradoAl', 'borradoUsuario', 'jurisdiccion':{'id', 'entidades_id', 'clues_id', 'clave', 'nombre', 'created_at', 'updated_at', 'deleted_at'}},
+	 *       "data": [{"parametros":{"edad":"0 mes","entre":11,"pom":0,"cuenta":1,"im":0,"is":0,"fs":0,"fm":1},"poblacion":{"oficial":10,"nominal":0,"conc":0},"dosis":[{"vacunas_id":1,"clave":"BCG","aplicacion":[1]},{"vacunas_id":2,"clave":"HE-B","aplicacion":[2,3,4]},{"vacunas_id":3,"clave":"PENTA","aplicacion":[2,3,4,5]},{"vacunas_id":8,"clave":"DPT","aplicacion":[6]},{"vacunas_id":5,"clave":"NEUMO13","aplicacion":[2,3,4]},{"vacunas_id":4,"clave":"ROTA RV5","aplicacion":[2,3,4]},{"vacunas_id":6,"clave":"IFZ","aplicacion":[2,3,6,6,6,6]},{"vacunas_id":7,"clave":"SRP","aplicacion":[2,6]},{"vacunas_id":9,"clave":"OPV","aplicacion":[1]}],"esquema_completo":0,"da":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]}...]
+	 *     } 
+	 */
+    public function actividad()
     {
         $parametros = Input::only(['q','jurisdicciones_id','municipios_id','localidades_id','clues_id','agebs_id','sector','manzana','filtro','todo','rep']);
         $text = '';        
@@ -539,7 +599,7 @@ class ReportePersonaController extends Controller
         }
     }
 
-    public function biologico(Request $request)
+    public function biologico()
     {
         return true;
     }

@@ -18,10 +18,31 @@ use App\Catalogo\VacunaEsquema;
 class EsquemaController extends Controller
 {
     /**
-     * Display a listing of the resource.
+	 * @api {get} 	/catalogo/esquema/ 	1. Listar Esquemas 
+	 * @apiVersion 	0.1.0
+	 * @apiName 	Esquema
+	 * @apiGroup 	Catalogo/Esquema
+	 *
+	 * @apiParam 	{String} 		q 			Descripción de Esquema (Opcional).
      *
-     * @return \Illuminate\Http\Response
-     */
+     * @apiSuccess 	{View} 			index  		Vista de Esquema (Se omite si la petición es ajax).
+     * @apiSuccess 	{Json} 			data		Lista de esquemas
+	 *
+	 * @apiSuccessExample Ejemplo de respuesta exitosa:
+	 *     HTTP/1.1 200 OK
+	 *     {
+	 *       "data": [{'id', 'descripcion', 'usuario_id', 'created_at', 'updated_at', 'deleted_at'}...]
+	 *     } 
+	 *
+	 * @apiErrorExample Ejemplo de repuesta fallida:
+	 *     HTTP/1.1 404 No encontrado
+	 *     {
+	 *       "icon"		: String icono a utilizar en la vista,
+     *       "error"	: String número de error,
+     *       "title"	: String titulo del mensaje,
+     *       "message"	: String descripción del error
+	 *     }
+	 */
     public function index()
     {
         $parametros = Input::only('q');
@@ -38,11 +59,34 @@ class EsquemaController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+	 * @api {get} 	/catalogo/esquema/:id 	2. Consultar Esquemaa
+	 * @apiVersion 	0.1.0
+	 * @apiName 	GetEsquema
+	 * @apiGroup 	Catalogo/Esquema
+     * 
+     * @apiParam 	{String} 		fecha_nacimiento    Fecha de nacimento del infante (Opcional).
+     * @apiParam 	{Request} 		request 	        Cabeceras de la petición.
+	 *
+     * @apiSuccess 	{Json} 		data		Devuelve detalles de un esquema
+	 *
+	 * @apiSuccessExample Ejemplo de respuesta exitosa:
+	 *     HTTP/1.1 200 OK
+	 *     {
+	 *       "data": [{'id', 'vacunas_id', 'esquemas_id', 'tipo_aplicacion', 'orden_esquema', 'fila', 'columna', 'intervalo_inicio', 'intervalo_inicio_anio', 'intervalo_inicio_mes', 'intervalo_inicio_dia', 'intervalo_fin', 'intervalo_fin_anio', 'intervalo_fin_mes', 'intervalo_fin_dia', 'edad_ideal', 'edad_ideal_anio', 'edad_ideal_mes', 'edad_ideal_dia', 'margen_anticipacion', 'dias_entre_siguiente_dosis', 'entre_siguiente_dosis_anio', 'entre_siguiente_dosis_mes', 'entre_siguiente_dosis_dia', 'etiqueta_ideal', 'etiqueta_ideal_anio', 'etiqueta_ideal_mes', 'etiqueta_ideal_dia', 'etiqueta_no_ideal', 'etiqueta_no_ideal_anio', 'etiqueta_no_ideal_mes', 'etiqueta_no_ideal_dia', 'dosis_requerida', 'usuario_id', 'created_at', 'updated_at', 'deleted_at'}...]
+     *       "letra_edad": 'Edad del infante, basada en la fecha de nacimiento proporcionada'
+     *       "esquema": {'id', 'descripcion', 'usuario_id', 'created_at', 'updated_at', 'deleted_at'}
+	 *     }
+	 *
+     * @apiError EsquemaNotFound No se encuentra
+     * 
+	 * @apiErrorExample Ejemplo de repuesta fallida:
+	 *     HTTP/1.1 200 No encontrado
+	 *     {
+     *       "data": NULL,
+     *       "letra_edad": NULL,
+     *       "esquema": {'id', 'descripcion', 'usuario_id', 'created_at', 'updated_at', 'deleted_at'}
+	 *     }
+	 */
     public function show(Request $request, $id)
     {
         $parametros = Input::only('fecha_nacimiento','id'); 
@@ -155,19 +199,13 @@ class EsquemaController extends Controller
             if ($esquema) {
                 return response()->json([ 'data' => $esquema_detalle, 'letra_edad' => $letra_edad, 'esquema' => $esquema ]);
             } else {
-            return response()->json([ 'data' => NULL, 'edad' => NULL, 'esquema' => $esquema]);
+            return response()->json([ 'data' => NULL, 'letra_edad' => NULL, 'esquema' => $esquema]); // HERE!!!!!!
             }    
         } else {
             return view('catalogo.esquema.show')->with(['data' => $esquema_detalle, 'letra_edad' => NULL, 'esquema' => $esquema]);
         }   
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function getEquema($year)
     {
         $esquema = Esquema::findOrFail($id);  

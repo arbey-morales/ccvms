@@ -102,10 +102,20 @@
         // Al segundo busca los contenedores de la clue seleccionada
         $(document).ready(function(){
             //setTimeout(function(){ $(".js-data-clues").change(); }, 1000);
-            $("#fecha_inicial").val(moment(new Date()).add(-1, 'days').format('Y-M-D'));
-            $("#fecha_final").val(moment(new Date()).format('Y-M-D'));
+            $("#fecha_inicial,#fecha_final").mask("9999-99-99");
+            $("#fecha_inicial").val(moment(new Date()).add(-1, 'days').format('YYYY-MM-DD'));
+            $("#fecha_final").val(moment(new Date()).format('YYYY-MM-DD'));
+
+            $("#fecha_inicial,#fecha_final").blur(function(e){
+                if (moment($(this).val(),'YYYY-MM-DD',true).isValid()) {
+                } else {                    
+                    notificar('Verifique','La fecha no es válida','warning',1000);
+                    $(this).focus();
+                }
+            });
+
         });
-        // valor iniicial del select contenedores
+        // valor inicial del select contenedores
         var contenedores = [{ 'id': 0, 'text': 'Seleccionar contenedor' }];
         var clues = [{ 'id': 0, 'clues':'', 'text': '* Unidad de salud' }];
         $(".js-data-contenedores").select2();
@@ -131,7 +141,7 @@
 
         $(".js-data-clues").select2({
             ajax: {
-                url: "../catalogo/clue",
+                url: "../catalogo/clue-contenedor",
                 dataType: 'json',
                 delay: 250,
                 data: function (params) {
@@ -200,7 +210,7 @@
                 $(".js-buscar").attr('disabled','disabled');                
                 //$(this).addClass('hidden');
                 if($("#fecha_inicial").val()==null || $("#fecha_inicial").val()=="" || $("#fecha_final").val()==null || $("#fecha_final").val()=="" || $("#clues_id").val()==0 || $("#contenedores_id").val()==0){
-                    notificar('Información','Debe agregar fecha inicial y final, además de seleccionar unidad de salud y contenedor','warning',2000);
+                    notificar('Información','Debe agregar fecha inicial y final, además de seleccionar unidad de salud y contenedor de biológico','warning',2000);
                     $(".js-buscar").removeAttr('disabled');
                     $("#cargando").empty();
                 } else{                

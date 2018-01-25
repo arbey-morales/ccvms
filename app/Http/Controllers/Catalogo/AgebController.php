@@ -17,44 +17,31 @@ use App\Catalogo\Municipio;
 class AgebController extends Controller
 {
     /**
-	 * @api {get} /catalogo/ageb/ Lista de AGEB's 
-	 * @apiVersion 0.1.0
-	 * @apiName Ageb
-	 * @apiGroup Ageb
+	 * @api {get}   /catalogo/ageb/     1. Listar AGEB's 
+	 * @apiVersion  0.1.0
+	 * @apiName     Ageb
+	 * @apiGroup    Catalogo/Ageb
 	 *
-	 * @apiParam {String} q id o número de Ageb (Opcional).
-     * @apiParam {Number} localidades_id id de municipio (Opcional).
+	 * @apiParam    {String}        q                   Id o número de Ageb (Opcional).
+     * @apiParam    {Number}        localidades_id      Id de municipio (Opcional).
+     * @apiParam    {Request}       request             Cabeceras de la petición.
      *
-     * @apiSuccess {View} index  Vista de Ageb (Se omite si la petición es ajax).
-     * @apiSuccess {Json} data
+     * @apiSuccess  {View}          show               Vista de Ageb (Se omite si la petición es ajax).
+     * @apiSuccess  {Json}          data                Lista de ageb's
 	 *
 	 * @apiSuccessExample Ejemplo de respuesta exitosa:
 	 *     HTTP/1.1 200 OK
 	 *     {
-	 *       "data": [{'id','municipios_id','localidades_id','usuario_id','created_at','updated_at'}]
-	 *     }
-	 *
-	 * @apiError AgebBadRequest Petición errónea
-     * @apiError AgebUnauthorized No autorizado
-     * @apiError AgebForbidden Prohibido
-     * @apiError AgebNotFound No se encuentra
-     * @apiError AgebMethodNotAllowed Método no permitido
-     * @apiError AgebNotAceptable No aceptable
-     * @apiError AgebConflict Conflicto
-     * @apiError AgebGone Recurso ya no existe
-     * @apiError AgebURITooLong Dirección demasiado larga
-     * @apiError AgebInternalServerError Error interno del servidor
-     * @apiError AgebNotImplement No implementado
-     * @apiError AgebServiceUnavailable Servicio no disponible
-     * 
+	 *       "data": [{'id','municipios_id','localidades_id','usuario_id','created_at','updated_at'}...]
+	 *     } 
 	 *
 	 * @apiErrorExample Ejemplo de repuesta fallida:
 	 *     HTTP/1.1 404 No encontrado
 	 *     {
-	 *       "icon": String icono a utilizar en la vista,
-     *       "error": String número de error,
-     *       "title": String titulo del mensaje,
-     *       "message": String descripción del error
+	 *       "icon"     : String icono a utilizar en la vista,
+     *       "error"    : String número de error,
+     *       "title"    : String titulo del mensaje,
+     *       "message"  : String descripción del error
 	 *     }
 	 */
     public function index(Request $request)
@@ -89,14 +76,14 @@ class AgebController extends Controller
     }
     
     /**
-	 * @api {get} /catalogo/ageb/:id Detalles de AGEB 
-	 * @apiVersion 0.1.0
-	 * @apiName GetAgeb
-	 * @apiGroup Ageb
+	 * @api {get}   /catalogo/ageb/:id  2. Consultar AGEB 
+	 * @apiVersion  0.1.0
+	 * @apiName     GetAgeb
+	 * @apiGroup    Catalogo/Ageb
 	 *
 	 *
-	 * @apiSuccess {View} index  Vista de Ageb (Se omite si la petición es ajax).
-     * @apiSuccess {Json} data
+	 * @apiSuccess {View}       index       Vista de Ageb (Se omite si la petición es ajax).
+     * @apiSuccess {Json}       data        Detalles de una ageb
 	 *
 	 * @apiSuccessExample Ejemplo de respuesta exitosa:
 	 *     HTTP/1.1 200 OK

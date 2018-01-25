@@ -332,6 +332,7 @@ class UserController extends Controller
                 }
             
                 if ($updates) {
+                    $user = User::findOrFail($id);
                     // >Detach Roles
                     $user->detachRole($usuario->rolesuser[0]->role_id);
                     // Attach Roles

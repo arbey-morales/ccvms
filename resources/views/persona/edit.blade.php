@@ -154,17 +154,17 @@
                     <div class="uk-grid uk-grid-collapse">
                         <div class="uk-width-1-2">
                             <div class="bt-flabels__wrapper">
-                                <span class="select-label">* Municipio</span>
-                                {!! Form::label('municipio_id', '* Municipio', ['for' => 'municipio_id'] ) !!}
-                                {!! Form::select('municipio_id', $municipios,  $data->municipios_id, ['class' => 'form-control js-data-municipio select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'municipio_id',  'data-placeholder' => '* Municipio', 'style' => 'width:100%'] ) !!}
+                                <span class="select-label">* Municipio/domicilio</span>
+                                {!! Form::label('municipio_id', '* Municipio/domicilio', ['for' => 'municipio_id'] ) !!}
+                                {!! Form::select('municipio_id', $municipios,  $data->municipios_id, ['class' => 'form-control js-data-municipio select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'municipio_id',  'data-placeholder' => '* Municipio/domicilio', 'style' => 'width:100%'] ) !!}
                                 <span class="bt-flabels__error-desc">Requerido</span>
                             </div>
                         </div>
                         <div class="uk-width-1-2">
                             <div class="bt-flabels__wrapper bt-flabels--right">  
-                                <span class="select-label">* Localidad</span> 
-                                {!! Form::label('localidad_id', '* Localidad', ['for' => 'localidad_id'] ) !!}
-                                {!! Form::select('localidad_id', [], $data->localidades_id, ['class' => 'form-control js-data-localidad select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'localidad_id',  'data-placeholder' => '* Localidad', 'style' => 'width:100%'] ) !!}
+                                <span class="select-label">* Localidad/domicilio</span> 
+                                {!! Form::label('localidad_id', '* Localidad/domicilio', ['for' => 'localidad_id'] ) !!}
+                                {!! Form::select('localidad_id', [], $data->localidades_id, ['class' => 'form-control js-data-localidad select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'localidad_id',  'data-placeholder' => '* Localidad/domicilio', 'style' => 'width:100%'] ) !!}
                                 <span class="bt-flabels__error-desc">Requerido</span>
                             </div>
                         </div>

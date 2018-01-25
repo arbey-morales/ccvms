@@ -16,10 +16,31 @@ use App\Catalogo\EstatusContenedor;
 class EstatusContenedorController extends Controller
 {
     /**
-     * Display a listing of the resource.
+	 * @api {get} 	/catalogo/estatus-contenedor/ 	1. Listar posibles Estatus de contenedor 
+	 * @apiVersion 	0.1.0
+	 * @apiName 	EstatusContenedor
+	 * @apiGroup 	Catalogo/Estatus-Contenedor
+	 *
+	 * @apiParam 	{String} 		q 			Descripción del Estatus del contenedor (Opcional).
      *
-     * @return \Illuminate\Http\Response
-     */
+     * @apiSuccess 	{View} 			index  		Vista de estatus de contenedores (Se omite si la petición es ajax).
+     * @apiSuccess 	{Json} 			data		Lista de estatus de contenedores
+	 *
+	 * @apiSuccessExample Ejemplo de respuesta exitosa:
+	 *     HTTP/1.1 200 OK
+	 *     {
+	 *       "data": [{'id', 'descripcion', 'color', 'icono', 'created_at', 'updated_at', 'deleted_at'}...]
+	 *     } 
+	 *
+	 * @apiErrorExample Ejemplo de repuesta fallida:
+	 *     HTTP/1.1 404 No encontrado
+	 *     {
+	 *       "icon"		: String icono a utilizar en la vista,
+     *       "error"	: String número de error,
+     *       "title"	: String titulo del mensaje,
+     *       "message"	: String descripción del error
+	 *     }
+	 */
     public function index()
     {
         $parametros = Input::only('q');
@@ -36,32 +57,27 @@ class EstatusContenedorController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-	public function create()
-    {
-
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+	 * @api {get} 	/catalogo/estatus-contenedor/:id 	2. Consultar Estatus para contenedor
+	 * @apiVersion 	0.1.0
+	 * @apiName 	GetEstatusContenedor
+	 * @apiGroup 	Catalogo/EstatusContenedor
+	 *
+     * @apiSuccess 	{Json} 		data		Devuelve detalles de un estaus de contenedor
+	 *
+	 * @apiSuccessExample Ejemplo de respuesta exitosa:
+	 *     HTTP/1.1 200 OK
+	 *     {
+	 *       "data": {'id', 'descripcion', 'color', 'icono', 'created_at', 'updated_at', 'deleted_at'}
+	 *     }
+	 *
+     * @apiError EstatusContenedorNotFound No se encuentra
+     * 
+	 * @apiErrorExample Ejemplo de repuesta fallida:
+	 *     HTTP/1.1 200 No encontrado
+	 *     {
+     *       "error": No se encuentra el recurso que esta buscando
+	 *     }
+	 */
     public function show($id)
     {
         $data =EstatusContenedor::find($id);
@@ -69,39 +85,5 @@ class EstatusContenedorController extends Controller
             return response()->json(['error' => "No se encuentra el recurso que esta buscando."]);
         }
         return response()->json([ 'data' => $data]);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-     public function edit($id)
-     {
-         
-     }
-
-     /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        
-    }
-
-    /**
-    * Remove the specified resource from storage.
-    *
-    * @param  int  $id
-    * @return \Illuminate\Http\Response
-    */
-    public function destroy($id, Request $request)
-    {
-        
     }
 }

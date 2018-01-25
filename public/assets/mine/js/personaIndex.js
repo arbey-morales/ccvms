@@ -694,9 +694,11 @@ $(".js-ajax-actividad").click(function(e){
                     if(isNaN(oficial_ec)) {
                         oficial_ec = 0;
                     }
+                    //console.log('CON: '+concidencia,' NOM: '+cont.poblacion.nominal,' OF:'+cont.poblacion.oficial)
                     concidencia=parseFloat(concidencia).toFixed(2);
                     nominal_ec=parseFloat(nominal_ec).toFixed(2);
                     oficial_ec=parseFloat(oficial_ec).toFixed(2);
+                    //console.log('CON: '+concidencia,' NOM: '+nominal_ec,' OF:'+oficial_ec)
                     tabla+= '<td>'+cont.parametros.edad+'</td><td>'+Math.round(cont.poblacion.oficial)+'</td><td>'+cont.poblacion.nominal+'</td><td>'+concidencia+'</td>';
                     //$.each(cont.dosis, function( d, dosis ) {
                         $.each(cont.da, function( ap, apli ) {

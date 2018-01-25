@@ -20,10 +20,33 @@ use App\Catalogo\Ciudad;
 class ColoniaController extends Controller
 {
     /**
-     * Display a listing of the resource.
+	 * @api {get}   /catalogo/colonia/  1. Listar Colonias 
+	 * @apiVersion  0.1.0
+	 * @apiName     Colonia
+	 * @apiGroup    Catalogo/Colonia
+	 *
+	 * @apiParam    {String}        q                   nombre o código postal de Colonia (Opcional).
+     * @apiParam    {Number}        municipios_id       Id de municipio de la colonia (Opcional).
+     * @apiParam    {Request}       request             Cabeceras de la petición.
      *
-     * @return \Illuminate\Http\Response
-     */
+     * @apiSuccess  {View}          index               Vista de Colonia (Se omite si la petición es ajax).
+     * @apiSuccess  {Json}          data                Lista de colonias en formato JSON.
+	 *
+	 * @apiSuccessExample Ejemplo de respuesta exitosa:
+	 *     HTTP/1.1 200 OK
+	 *     {
+	 *       "data": [{'id', 'codigo_postal', 'nombre', 'oficina_postal', 'asentamientoCPC_id', 'entidades_id', 'municipios_id', 'tipos_asentamiento_id', 'tipos_zona_id', 'ciudades_id', 'created_at', 'updated_at', 'deleted_at'}...]
+	 *     } 
+	 *
+	 * @apiErrorExample Ejemplo de repuesta fallida:
+	 *     HTTP/1.1 404 No encontrado
+	 *     {
+	 *       "icon"     :   String icono a utilizar en la vista,
+     *       "error"    :   String número de error,
+     *       "title"    :   String titulo del mensaje,
+     *       "message"  :   String descripción del error
+	 *     }
+	 */
     public function index(Request $request)
     {
         $parametros = Input::only('q','municipios_id');
@@ -59,9 +82,26 @@ class ColoniaController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
+	 * @api {get}   /catalogo/colonia/create    2. Crear vista de nueva Colonia
+	 * @apiVersion  0.1.0
+	 * @apiName     CreateColonia
+	 * @apiGroup    Catalogo/Colonia
+     * 
+     * @apiSuccess  {View}      create          Vista alojada en: \resources\views\catalogo\colonia\create
+     * @apiSuccess  {Array}     municipios      Arreglo del catálogo de municipios
+     * @apiSuccess  {Array}     ciudades        Arreglo del catálogo de instituciones
+     * @apiSuccess  {Array}     zonas           Arreglo del catálogo de tipos de unidades
+     * @apiSuccess  {Array}     asentamientos   Arreglo del catálogo de estatus   
+     * 
+     * * @apiErrorExample Ejemplo de repuesta fallida:
+	 *     HTTP/1.1 200 No encontrado
+	 *     {
+     *       'code'    : 1,
+     *       'title'   : 'Información',
+     *       'text'    : 'Ocurrió un error al intentar eliminar los datos.',
+     *       'type'    : 'error',
+     *       'styling' : 'bootstrap3'
+	 *     }
      */
 	public function create()
     {
@@ -90,11 +130,33 @@ class ColoniaController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+	 * @api {post}  /catalogo/colonia/store  3. Crear Colonia
+	 * @apiVersion  0.1.0
+	 * @apiName     StoreColonia
+	 * @apiGroup    Catalogo/Colonia
+	 *
+     * @apiParam    {Request}    request                    Cabeceras de la petición.
+	 *
+	 * @apiSuccess  {View}       /catalogo/colonia/create   Vista para crear Colonia
+     * 
+     * @apiSuccess  {String}     msgGeneral                 Devuelve mensaje de éxito
+     * @apiSuccess  {String}     type                       Tipos válidos: success, error, warning e info
+	 *
+	 * @apiSuccessExample Ejemplo de respuesta exitosa:
+	 *     HTTP/1.1 200 OK
+	 *     {	   
+     *       'msgGeneral'   :   'Operación realizada con éxito',
+     *       'type'         :   'success'
+	 *     }
+	 *
+     * @apiError ColoniaNotFound No se encuentra
+     * 
+	 * @apiErrorExample Ejemplo de repuesta fallida:
+	 *     HTTP/1.1 200 No encontrado
+	 *     {
+     *       'msgGeneral'   :   'Ocurrió un error al intentar guardar los datos enviados.',
+     *       'type'         :   'error'
+	 */  
     public function store(Request $request)
     {
         $msgGeneral = '';
@@ -158,11 +220,27 @@ class ColoniaController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+	 * @api {get}   /catalogo/colonia/:id   4. Consultar Colonia 
+	 * @apiVersion  0.1.0
+	 * @apiName     GetColonia
+	 * @apiGroup    Catalogo/Colonia
+	 *
+     * @apiSuccess  {Json}      data        Contiene los detalles de la consulta de una colonia 
+	 *
+	 * @apiSuccessExample Ejemplo de respuesta exitosa:
+	 *     HTTP/1.1 200 OK
+	 *     {
+	 *       "data": {'id', 'codigo_postal', 'nombre', 'oficina_postal', 'asentamientoCPC_id', 'entidades_id', 'municipios_id', 'tipos_asentamiento_id', 'tipos_zona_id', 'ciudades_id', 'created_at', 'updated_at', 'deleted_at'}
+	 *     }
+	 *
+     * @apiError ColoniaNotFound No se encuentra
+     * 
+	 * @apiErrorExample Ejemplo de repuesta fallida:
+	 *     HTTP/1.1 200 No encontrado
+	 *     {
+     *       "error": No se encuentra el recurso que esta buscando
+	 *     }
+	 */
     public function show($id)
     {
         $data = Colonia::with('municipio','entidad','ciudad')->find($id);
@@ -173,11 +251,34 @@ class ColoniaController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+	 * @api {get}   /catalogo/colonia/:id/edit  5. Editar Colonia
+	 * @apiVersion  0.1.0
+	 * @apiName     EditColonia
+	 * @apiGroup    Catalogo/Colonia
+     * 
+     * @apiParam    {Number}    id              Colonia id único.
+     * 
+     * @apiSuccess  {View}      edit            Vista alojada en: \resources\views\catalogo\colonia\edit
+     * @apiSuccess  {Array}     municipios      Arreglo del catálogo de municipios
+     * @apiSuccess  {Array}     ciudades        Arreglo del catálogo de instituciones
+     * @apiSuccess  {Array}     zonas           Arreglo del catálogo de tipos de unidades
+     * @apiSuccess  {Array}     asentamientos   Arreglo del catálogo de estatus 
+	 *
+	 *
+	 * @apiSuccessExample Ejemplo de respuesta exitosa:
+	 *     HTTP/1.1 200 OK
+	 *     {
+	 *       "data": {'id', 'codigo_postal', 'nombre', 'oficina_postal', 'asentamientoCPC_id', 'entidades_id', 'municipios_id', 'tipos_asentamiento_id', 'tipos_zona_id', 'ciudades_id', 'created_at', 'updated_at', 'deleted_at'}
+	 *     }
+	 *
+     * @apiError ColoniaNotFound No se encuentra
+     * 
+	 * @apiErrorExample Ejemplo de repuesta fallida:
+	 *     HTTP/1.1 200 No encontrado
+	 *     {
+     *       "error": No se encuentra el recurso que esta buscando
+	 *     }
+	 */
      public function edit($id)
      {
          if (Auth::user()->is('admin|root') && Auth::user()->can('show.catalogos') && Auth::user()->activo==1) {
@@ -209,13 +310,34 @@ class ColoniaController extends Controller
          }
      }
 
-     /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    /**
+	 * @api {PUT}   /catalogo/colonia/update    6. Actualizar Colonia 
+	 * @apiVersion  0.1.0
+	 * @apiName     UpdateColonia
+	 * @apiGroup    Catalogo/Colonia
+     * 
+     * @apiParam    {Number}    id          Colonia id único.
+     * @apiParam    {Request}   request     Cabeceras de la petición.
+	 
+	 * @apiSuccess  {String}    msgGeneral  Devuelve mensaje de éxito
+     * @apiSuccess  {String}    type        Tipos válidos: success, error, warning e info
+	 *
+	 * @apiSuccessExample Ejemplo de respuesta exitosa:
+	 *     HTTP/1.1 200 OK
+	 *     {	   
+     *       'msgGeneral'   :   'Operación realizada con éxito',
+     *       'type'         :   'success'
+	 *     }
+	 *
+     * @apiError ColoniaNotFound No se encuentra
+     * 
+	 * @apiErrorExample Ejemplo de repuesta fallida:
+	 *     HTTP/1.1 200 No encontrado
+	 *     {
+     *       'msgGeneral'   :   'Ocurrió un error al intentar guardar los datos enviados.',
+     *       'type'         :   'error'
+	 *     }
+	 */
     public function update(Request $request, $id)
     {
         $msgGeneral = '';
@@ -278,11 +400,39 @@ class ColoniaController extends Controller
     }
 
     /**
-    * Remove the specified resource from storage.
-    *
-    * @param  int  $id
-    * @return \Illuminate\Http\Response
-    */
+	 * @api {DELETE}    /catalogo/colonia/:id   7. Borrar Colonia 
+	 * @apiVersion  0.1.0
+	 * @apiName     DestroyColonia
+	 * @apiGroup    Catalogo/Colonia
+     * 
+     * @apiParam    {Number}    id          Colonia id único.
+     * @apiParam    {Request}   request     Cabeceras de la petición.
+	 
+	 * @apiSuccess  {String}    msgGeneral  Mensaje descriptivo de la operación realizada
+     * @apiSuccess  {String}    type        Tipos válidos: success, error, warning e info
+	 *
+	 * @apiSuccessExample Ejemplo de respuesta exitosa:
+	 *     HTTP/1.1 200 OK
+	 *     {	   
+     *       'code'    : 1,
+     *       'title'   : 'Información',
+     *       'text'    : 'Se borraron los datos',
+     *       'type'    : 'success',
+     *       'styling' : 'bootstrap3'
+	 *     }
+	 *
+     * @apiError ColoniaNotFound No se encuentra
+     * 
+	 * @apiErrorExample Ejemplo de repuesta fallida:
+	 *     HTTP/1.1 200 No encontrado
+	 *     {
+     *       'code'    : 1,
+     *       'title'   : 'Información',
+     *       'text'    : 'Ocurrió un error al intentar eliminar los datos.',
+     *       'type'    : 'error',
+     *       'styling' : 'bootstrap3'
+	 *     }
+	 */
     public function destroy($id, Request $request)
     {
         $msgGeneral     = '';
