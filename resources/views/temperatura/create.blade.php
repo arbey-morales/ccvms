@@ -33,11 +33,11 @@
             <div class="row">
                 <div class="col-md-6">
                     {!! Form::label('clues_id', '* Unidad de salud', ['for' => 'clues_id'] ) !!}
-                    {!! Form::select('clues_id', [],  0, ['class' => 'form-control js-data-clues select2', 'data-parsley-required' => 'true', 'id' => 'clues_id', 'data-placeholder' => '* Unidad de salud', 'style' => 'width:100%'] ) !!}
+                    {!! Form::select('clues_id', [],  0, ['class' => 'form-control js-data-clues select2', 'data-parsley-required' => 'false', 'id' => 'clues_id', 'data-placeholder' => '* Unidad de salud', 'style' => 'width:100%'] ) !!}
                 </div>
                 <div class="col-md-6">
                     {!! Form::label('contenedores_id', '* Contenedor de biológico', ['for' => 'contenedores_id'] ) !!}
-                    {!! Form::select('contenedores_id', [],  null, ['class' => 'form-control js-data-contenedores select2', 'data-parsley-required' => 'true', 'id' => 'contenedores_id', 'data-placeholder' => '* Contenedor de biológico', 'style' => 'width:100%'] ) !!}
+                    {!! Form::select('contenedores_id', [],  null, ['class' => 'form-control js-data-contenedores select2', 'data-parsley-required' => 'false', 'id' => 'contenedores_id', 'data-placeholder' => '* Contenedor de biológico', 'style' => 'width:100%'] ) !!}
                 </div>                
             </div>
             <div class="row">
@@ -178,7 +178,7 @@
                 while (contenedores.length) { contenedores.pop(); }                
                 contenedores.push({ 'id': 0, 'text': 'Seleccionar contenedor' });  
                 $.each(response.data, function( i, cont ) {
-                    contenedores.push({ 'id': cont.id, 'text': cont.tipo_contenedor.nombre+': '+cont.marca.nombre+'/'+cont.modelo.nombre+'. Serie: '+cont.serie });
+                    contenedores.push({ 'id': cont.id, 'text': cont.tipo_contenedor.nombre+': '+cont.modelo.marca.nombre+'/'+cont.modelo.nombre+'. Serie: '+cont.serie });
                 });
                 $(".js-data-contenedores").select2({
                     language: "es",

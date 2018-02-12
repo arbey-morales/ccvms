@@ -61,7 +61,7 @@
                             <div class="bt-flabels__wrapper">
                             <span class="select-label">* Unidad de salud</span>
                             {!! Form::label('clues_id', '* Unidad de salud', ['for' => 'clues_id'] ) !!}
-                            {!! Form::select('clues_id', $clues,  0, ['class' => 'form-control js-data-clues select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'clues_id', 'data-placeholder' => '* Unidad de salud', 'style' => 'width:100%'] ) !!}
+                            {!! Form::select('clues_id', [],  0, ['class' => 'form-control js-data-clue select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'clues_id', 'data-placeholder' => '* Unidad de salud', 'style' => 'width:100%'] ) !!}
                             <span class="bt-flabels__error-desc">Requerido</span>
                             </div> 
                         </div>
@@ -76,11 +76,22 @@
                     <div class="uk-grid uk-grid-collapse">
                         <div class="uk-width-1-2">
                             <div class="bt-flabels__wrapper">
-                                {!! Form::label('folio', '* Folio', ['for' => 'folio'] ) !!}
-                                {!! Form::text('folio', null , ['class' => 'form-control', 'data-parsley-required' => 'true', 'id' => 'folio', 'autocomplete' => 'off', 'placeholder' => '* Folio' ]  ) !!}
+                                <span class="select-label">* Modelo</span>                                                         
+                                {!! Form::label('modelos_id', '* Modelo', ['for' => 'modelos_id'] ) !!}
+                                {!! Form::select('modelos_id', [], 0, ['class' => 'form-control js-data-modelo select2', 'data-parsley-type' => 'number', 'data-parsley-min' => '0', 'id' => 'modelos_id',  'data-placeholder' => '* Modelo', 'style' => 'width:100%'] ) !!}
                                 <span class="bt-flabels__error-desc">Requerido</span>
                             </div>
                         </div>
+                        <div class="uk-width-1-2">
+                            <div class="bt-flabels__wrapper"> 
+                                <span class="select-label">* Estatus</span>
+                                {!! Form::label('estatus_contenedores_id', '* Estatus', ['for' => 'estatus_contenedores_id'] ) !!}
+                                {!! Form::select('estatus_contenedores_id', $estatus,  0, ['class' => 'form-control js-data-status select2', 'data-parsley-type' => 'number', 'data-parsley-min' => '0', 'id' => 'estatus_contenedores_id',  'data-placeholder' => '* Estatus', 'style' => 'width:100%'] ) !!}
+                                <span class="bt-flabels__error-desc">Requerido</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="uk-grid uk-grid-collapse">                        
                         <div class="uk-width-1-2">
                             <div class="bt-flabels__wrapper bt-flabels--right">  
                                 <span class="select-label">* Tipos contenedores</span>
@@ -89,55 +100,10 @@
                                 <span class="bt-flabels__error-desc">Requerido</span>
                             </div>
                         </div>
-                    </div>
-                    <div class="uk-grid uk-grid-collapse">
-                        <div class="uk-width-1-2">
-                            <div class="bt-flabels__wrapper"> 
-                                <span class="select-label">* Marca</span>
-                                {!! Form::label('marcas_id', '* Marca', ['for' => 'marcas_id'] ) !!}
-                                {!! Form::select('marcas_id', $marcas,  0, ['class' => 'form-control js-data-marca select2', 'data-parsley-type' => 'number', 'data-parsley-min' => '0', 'id' => 'marcas_id',  'data-placeholder' => '* Marca', 'style' => 'width:100%'] ) !!}
-                                <span class="bt-flabels__error-desc">Requerido</span>
-                            </div>
-                        </div>
                         <div class="uk-width-1-2">
                             <div class="bt-flabels__wrapper">
-                                <span class="select-label">* Modelo</span>                                                         
-                                {!! Form::label('modelos_id', '* Modelo', ['for' => 'modelos_id'] ) !!}
-                                {!! Form::select('modelos_id', $modelos, 0, ['class' => 'form-control js-data-modelo select2', 'data-parsley-type' => 'number', 'data-parsley-min' => '0', 'id' => 'modelos_id',  'data-placeholder' => '* Modelo', 'style' => 'width:100%'] ) !!}
-                                <span class="bt-flabels__error-desc">Requerido</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="uk-grid uk-grid-collapse">
-                        <div class="uk-width-1-2">
-                            <div class="bt-flabels__wrapper"> 
-                                <span class="select-label">* Estatus</span>
-                                {!! Form::label('estatus_contenedores_id', '* Estatus', ['for' => 'estatus_contenedores_id'] ) !!}
-                                {!! Form::select('estatus_contenedores_id', $estatus,  0, ['class' => 'form-control js-data-marca select2', 'data-parsley-type' => 'number', 'data-parsley-min' => '0', 'id' => 'estatus_contenedores_id',  'data-placeholder' => '* Estatus', 'style' => 'width:100%'] ) !!}
-                                <span class="bt-flabels__error-desc">Requerido</span>
-                            </div>
-                        </div>
-                        <div class="uk-width-1-2">
-                            <div class="bt-flabels__wrapper">
-                            <span class="select-label">* Tipo de mantenimiento</span>
-                                {!! Form::label('tipos_mantenimiento', '* Tipo de mantenimiento', ['for' => 'tipos_mantenimiento'] ) !!}
-                                {!! Form::select('tipos_mantenimiento', ['0' => '* Tipo de mantenimiento','DIA' => 'Diario','SEM' => 'Semanal','QUI' => 'Quincenal','MES' => 'Mensual','IND' => 'Indefinido'],  0, ['class' => 'form-control js-data-tipo-mantenimiento select2', 'data-parsley-required' => 'true', 'data-parsley-length' => '[3, 3]', 'id' => 'tipos_mantenimiento',  'data-placeholder' => '* Tipo de mantenimiento', 'style' => 'width:100%'] ) !!}
-                                <span class="bt-flabels__error-desc">Requerido</span>                                
-                            </div>
-                        </div>
-                    </div>
-                    <div class="uk-grid uk-grid-collapse">
-                        <div class="uk-width-1-2">
-                            <div class="bt-flabels__wrapper"> 
-                                {!! Form::label('temperatura_minima', 'Temperatura mínima', ['for' => 'temperatura_minima'] ) !!}
-                                {!! Form::text('temperatura_minima', null , ['class' => 'form-control', 'data-parsley-type' => 'number', 'id' => 'temperatura_minima', 'autocomplete' => 'off', 'placeholder' => 'Temperatura mínima' ]  ) !!}
-                                <span class="bt-flabels__error-desc">Sólo números</span>
-                            </div>
-                        </div>
-                        <div class="uk-width-1-2">
-                            <div class="bt-flabels__wrapper">
-                                {!! Form::label('temperatura_maxima', 'Temperatura máxima', ['for' => 'temperatura_maxima'] ) !!}
-                                {!! Form::text('temperatura_maxima', null , ['class' => 'form-control', 'data-parsley-type' => 'number', 'id' => 'temperatura_maxima', 'autocomplete' => 'off', 'placeholder' => 'Temperatura máxima' ]  ) !!}
+                                {!! Form::label('capacidad', '* Capacidad en Pies', ['for' => 'capacidad', 'id'=>'capacidad-label'] ) !!}
+                                {!! Form::text('capacidad', null , ['class' => 'form-control', 'data-parsley-type' => 'number', 'id' => 'capacidad', 'autocomplete' => 'off', 'placeholder' => '* Capacidad en Pies' ]  ) !!}
                                 <span class="bt-flabels__error-desc">Sólo números</span>                                
                             </div>
                         </div>
@@ -166,6 +132,140 @@
 
     <!-- Select2 personalizado -->
     <script> 
-        $(".js-data-clues,.js-data-tipo-mantenimiento,.js-data-marca,.js-data-tipo-contenedor,.js-data-modelo,.js-data-estatus").select2();
+        var clues = [{ 'id': 0, 'clues':'', 'text': '* Unidad de salud' }];
+        $(".js-data-status,.js-data-tipo-contenedor,.js-data-estatus").select2();
+
+        $(".js-data-tipo-contenedor").change(function(e) {
+            if($(this).val()==4){
+                $("#capacidad").attr('placeholder', '* Capacidad en Litros');
+                $("#capacidad-label").text('* Capacidad en Litros');
+            } else {
+                $("#capacidad").attr('placeholder', '* Capacidad en Pies');
+                $("#capacidad-label").text('* Capacidad en Pies');
+            }
+        });
+
+        $(".js-data-clue").select2({
+            ajax: {
+                url: "/catalogo/clue",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                return {
+                    q: params.term, // search term
+                    page: params.page
+                };
+                },
+                processResults: function (data, params) {            
+                // parse the results into the format expected by Select2
+                // since we are using custom formatting functions we do not need to
+                // alter the remote JSON data, except to indicate that infinite
+                // scrolling can be used
+                params.page = params.page || 1;
+
+                return {
+                    results: $.map(data.data, function (item) {  // hace un  mapeo de la respuesta JSON para presentarlo en el select
+                        return {
+                            id:        item.id,
+                            clues:     item.clues,
+                            text:      item.nombre
+                        }
+                    }),
+                    pagination: {
+                    more: (params.page * 30) < data.total_count
+                    }
+                };
+                },
+                cache: true
+            },
+            escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
+            minimumInputLength: 5,
+            language: "es",
+            placeholder: {
+                id: clues[0].id, 
+                clues: clues[0].clues,
+                text: clues[0].text
+            },
+            cache: true,
+            templateResult: formatRepo, // omitted for brevity, see the source of this page
+            templateSelection: formatRepoSelection // omitted for brevity, see the source of this page
+        });
+
+        function formatRepo (clues) {
+            if (!clues.id) { return clues.text; }
+            var $clues = $(
+                '<span class="">' + clues.clues + ' - '+ clues.text +'</span>'
+            );
+            return $clues;
+        };
+        function formatRepoSelection (clues) {
+            if (!clues.id) { return clues.text; }
+            var $clues = $(
+                '<span class="results-select2"> ' + clues.clues+ ' - '+ clues.text +'</span>'
+            );
+            return $clues;
+        };
+
+        var modelos = [{ 'id': 0, 'marca':'', 'text': '* Modelo' }];
+        $(".js-data-modelo").select2({
+            ajax: {
+                url: "/catalogo/modelo",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                return {
+                    q: params.term, // search term
+                    page: params.page
+                };
+                },
+                processResults: function (data, params) {            
+                // parse the results into the format expected by Select2
+                // since we are using custom formatting functions we do not need to
+                // alter the remote JSON data, except to indicate that infinite
+                // scrolling can be used
+                params.page = params.page || 1;
+
+                return {
+                    results: $.map(data.data, function (item) {  // hace un  mapeo de la respuesta JSON para presentarlo en el select
+                        return {
+                            id:        item.id,
+                            marca:     item.marca_nombre,
+                            text:      item.nombre
+                        }
+                    }),
+                    pagination: {
+                    more: (params.page * 30) < data.total_count
+                    }
+                };
+                },
+                cache: true
+            },
+            escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
+            minimumInputLength: 2,
+            language: "es",
+            placeholder: {
+                id: modelos[0].id, 
+                marca: modelos[0].marca,
+                text: modelos[0].text
+            },
+            cache: true,
+            templateResult: formatRepoModelo, // omitted for brevity, see the source of this page
+            templateSelection: formatRepoModeloSelection // omitted for brevity, see the source of this page
+        });
+
+        function formatRepoModelo (modelos) {
+            if (!modelos.id) { return modelos.text; }
+            var $modelos = $(
+                '<span class="">' + modelos.text + ' - '+ modelos.marca +'</span>'
+            );
+            return $modelos;
+        };
+        function formatRepoModeloSelection (modelos) {
+            if (!modelos.id) { return modelos.text; }
+            var $modelos = $(
+                '<span class="results-select2"> ' + modelos.text+ ' - '+ modelos.marca +'</span>'
+            );
+            return $modelos;
+        };
     </script>
 @endsection

@@ -2,7 +2,8 @@
     <thead>
         <tr>
             <th class="text-left">#</th>
-            <th class="text-left">Nombre</th>
+            <th class="text-left">Nombre del modelo</th>
+            <th class="text-left">Marca</th>
             <th class="text-left">Creado por</th>
             <th class="text-left">Creado el</th>
             <th class="text-left">Últ. actualización</th>
@@ -14,6 +15,7 @@
             <tr id="{{ $item->id }}" data-id="{{ $item->id }}" data-nombre="{{ $item->nombre }}" data-toggle="tooltip" data-placement="top">
                 <td class="text-center">  {{ ++$key }}  </td>
                 <td class="text-left">{{ $item->nombre }}</td>
+                <td class="text-left">{{ $item->marca_nombre }}</td>
                 <td class="text-left">{{ $item->usuario_id }}</td>
                 <td class="text-left">{{ $item->created_at }}</td>
                 <td class="text-left">{{ $item->updated_at }}</td>

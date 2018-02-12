@@ -55,10 +55,22 @@
             @include('errors.msgAll') <!-- Mensages -->
             {!! Form::model($data, ['route' => ['catalogo.modelo.update', $data], 'method' => 'PUT', 'class' => 'uk-form bt-flabels js-flabels', 'data-parsley-validate' => '', 'data-parsley-errors-messages-disabled' => '']) !!}
                 <div class="bt-form__wrapper">  
-                    <div class="bt-flabels__wrapper">
-                        {!! Form::label('nombre', '* Nombre o descripción del modelo', ['for' => 'nombre'] ) !!}
-                        {!! Form::text('nombre', null , ['class' => 'form-control', 'data-parsley-required' => 'true', 'data-parsley-length' => '[3, 100]', 'id' => 'nombre', 'autocomplete' => 'off', 'placeholder' => '* Nombre o descripción del modelo' ]  ) !!}
-                        <span class="bt-flabels__error-desc">Requerido / Mín: 3 - Máx: 100 caracteres</span>                              
+                    <div class="uk-grid uk-grid-collapse">                        
+                        <div class="uk-width-1-2">
+                            <div class="bt-flabels__wrapper">
+                                {!! Form::label('nombre', '* Nombre o descripción del modelo', ['for' => 'nombre'] ) !!}
+                                {!! Form::text('nombre', null , ['class' => 'form-control', 'data-parsley-required' => 'true', 'data-parsley-length' => '[3, 100]', 'id' => 'nombre', 'autocomplete' => 'off', 'placeholder' => '* Nombre o descripción del modelo' ]  ) !!}
+                                <span class="bt-flabels__error-desc">Requerido / Mín: 3 - Máx: 100 caracteres</span>                              
+                            </div>
+                        </div>
+                        <div class="uk-width-1-2">
+                            <div class="bt-flabels__wrapper bt-flabels--right">   
+                                <span class="select-label">* Marcas</span>
+                                {!! Form::label('marcas_id', '* Marcas', ['for' => 'marcas_id'] ) !!}
+                                {!! Form::select('marcas_id', [], $data->marcas_id, ['class' => 'form-control js-data-marca select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'marcas_id',  'data-placeholder' => '* Marcas', 'style' => 'width:100%'] ) !!}
+                                <span class="bt-flabels__error-desc">Requerido</span>
+                            </div>
+                        </div>
                     </div>
                 </div>  
                     
@@ -81,4 +93,85 @@
     <!-- Form Mine -->
     {!! Html::script('assets/mine/js/parsleyjs/2.1.2/parsley.min.js') !!}
     {!! Html::script('assets/mine/js/floating-labels.js') !!}
+
+    <script>
+        var data   = $.parseJSON(escaparCharEspeciales('{{json_encode($data)}}'));
+        var marcas = [{ 'id': data.marca.id, 'text': data.marca.nombre }];
+
+        $(".js-data-marca").select2({
+            ajax: {
+                url: "../../../catalogo/marca",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                return {
+                    q: params.term, // search term
+                    page: params.page
+                };
+                },
+                processResults: function (data, params) {            
+                // parse the results into the format expected by Select2
+                // since we are using custom formatting functions we do not need to
+                // alter the remote JSON data, except to indicate that infinite
+                // scrolling can be used
+                params.page = params.page || 1;
+
+                return {
+                    results: $.map(data.data, function (item) {  // hace un  mapeo de la respuesta JSON para presentarlo en el select
+                       // console.log(item)
+                        return {
+                            id:        item.id,
+                            text:      item.nombre
+                        }
+                    }),
+                    pagination: {
+                    more: (params.page * 30) < data.total_count
+                    }
+                };
+                },
+                cache: true
+            },
+            escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
+            minimumInputLength: 2,
+            language: "es",
+            placeholder: {
+                id: marcas[0].id, 
+                text: marcas[0].text
+            },
+            cache: true,
+            templateResult: formatRepo, // omitted for brevity, see the source of this page
+            templateSelection: formatRepoSelection // omitted for brevity, see the source of this page
+        });
+
+        function formatRepo (marcas) {
+            if (!marcas.id) { return marcas.text; }
+            var $marcas = $(
+                '<span class="">'+ marcas.text +'</span>'
+            );
+            return $marcas;
+        };
+        function formatRepoSelection (marcas) {
+            if (!marcas.id) { return marcas.text; }
+            var $marcas = $(
+                '<span class="results-select2">'+ marcas.text +'</span>'
+            );
+            return $marcas;
+        };
+
+        $(".js-data-marca").select2("trigger", "select", { 
+            data: marcas[0] 
+        }); 
+
+        function escaparCharEspeciales(str) {
+            var map =
+            {
+                '&amp;': '&',
+                '&lt;': '<',
+                '&gt;': '>',
+                '&quot;': '"',
+                '&#039;': "'"
+            };
+            return str.replace(/&amp;|&lt;|&gt;|&quot;|&#039;/g, function(m) {return map[m];});
+        }
+    </script>
 @endsection

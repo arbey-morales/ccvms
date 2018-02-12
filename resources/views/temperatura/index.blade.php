@@ -127,7 +127,7 @@
                 while (contenedores.length) { contenedores.pop(); }                
                 contenedores.push({ 'id': 0, 'text': 'Seleccionar contenedor' });  
                 $.each(response.data, function( i, cont ) {
-                    contenedores.push({ 'id': cont.id, 'text': cont.tipo_contenedor.nombre+': '+cont.marca.nombre+'/'+cont.modelo.nombre+'. Serie: '+cont.serie });
+                    contenedores.push({ 'id': cont.id, 'text': cont.tipo_contenedor.nombre+': '+cont.modelo.marca.nombre+'/'+cont.modelo.nombre+'. Serie: '+cont.serie });
                 });
                 $(".js-data-contenedores").select2({
                     language: "es",

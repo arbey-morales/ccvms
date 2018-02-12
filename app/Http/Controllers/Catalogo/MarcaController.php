@@ -21,16 +21,21 @@ class MarcaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         $parametros = Input::only('q');
         if (Auth::user()->can('show.catalogos') && Auth::user()->activo==1 && Auth::user()->is('root|red-frio')) {
+            $data = Marca::where('deleted_at',NULL);
             if ($parametros['q']) {
-                $data = Marca::where('descripcion','LIKE',"%".$parametros['q']."%")->where('deleted_at',NULL)->get();
-            } else {
-                $data = Marca::where('deleted_at',NULL)->get();
-            }                  
-            return view('catalogo.marca.index')->with('data', $data)->with('q', $parametros['q']);
+                $data = $data->where('nombre','LIKE',"%".$parametros['q']."%");
+            }  
+            $data = $data->get(); 
+
+            if ($request->ajax()) {
+                return response()->json([ 'data' => $data]);
+            } else {             
+                return view('catalogo.marca.index')->with('data', $data);
+            }
         } else {
             return response()->view('errors.allPagesError', ['icon' => 'user-secret', 'error' => '403', 'title' => 'Forbidden / Prohibido', 'message' => 'No tiene autorización para acceder al recurso. Se ha negado el acceso.'], 403);
         }

@@ -16,11 +16,8 @@ class ContenedorBiologico extends Model
     public function tipoContenedor(){
         return $this->belongsTo('App\Catalogo\TipoContenedor', 'tipos_contenedores_id', 'id')->select('id','clave','nombre');
     }
-    public function marca(){
-        return $this->belongsTo('App\Catalogo\Marca', 'marcas_id', 'id')->select('id','nombre');
-    }
     public function modelo(){
-        return $this->belongsTo('App\Catalogo\Modelo', 'modelos_id', 'id')->select('id','nombre');
+        return $this->belongsTo('App\Catalogo\Modelo', 'modelos_id', 'id')->select('id','marcas_id','nombre')->with('marca');
     }
     public function estatus(){
         return $this->belongsTo('App\Catalogo\EstatusContenedor', 'estatus_contenedor_id', 'id')->select('id','descripcion','icono','color');

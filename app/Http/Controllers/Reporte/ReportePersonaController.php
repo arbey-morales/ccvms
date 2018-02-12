@@ -205,7 +205,7 @@ class ReportePersonaController extends Controller
 		if (Auth::user()->can('show.personas') && Auth::user()->activo==1) { 
             $anios_atras = Carbon::today("America/Mexico_City")->subYears(10)->format('Y-m-d');
             $personas = DB::table('personas as p')
-                ->select('p.id','p.nombre','p.apellido_paterno','p.apellido_materno','p.fecha_nacimiento','p.genero','p.curp','p.calle','p.numero','p.municipios_id','p.clues_id','clu.clues AS clu_clues','clu.jurisdicciones_id AS clu_jurisdiccion_id','clu.nombre AS clu_nombre','col.nombre AS col_nombre','loc.nombre AS loc_nombre','mun.nombre AS mun_nombre','tp.clave AS tp_clave','tp.descripcion AS tp_descripcion');  
+                ->select('p.id','p.nombre','p.tutor','p.apellido_paterno','p.apellido_materno','p.fecha_nacimiento','p.genero','p.curp','p.calle','p.numero','p.municipios_id','p.clues_id','clu.clues AS clu_clues','clu.jurisdicciones_id AS clu_jurisdiccion_id','clu.nombre AS clu_nombre','col.nombre AS col_nombre','loc.nombre AS loc_nombre','mun.nombre AS mun_nombre','tp.clave AS tp_clave','tp.descripcion AS tp_descripcion');  
 
             if (Auth::user()->is('captura'))          
                 $personas = $personas->where('clu.jurisdicciones_id', Auth::user()->idJurisdiccion);
@@ -251,6 +251,8 @@ class ReportePersonaController extends Controller
                 ->orderBy('p.apellido_materno', 'ASC')
                 ->orderBy('p.nombre', 'ASC')
                 ->get();
+
+                //dd(json_encode($data));
                 
             foreach ($data as $cont=>$value) { 
                 $value->seguimientos = collect();

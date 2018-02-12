@@ -39,7 +39,7 @@ class ContenedorBiologicoController extends Controller
 	 * @apiSuccessExample Ejemplo de respuesta exitosa:
 	 *     HTTP/1.1 200 OK
 	 *     {
-	 *       "data": [{'id', 'clues_id', 'servidor_id', 'incremento', 'tipos_contenedores_id', 'marcas_id', 'modelos_id', 'estatus_contenedor_id', 'serie', 'folio', 'tipos_mantenimiento', 'temperatura_minima', 'temperatura_maxima', 'usuario_id', 'created_at', 'updated_at', 'deleted_at'}...]
+	 *       "data": [{'id', 'clues_id', 'servidor_id', 'incremento', 'tipos_contenedores_id', 'modelos_id', 'estatus_contenedor_id', 'serie', 'folio', 'tipos_mantenimiento', 'temperatura_minima', 'temperatura_maxima', 'usuario_id', 'created_at', 'updated_at', 'deleted_at'}...]
 	 *     } 
 	 *
 	 * @apiErrorExample Ejemplo de repuesta fallida:
@@ -53,16 +53,14 @@ class ContenedorBiologicoController extends Controller
 	 */
     public function index(Request $request)
     {
-        $parametros = Input::only('q','clues_id');
         if (Auth::user()->can('show.catalogos') && Auth::user()->activo==1 && Auth::user()->is('root|red-frio')) {
-            $data = ContenedorBiologico::with('clue','tipoContenedor','marca','modelo','estatus');
-            if ($parametros['q']) {
-                $data = where('folio','LIKE',"%".$parametros['q']."%")
-                    ->orWhere('serie','LIKE',"%".$parametros['q']."%");
+            $data = ContenedorBiologico::with('clue','tipoContenedor','modelo','estatus');
+            if ($request['q']) {
+                $data = Where('serie','LIKE',"%".$request['q']."%");
             } 
             
-            if($parametros['clues_id']){
-                $data = $data->where('clues_id',$parametros['clues_id']);
+            if($request['clues_id']){
+                $data = $data->where('clues_id',$request['clues_id']);
             }
             $data = $data->where('deleted_at',NULL)
                 ->orderBy('clues_id', 'ASC')
@@ -70,7 +68,7 @@ class ContenedorBiologicoController extends Controller
             if ($request->ajax()) {
                 return Response::json([ 'data' => $data], HttpResponse::HTTP_OK);
             } else {
-                return view('catalogo.contenedor.index')->with('data', $data)->with('q', $parametros['q']);
+                return view('catalogo.contenedor.index')->with('data', $data)->with('q', $request['q']);
             }            
         } else {
             return response()->view('errors.allPagesError', ['icon' => 'user-secret', 'error' => '403', 'title' => 'Forbidden / Prohibido', 'message' => 'No tiene autorización para acceder al recurso. Se ha negado el acceso.'], 403);
@@ -85,7 +83,6 @@ class ContenedorBiologicoController extends Controller
      * 
      * @apiSuccess  {View}       create               Vista alojada en: \resources\views\catalogo\contenedor-biologico\create
      * @apiSuccess  {Array}      clues                Arreglo del catálogo de clues
-     * @apiSuccess  {Array}      marcas               Arreglo del catálogo de marcas
      * @apiSuccess  {Array}      modelos              Arreglo del catálogo de modelos
      * @apiSuccess  {Array}      tipos_contenedores   Arreglo del catálogo de tipos de contenedores
      * @apiSuccess  {Array}      estatus              Arreglo del catálogo de estatus   
@@ -104,11 +101,9 @@ class ContenedorBiologicoController extends Controller
     {
         if (Auth::user()->can('create.catalogos') && Auth::user()->is('root|red-frio') && Auth::user()->activo==1) {  
             $clues   = Clue::select('id','clues','nombre')->where('instituciones_id',13)->where('deleted_at',NULL)->where('estatus_id', 1)->get();
-            $marcas  = Marca::where('deleted_at',NULL)->get();
             $tipos_contenedores  = TipoContenedor::where('deleted_at',NULL)->get();
             $modelos  = Modelo::where('deleted_at',NULL)->get();
             $estatus = EstatusContenedor::where('deleted_at',NULL)->get();
-            $arraymarca=[];
             $arrayestatu=[];
             $arraymodelo=[];
             foreach ($estatus as $estatu) {
@@ -120,14 +115,11 @@ class ContenedorBiologicoController extends Controller
             foreach ($tipos_contenedores as $tipocontenedor) {
                 $arraytipocontenedor[$tipocontenedor->id] = $tipocontenedor->nombre;
             }
-            foreach ($marcas as $marca) {
-                $arraymarca[$marca->id] = $marca->nombre;
-            }
             foreach ($clues as $clue) {
                 $arrayclue[$clue->id] = $clue->clues.' - '.$clue->nombre;
             }
            
-            return view('catalogo.contenedor.create')->with(['clues' => $arrayclue, 'marcas' => $arraymarca, 'modelos' => $arraymodelo, 'estatus' => $arrayestatu, 'tipos_contenedores' => $arraytipocontenedor]);
+            return view('catalogo.contenedor.create')->with(['clues' => $arrayclue, 'modelos' => $arraymodelo, 'estatus' => $arrayestatu, 'tipos_contenedores' => $arraytipocontenedor]);
         } else {
             return response()->view('errors.allPagesError', ['icon' => 'user-secret', 'error' => '403', 'title' => 'Forbidden / Prohibido', 'message' => 'No tiene autorización para acceder al recurso. Se ha negado el acceso.'], 403);
         }
@@ -179,12 +171,10 @@ class ContenedorBiologicoController extends Controller
 
             $rules = [
                 'clues_id'                => 'required|min:1|numeric',
-                'marcas_id'               => 'required|min:1|numeric',
                 'modelos_id'              => 'required|min:1|numeric',
                 'tipos_contenedores_id'   => 'required|min:1|numeric',
-                'tipos_mantenimiento'     => 'required|min:3|in:DIA,SEM,QUI,MES,IND',
+                'capacidad'               => 'required|min:1',
                 'estatus_contenedores_id' => 'required|min:1|numeric',
-                'folio'                   => 'required|unique:contenedores,folio,NULL,id,deleted_at,NULL',
                 'serie'                   => 'required|min:1|max:25|unique:contenedores,serie,NULL,id,deleted_at,NULL',
                 'temperatura_minima'      => 'sometimes|numeric',
                 'temperatura_maxima'      => 'sometimes|numeric'
@@ -203,23 +193,22 @@ class ContenedorBiologicoController extends Controller
                 $incremento = 1;                             
             }
             $id = $clue->servidor.''.$incremento; 
+            $unidad_medida_id = 39; // CÁMARA FRÍA Y REFRI -> pie
+            if ($request->tipos_contenedores_id==4) // TERMO -> lts
+                $unidad_medida_id = 4;
+
             
             $contenedor = new ContenedorBiologico;
             $contenedor->id                         = $id;
             $contenedor->servidor_id                = $clue->servidor;
             $contenedor->incremento                 = $incremento;
             $contenedor->clues_id                   = $request->clues_id;
-            $contenedor->marcas_id                  = $request->marcas_id;
             $contenedor->modelos_id                 = $request->modelos_id;
+            $contenedor->unidades_medidas_id        = $unidad_medida_id;
             $contenedor->tipos_contenedores_id      = $request->tipos_contenedores_id;
-            $contenedor->tipos_mantenimiento        = $request->tipos_mantenimiento;
+            $contenedor->capacidad                  = $request->capacidad;
             $contenedor->estatus_contenedor_id      = $request->estatus_contenedores_id;
-            $contenedor->serie                      = $request->serie;  
-            $contenedor->folio                      = $request->folio;
-            if(isset($request->temperatura_minima) && $request->temperatura_minima!="" && $request->temperatura_minima!=NULL)
-                $contenedor->temperatura_minima     = $request->temperatura_minima;
-            if(isset($request->temperatura_maxima) && $request->temperatura_maxima!="" && $request->temperatura_maxima!=NULL)
-                $contenedor->temperatura_maxima     = $request->temperatura_maxima;
+            $contenedor->serie                      = $request->serie; 
             $contenedor->usuario_id                 = Auth::user()->email;
             $contenedor->created_at                 = Carbon::now("America/Mexico_City")->format('Y-m-d H:i:s');
             
@@ -260,7 +249,7 @@ class ContenedorBiologicoController extends Controller
 	 * @apiSuccessExample Ejemplo de respuesta exitosa:
 	 *     HTTP/1.1 200 OK
 	 *     {
-	 *       "data": {'id', 'clues_id', 'servidor_id', 'incremento', 'tipos_contenedores_id', 'marcas_id', 'modelos_id', 'estatus_contenedor_id', 'serie', 'folio', 'tipos_mantenimiento', 'temperatura_minima', 'temperatura_maxima', 'usuario_id', 'created_at', 'updated_at', 'deleted_at'}
+	 *       "data": {'id', 'clues_id', 'servidor_id', 'incremento', 'tipos_contenedores_id', 'modelos_id', 'estatus_contenedor_id', 'serie', 'folio', 'tipos_mantenimiento', 'temperatura_minima', 'temperatura_maxima', 'usuario_id', 'created_at', 'updated_at', 'deleted_at'}
 	 *     }
 	 *
      * @apiError ContenedorBiologicoNotFound No se encuentra
@@ -273,7 +262,7 @@ class ContenedorBiologicoController extends Controller
 	 */
     public function show($id)
     {
-        $data = ContenedorBiologico::with('clue','tipoContenedor','marca','modelo','estatus')->find($id);
+        $data = ContenedorBiologico::with('clue','tipoContenedor','modelo','estatus')->find($id);
         if(!$data ){            
             return response()->json(['error' => "No se encuentra el recurso que esta buscando."]);
         }
@@ -290,7 +279,6 @@ class ContenedorBiologicoController extends Controller
      * 
      * @apiSuccess  {View}          edit                 Vista alojada en: \resources\views\catalogo\contenedor-biologico\edit
      * @apiSuccess  {Array}         clues                Arreglo del catálogo de clues
-     * @apiSuccess  {Array}         marcas               Arreglo del catálogo de marcas
      * @apiSuccess  {Array}         modelos              Arreglo del catálogo de modelos
      * @apiSuccess  {Array}         tipos_contenedores   Arreglo del catálogo de tipos de contenedores
      * @apiSuccess  {Array}         estatus              Arreglo del catálogo de estatus  	 *
@@ -298,7 +286,7 @@ class ContenedorBiologicoController extends Controller
 	 * @apiSuccessExample Ejemplo de respuesta exitosa:
 	 *     HTTP/1.1 200 OK
 	 *     {
-	 *       "data": {'id', 'clues_id', 'servidor_id', 'incremento', 'tipos_contenedores_id', 'marcas_id', 'modelos_id', 'estatus_contenedor_id', 'serie', 'folio', 'tipos_mantenimiento', 'temperatura_minima', 'temperatura_maxima', 'usuario_id', 'created_at', 'updated_at', 'deleted_at'}
+	 *       "data": {'id', 'clues_id', 'servidor_id', 'incremento', 'tipos_contenedores_id', 'modelos_id', 'estatus_contenedor_id', 'serie', 'folio', 'tipos_mantenimiento', 'temperatura_minima', 'temperatura_maxima', 'usuario_id', 'created_at', 'updated_at', 'deleted_at'}
 	 *     }
 	 *
      * @apiError ContenedorBiologicoNotFound No se encuentra
@@ -312,30 +300,18 @@ class ContenedorBiologicoController extends Controller
      public function edit($id)
      {
          if (Auth::user()->is('root|red-frio') && Auth::user()->can('show.catalogos') && Auth::user()->activo==1) {
-            $data = ContenedorBiologico::findOrFail($id);
+            $data = ContenedorBiologico::with('modelo','clue')->find($id);
             if($data) {                
-                $clues   = Clue::select('id','clues','nombre')->where('instituciones_id',13)->where('deleted_at',NULL)->where('estatus_id', 1)->get();
-                $marcas  = Marca::where('deleted_at',NULL)->get();
                 $tipos_contenedores  = TipoContenedor::where('deleted_at',NULL)->get();
-                $modelos  = Modelo::where('deleted_at',NULL)->get();
                 $estatus = EstatusContenedor::where('deleted_at',NULL)->get();
                 foreach ($estatus as $estatu) {
                     $arrayestatu[$estatu->id] = $estatu->descripcion;
                 }
-                foreach ($modelos as $modelo) {
-                    $arraymodelo[$modelo->id] = $modelo->nombre;
-                }
                 foreach ($tipos_contenedores as $tipocontenedor) {
                     $arraytipocontenedor[$tipocontenedor->id] = $tipocontenedor->nombre;
                 }
-                foreach ($marcas as $marca) {
-                    $arraymarca[$marca->id] = $marca->nombre;
-                }
-                foreach ($clues as $clue) {
-                    $arrayclue[$clue->id] = $clue->clues.' - '.$clue->nombre;
-                }
                
-                return view('catalogo.contenedor.edit')->with(['data' => $data,'clues' => $arrayclue, 'marcas' => $arraymarca, 'modelos' => $arraymodelo, 'estatus' => $arrayestatu, 'tipos_contenedores' => $arraytipocontenedor]); 
+                return view('catalogo.contenedor.edit')->with(['data' => $data, 'estatus' => $arrayestatu, 'tipos_contenedores' => $arraytipocontenedor]); 
             } else {
                 return response()->view('errors.allPagesError', ['icon' => 'search-minus', 'error' => '404', 'title' => 'Not found / No se encuentra', 'message' => 'El servidor no puede encontrar el recurso solicitado y no es posible determinar si esta ausencia es temporal o permanente.'], 404);
             }
@@ -396,12 +372,10 @@ class ContenedorBiologicoController extends Controller
 
             $rules = [
                 'clues_id'                => 'required|min:1|numeric',
-                'marcas_id'               => 'required|min:1|numeric',
                 'modelos_id'              => 'required|min:1|numeric',
                 'tipos_contenedores_id'   => 'required|min:1|numeric',
-                'tipos_mantenimiento'     => 'required|min:3|in:DIA,SEM,QUI,MES,IND',
+                'capacidad'               => 'required|min:1',
                 'estatus_contenedores_id' => 'required|min:1|numeric',
-                'folio'                   => 'required|unique:contenedores,folio,'.$id.',id,deleted_at,NULL',
                 'serie'                   => 'required|min:1|max:25|unique:contenedores,serie,'.$id.',id,deleted_at,NULL',
                 'temperatura_minima'      => 'sometimes|numeric',
                 'temperatura_maxima'      => 'sometimes|numeric'
@@ -410,6 +384,10 @@ class ContenedorBiologicoController extends Controller
             $this->validate($request, $rules, $messages);
             $request->clues_id = (int) $request->clues_id;
             $clue = Clue::find($request->clues_id);
+            
+            $unidad_medida_id = 39; // CÁMARA FRÍA Y REFRI -> pie
+            if ($request->tipos_contenedores_id==4) // TERMO -> lts
+                $unidad_medida_id = 4;
             
             if($last_clue_id!=$request->clues_id){ // SI LAS CLUES NO COINCIDEN
                 $contenedor_id = '';
@@ -430,17 +408,12 @@ class ContenedorBiologicoController extends Controller
             $new_contenedor = $contenedor->id;
             
             $contenedor->clues_id                   = $request->clues_id;
-            $contenedor->marcas_id                  = $request->marcas_id;
             $contenedor->modelos_id                 = $request->modelos_id;
             $contenedor->tipos_contenedores_id      = $request->tipos_contenedores_id;
-            $contenedor->tipos_mantenimiento        = $request->tipos_mantenimiento;
+            $contenedor->unidades_medidas_id        = $unidad_medida_id;
             $contenedor->estatus_contenedor_id      = $request->estatus_contenedores_id;
             $contenedor->serie                      = $request->serie;  
-            $contenedor->folio                      = $request->folio;
-            if(isset($request->temperatura_minima) && $request->temperatura_minima!="" && $request->temperatura_minima!=NULL)
-                $contenedor->temperatura_minima     = $request->temperatura_minima;
-            if(isset($request->temperatura_maxima) && $request->temperatura_maxima!="" && $request->temperatura_maxima!=NULL)
-                $contenedor->temperatura_maxima     = $request->temperatura_maxima;
+            $contenedor->capacidad                  = $request->capacidad;
             $contenedor->usuario_id                 = Auth::user()->email;
             $contenedor->created_at                 = $created_at;
             $contenedor->updated_at                 = Carbon::now("America/Mexico_City")->format('Y-m-d H:i:s');

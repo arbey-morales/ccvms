@@ -9,4 +9,8 @@ class Modelo extends Model
     protected $table = 'modelos';
     
     public $timestamps = false;
+
+    public function marca(){
+        return $this->belongsTo('App\Catalogo\Marca', 'marcas_id', 'id')->select('id','nombre');
+  }
 }

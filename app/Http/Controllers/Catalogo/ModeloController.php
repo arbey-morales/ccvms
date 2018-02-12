@@ -13,6 +13,7 @@ use Carbon\Carbon;
 
 use Session; 
 use App\Catalogo\Modelo;
+use App\Catalogo\Marca;
 
 class ModeloController extends Controller
 {
@@ -21,16 +22,25 @@ class ModeloController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $parametros = Input::only('q');
-        if (Auth::user()->can('show.catalogos') && Auth::user()->activo==1 && Auth::user()->is('root|red-frio')) {
-            if ($parametros['q']) {
-                $data = Modelo::where('descripcion','LIKE',"%".$parametros['q']."%")->where('deleted_at',NULL)->get();
-            } else {
-                $data = Modelo::where('deleted_at',NULL)->get();
-            }                 
-            return view('catalogo.modelo.index')->with('data', $data)->with('q', $parametros['q']);
+        if (Auth::user()->can('show.catalogos') && Auth::user()->activo==1 && Auth::user()->is('root|red-frio')) {    
+            $data = DB::table('modelos AS mo')
+                    ->select('mo.*','ma.id AS marca_id','ma.nombre AS marca_nombre')
+                    ->leftJoin('marcas AS ma','ma.id','=','mo.marcas_id')
+                    ->where('mo.deleted_at',NULL);
+            if ($request['q']) {
+                $data = $data->where('mo.nombre','LIKE',"%".$request['q']."%")
+                             ->orWhere('ma.nombre','LIKE',"%".$request['q']."%");
+            }  
+            $data = $data->get(); 
+
+            if ($request->ajax()) {
+                return response()->json([ 'data' => $data]);
+            } else {             
+                return view('catalogo.modelo.index')->with(['data'=>$data,'q'=>$request['q']]);
+            }
+            
         } else {
             return response()->view('errors.allPagesError', ['icon' => 'user-secret', 'error' => '403', 'title' => 'Forbidden / Prohibido', 'message' => 'No tiene autorización para acceder al recurso. Se ha negado el acceso.'], 403);
         }
@@ -53,7 +63,7 @@ class ModeloController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {
+    {     
         $msgGeneral = '';
         $type       = 'flash_message_info';
 
@@ -68,13 +78,15 @@ class ModeloController extends Controller
             ];
 
             $rules = [
-                'nombre'                => 'required|min:3|max:100|string|unique:modelos,nombre,NULL,id,deleted_at,NULL'                
+                'nombre'                => 'required|min:3|max:100|string|unique:modelos,nombre,NULL,id,deleted_at,NULL',
+                'marcas_id'             => 'required|numeric|min:1'                
             ];
             
             $this->validate($request, $rules, $messages);
 
             $modelo = new Modelo;
             $modelo->nombre                       = $request->nombre;
+            $modelo->marcas_id                    = $request->marcas_id;
             $modelo->usuario_id                   = Auth::user()->email;
             $modelo->created_at                   = Carbon::now("America/Mexico_City")->format('Y-m-d H:i:s');
             
@@ -128,7 +140,7 @@ class ModeloController extends Controller
      public function edit($id)
      {
         if (Auth::user()->is('red-frio|root') && Auth::user()->can('show.catalogos') && Auth::user()->activo==1) {
-            $data = Modelo::findOrFail($id);
+            $data = Modelo::with('marca')->find($id);
             if($data) {               
                 return view('catalogo.modelo.edit')->with(['data' => $data]); 
             } else {
@@ -162,13 +174,15 @@ class ModeloController extends Controller
             ];
 
             $rules = [
-                'nombre'                => 'required|min:3|max:100|string|unique:modelos,nombre,'.$id.',id,deleted_at,NULL'                
+                'nombre'                => 'required|min:3|max:100|string|unique:modelos,nombre,'.$id.',id,deleted_at,NULL',
+                'marcas_id'             => 'required|numeric|min:1'                
             ];
             
             $this->validate($request, $rules, $messages);
 
             $modelo                = Modelo::find($id);
             $modelo->nombre        = $request->nombre;  
+            $modelo->marcas_id     = $request->marcas_id;
             $modelo->usuario_id    = Auth::user()->email;
             $modelo->updated_at = Carbon::now("America/Mexico_City")->format('Y-m-d H:i:s');
             
