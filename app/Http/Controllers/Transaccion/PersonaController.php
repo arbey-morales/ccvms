@@ -1358,7 +1358,7 @@ class PersonaController extends Controller
                 $esquema_date = explode('-', $persona->fecha_nacimiento);
                 $bd = explode('-', $persona->fecha_nacimiento);
                 $esquema = Esquema::with('vacunasEsquemas')->find($esquema_date[0]); 
-
+                
                 /**************/   
                 $esquema_detalle = DB::table('vacunas_esquemas AS ve')
                     ->select('ve.*','v.clave','v.nombre','v.orden_esquema AS v_orden_esquema','v.color_rgb')
@@ -1421,7 +1421,6 @@ class PersonaController extends Controller
                 } // End foreach principal
                 $persona->esquema_detalle = $collect_esquema_detalle;
                 /**************/
-
                 $ahora = Carbon::now("America/Mexico_City");
                 $manana = Carbon::tomorrow("America/Mexico_City");
                 $fecha_nacimiento = Carbon::parse($esquema_date[2]."-".$esquema_date[1]."-".$esquema_date[0]." 00:00:00","America/Mexico_City");

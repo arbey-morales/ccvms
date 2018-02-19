@@ -73,7 +73,6 @@ class TemperaturaContenedor2Controller extends Controller
             $minimas = [];
             $texto = '';
             $sub_texto = '';
-
             if(isset($parametros['contenedores_id'])){
                 $contenedor = ContenedorBiologico::find($parametros['contenedores_id']);
                 $texto = $contenedor->tipoContenedor->nombre.'('.$contenedor->marca->nombre.'|'.$contenedor->modelo->nombre.'|Serie: '.$contenedor->serie.') CLUE: '.$contenedor->clue->clues;

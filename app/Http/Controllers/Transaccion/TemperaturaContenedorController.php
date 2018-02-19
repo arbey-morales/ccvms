@@ -72,8 +72,10 @@ class TemperaturaContenedorController extends Controller
             $sub_texto = '';
 
             if(isset($parametros['contenedores_id'])){
+                
                 $contenedor = ContenedorBiologico::find($parametros['contenedores_id']);
-                $texto = $contenedor->tipoContenedor->nombre.'('.$contenedor->marca->nombre.'|'.$contenedor->modelo->nombre.'|Serie: '.$contenedor->serie.') CLUE: '.$contenedor->clue->clues;
+                //dd($contenedor->modelo->marca->nombre);
+                $texto = $contenedor->tipoContenedor->nombre.'('.$contenedor->modelo->marca->nombre.'|'.$contenedor->modelo->nombre.'|Serie: '.$contenedor->serie.') CLUE: '.$contenedor->clue->clues;
                 $sub_texto = $parametros['fecha_inicial'].' | '.$parametros['fecha_final'];    
 
                 if(Carbon::parse($parametros['fecha_inicial'])->diffInDays(Carbon::parse($parametros['fecha_final']), false)>=0){

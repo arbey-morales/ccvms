@@ -334,6 +334,7 @@
         var aplicaciones_dosis = $.parseJSON(escaparCharEspeciales('{{json_encode($data->personasVacunasEsquemas)}}'));
         var persona = $.parseJSON(escaparCharEspeciales('{{$data}}'));
         // GUARADARÁ EL ESQUEMA SELECCIONADO
+        console.log(persona,esquema,aplicaciones_dosis)
         var ultimo_esquema = ''; 
         var ultima_fecha_nacimiento = '{{$data->fecha_nacimiento}}';
         var original_fecha_nacimiento = '{{$data->fecha_nacimiento}}';
