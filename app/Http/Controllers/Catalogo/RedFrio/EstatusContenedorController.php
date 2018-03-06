@@ -1,17 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Catalogo;
+namespace App\Http\Controllers\Catalogo\RedFrio;
 
 use Illuminate\Http\Request;
-
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use Auth;
-use DB;
-use Input;
+use Auth, DB, Input, Response, Session; 
 
-use Session; 
-use App\Catalogo\EstatusContenedor;
+use App\Models\Catalogo\RedFrio\EstatusContenedor;
 
 class EstatusContenedorController extends Controller
 {
@@ -41,19 +37,19 @@ class EstatusContenedorController extends Controller
      *       "message"	: String descripción del error
 	 *     }
 	 */
-    public function index()
+    public function index(Request $request)
     {
         $parametros = Input::only('q');
-        if (Auth::user()->can('show.catalogos') && Auth::user()->activo==1 && Auth::user()->is('root|red-frio')) {
-            if ($parametros['q']) {
-                $data = EstatusContenedor::where('descripcion','LIKE',"%".$parametros['q']."%")->where('deleted_at',NULL)->get();
-            } else {
-                $data = EstatusContenedor::where('deleted_at',NULL)->get();
-            }      
-            return view('catalogo.estatus-contenedor.index')->with('data', $data)->with('q', $parametros['q']);
-        } else {
-            return response()->view('errors.allPagesError', ['icon' => 'user-secret', 'error' => '403', 'title' => 'Forbidden / Prohibido', 'message' => 'No tiene autorización para acceder al recurso. Se ha negado el acceso.'], 403);
-        }
+		if ($parametros['q']) {
+			$data = EstatusContenedor::where('descripcion','LIKE',"%".$parametros['q']."%")->where('deleted_at',NULL)->get();
+		} else {
+			$data = EstatusContenedor::where('deleted_at',NULL)->get();
+		}
+		if ($request->ajax()) {
+			return Response::json(array("status" => 200, "messages" => "Operación realizada con exito", "data" => $data, "total" => count($data)), 200);			
+		} else {       
+			return view('catalogo.estatus-contenedor.index')->with('data', $data)->with('q', $parametros['q']);
+		}
     }
 
     /**

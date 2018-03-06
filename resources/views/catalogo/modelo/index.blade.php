@@ -14,7 +14,7 @@
         <h2>Modelos  <i class="fa fa-angle-right text-danger"></i><small> Lista</small></h2>
         @role('root|red-frio')
             @permission('create.catalogos')
-                <a class="btn btn-default pull-right" href="{{ route('catalogo.modelo.create') }}" role="button">Nuevo modelo</a>
+                <a class="btn btn-default pull-right" href="{{ url('catalogo/red-frio/modelo/create') }}" role="button">Nuevo modelo</a>
             @endpermission 
         @endrole
         <div class="clearfix"></div>
@@ -48,7 +48,7 @@
             </div>
         </div>
     </div>
-    {!! Form::open(['route' => ['catalogo.modelo.destroy', ':ITEM_ID'], 'method' => 'DELETE', 'id' => 'form-delete']) !!}
+    {!! Form::open(['route' => ['catalogo.red-frio.modelo.destroy', ':ITEM_ID'], 'method' => 'DELETE', 'id' => 'form-delete']) !!}
     {!! Form::close() !!}
 @endsection
 @section('my_scripts')

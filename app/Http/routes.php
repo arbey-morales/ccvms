@@ -13,9 +13,9 @@
 
 Route::get('/', ['middleware' => 'auth', function () {
     if(\Auth::user()->is('red-frio')){
-        return redirect('temperatura');
+        return redirect('dashboard');
     } else {
-        return redirect('persona');
+        return redirect('dashboard');
     }        
 }]);
 
@@ -30,11 +30,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::group(['namespace' => 'Transaccion'], function () {
         // Trancacciones vacunación
         Route::get('persona/buscar',                           'PersonaController@buscar');
-        Route::get('persona/curp-repetida',                    'PersonaController@curp_repetida');
+        Route::get('persona/curp-repetida',                    'PersonaController@curpRepetida');
         Route::get('persona/curp',                             'PersonaController@curp');
         Route::get('persona/reporte',                          'PersonaController@reporte');
-        Route::resource('persona',                             'PersonaController');
-        Route::get('dashboard',                                'PersonaController@dashboard');          
+        Route::resource('persona',                             'PersonaController');                
         Route::resource('usuario',                             'UserController');
         Route::resource('monitoreo',                           'MonitoreoController');
         Route::resource('cuadro-dist-juris',                   'CuadroDistribucionJurisdiccionalController');
@@ -42,6 +41,13 @@ Route::group(['middleware' => 'auth'], function () {
         // Transacciones red de frío
         Route::resource('temperatura',                         'TemperaturaContenedorController');
     });  
+
+    Route::group(['namespace' => 'Dashboard', 'prefix' => 'dashboard',], function () {
+        Route::get('/',                                 'DashboardController@index');
+        Route::get('capturas',                          'DashboardController@capturas');  
+        Route::get('vacunacion',                        'DashboardController@vacunacion');
+        Route::get('contenedores-status',               'DashboardController@contenedoresEstatus');
+    });
 
     Route::group(['prefix' => 'persona/reporte', 'namespace' => 'Reporte'], function () {
         // Reportes vacunación
@@ -55,7 +61,7 @@ Route::group(['middleware' => 'auth'], function () {
         // Catalogos vacunación
         Route::resource('ageb',                 'AgebController',                   ['only' => ['index', 'show']]);
         Route::resource('clue',                 'ClueController');
-        Route::get('clue-contenedor',          'ClueController@cluecontenedor');
+        Route::get('clue-contenedor',           'ClueController@clueContenedor');
         Route::resource('codigo',               'CodigoCensoController',            ['only' => ['index', 'show']]);
         Route::resource('entidad',              'EntidadController',                ['only' => ['index', 'show']]);
         Route::resource('esquema',              'EsquemaController',                ['only' => ['index', 'show']]);
@@ -69,11 +75,21 @@ Route::group(['middleware' => 'auth'], function () {
         Route::resource('tipo-parto',           'TipoPartoController',              ['only' => ['index', 'show']]);
         Route::resource('poblacion-conapo',     'PoblacionConapoController');
         Route::post('poblacion-conapo/importar','PoblacionConapoController@importar');
+        // Catalogos Vacunación
+        Route::group(['prefix' => 'vacunacion', 'namespace' => 'Vacunacion'], function () {
+            Route::get('piramide-poblacional/clue-detalle',     'PiramidePoblacionalController@clueDetalle');
+            Route::resource('piramide-poblacional',     'PiramidePoblacionalController');
+        });
         // Catalogos Red de frío
-        Route::resource('marca',                'MarcaController');
-        Route::resource('modelo',               'ModeloController');
-        Route::resource('estatus-contenedor',   'EstatusContenedorController',      ['only' => ['index', 'show']]);
-        Route::resource('contenedor-biologico', 'ContenedorBiologicoController');
+        Route::group(['prefix' => 'red-frio', 'namespace' => 'RedFrio'], function () {
+            Route::resource('contenedor-biologico', 'ContenedorBiologicoController');
+            Route::resource('estatus-contenedor',   'EstatusContenedorController',      ['only' => ['index', 'show']]);
+            Route::resource('tipo-contenedor',      'TipoContenedorController',         ['only' => ['index', 'show']]);
+            Route::resource('marca',                'MarcaController');
+            Route::resource('modelo',               'ModeloController');
+        });
+                
+        
     });
 });
 

@@ -9,7 +9,7 @@
         </h3>
         <ul class="nav side-menu">
             <li>
-                <a href="{{ url('/') }}"><i class="fa fa-dashboard"></i> Tablero </a>
+                <a href="{{ url('dashboard') }}"><i class="fa fa-dashboard"></i> Dashboard </a>
             </li>
             @role('admin|root|captura')
                 @permission('show.personas')
@@ -46,10 +46,10 @@
                         <li><a href="{{ route('catalogo.colonia.index') }}">Colonias</a></li>
                     @endrole
                     @role('red-frio|root')        
-                        <li><a href="{{ route('catalogo.marca.index') }}">Marca</a></li>
-                        <li><a href="{{ route('catalogo.modelo.index') }}">Modelo</a></li>            
-                        <li><a href="{{ route('catalogo.contenedor-biologico.index') }}">Contenedores de biológico</a></li>
-                        <li><a href="{{ route('catalogo.estatus-contenedor.index') }}">Estatus contenedores</a></li>
+                        <li><a href="{{ url('catalogo/red-frio/marca') }}">Marca</a></li>
+                        <li><a href="{{ url('catalogo/red-frio/modelo') }}">Modelo</a></li>            
+                        <li><a href="{{ url('catalogo/red-frio/contenedor-biologico') }}">Contenedores de biológico</a></li>
+                        <li><a href="{{ url('catalogo/red-frio/estatus-contenedor') }}">Estatus contenedores</a></li>
                     @endrole 
                 @endpermission  
                 </ul>                
@@ -57,30 +57,34 @@
             
         </ul>
     </div>
-    @role('admin|root')
-        <!-- SECCIÓN SÓLO OPERADOR ESTATAL -->
+    @role('admin|captura|root')
         <div class="menu_section">
             <h3>OTROS AJUSTES</h3>
             <ul class="nav side-menu">
                 <li><a><i class="fa fa-tasks"></i> Info. CCVMS  <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                         @permission('show.catalogos')
-                            <li><a href="{{ route('catalogo.poblacion-conapo.index') }}">Población CONAPO</a></li>
+                            @role('admin|root')
+                                <li><a href="{{ route('catalogo.poblacion-conapo.index') }}">Población CONAPO</a></li>
+                            @endrole
+                            <li><a href="{{ url('catalogo/vacunacion/piramide-poblacional') }}">Pirámide poblacional</a></li>
                             <!--<li><a href="{{ route('usuario.index') }}">Esquema de vacunación</a></li>-->
                         @endpermission
                     </ul>
                 </li>
-                <li><a><i class="fa fa-universal-access"></i> Seguridad <span class="fa fa-chevron-down"></span></a>
-                    <ul class="nav child_menu">
-                        @permission('show.usuarios')<li><a href="{{ route('usuario.index') }}">Usuarios</a></li>@endpermission
-                        @permission('show.usuarios')<li><a href="{{ route('monitoreo.index') }}">Monitoreo</a></li>@endpermission
-                       <!-- @role('root') 
-                            @permission('show.roles')<li><a href="#">Roles</a></li>@endpermission
-                            @permission('show.permissions')<li><a href="#">Permisos</a></li>@endpermission
-                        @endrole 
-                        -->
-                    </ul>
-                </li>
+                @role('admin|root')
+                    <li><a><i class="fa fa-universal-access"></i> Seguridad <span class="fa fa-chevron-down"></span></a>
+                        <ul class="nav child_menu">
+                            @permission('show.usuarios')<li><a href="{{ route('usuario.index') }}">Usuarios</a></li>@endpermission
+                            @permission('show.usuarios')<li><a href="{{ route('monitoreo.index') }}">Monitoreo</a></li>@endpermission
+                        <!-- @role('root') 
+                                @permission('show.roles')<li><a href="#">Roles</a></li>@endpermission
+                                @permission('show.permissions')<li><a href="#">Permisos</a></li>@endpermission
+                            @endrole 
+                            -->
+                        </ul>
+                    </li>
+                @endrole
             </ul>
         </div>  
     @endrole

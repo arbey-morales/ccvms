@@ -1,25 +1,24 @@
 <?php
 
-namespace App\Http\Controllers\Catalogo;
+namespace App\Http\Controllers\Catalogo\RedFrio;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response as HttpResponse;
 use \Validator,\Hash, \Response;
-
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Auth;
 use DB;
 use Input;
 use Carbon\Carbon;
-
 use Session; 
+
 use App\Catalogo\Clue;
-use App\Catalogo\ContenedorBiologico;
-use App\Catalogo\Modelo;
-use App\Catalogo\Marca;
-use App\Catalogo\EstatusContenedor;
-use App\Catalogo\TipoContenedor;
+use App\Models\Catalogo\RedFrio\ContenedorBiologico;
+use App\Models\Catalogo\RedFrio\Modelo;
+use App\Models\Catalogo\RedFrio\Marca;
+use App\Models\Catalogo\RedFrio\EstatusContenedor;
+use App\Models\Catalogo\RedFrio\TipoContenedor;
 
 class ContenedorBiologicoController extends Controller
 {
@@ -100,7 +99,7 @@ class ContenedorBiologicoController extends Controller
 	public function create()
     {
         if (Auth::user()->can('create.catalogos') && Auth::user()->is('root|red-frio') && Auth::user()->activo==1) {  
-            $clues   = Clue::select('id','clues','nombre')->where('instituciones_id',13)->where('deleted_at',NULL)->where('estatus_id', 1)->get();
+            //$clues   = Clue::select('id','clues','nombre')->where('instituciones_id',13)->where('deleted_at',NULL)->where('estatus_id', 1)->get();
             $tipos_contenedores  = TipoContenedor::where('deleted_at',NULL)->get();
             $modelos  = Modelo::where('deleted_at',NULL)->get();
             $estatus = EstatusContenedor::where('deleted_at',NULL)->get();
@@ -109,17 +108,11 @@ class ContenedorBiologicoController extends Controller
             foreach ($estatus as $estatu) {
                 $arrayestatu[$estatu->id] = $estatu->descripcion;
             }
-            foreach ($modelos as $modelo) {
-                $arraymodelo[$modelo->id] = $modelo->nombre;
-            }
             foreach ($tipos_contenedores as $tipocontenedor) {
                 $arraytipocontenedor[$tipocontenedor->id] = $tipocontenedor->nombre;
             }
-            foreach ($clues as $clue) {
-                $arrayclue[$clue->id] = $clue->clues.' - '.$clue->nombre;
-            }
            
-            return view('catalogo.contenedor.create')->with(['clues' => $arrayclue, 'modelos' => $arraymodelo, 'estatus' => $arrayestatu, 'tipos_contenedores' => $arraytipocontenedor]);
+            return view('catalogo.contenedor.create')->with(['estatus' => $arrayestatu, 'tipos_contenedores' => $arraytipocontenedor]);
         } else {
             return response()->view('errors.allPagesError', ['icon' => 'user-secret', 'error' => '403', 'title' => 'Forbidden / Prohibido', 'message' => 'No tiene autorización para acceder al recurso. Se ha negado el acceso.'], 403);
         }
@@ -175,10 +168,14 @@ class ContenedorBiologicoController extends Controller
                 'tipos_contenedores_id'   => 'required|min:1|numeric',
                 'capacidad'               => 'required|min:1',
                 'estatus_contenedores_id' => 'required|min:1|numeric',
-                'serie'                   => 'required|min:1|max:25|unique:contenedores,serie,NULL,id,deleted_at,NULL',
                 'temperatura_minima'      => 'sometimes|numeric',
                 'temperatura_maxima'      => 'sometimes|numeric'
             ];
+
+            if(trim($request->serie)=='N/A' || trim($request->serie)=='n/a'){
+            } else {
+                $rules['serie'] = 'required|min:1|max:25|unique:contenedores,serie,NULL,id,deleted_at,NULL';
+            }
             
             $this->validate($request, $rules, $messages);
 
@@ -216,7 +213,7 @@ class ContenedorBiologicoController extends Controller
                 DB::beginTransaction();
                 if($contenedor->save()) {                    
                     DB::commit();
-                    $msgGeneral = 'Perfecto! se gurdaron los datos';
+                    $msgGeneral = 'Perfecto! se guardaron los datos';
                     $type       = 'flash_message_ok';
                     Session::flash($type, $msgGeneral);
                     return redirect()->back();
@@ -376,10 +373,14 @@ class ContenedorBiologicoController extends Controller
                 'tipos_contenedores_id'   => 'required|min:1|numeric',
                 'capacidad'               => 'required|min:1',
                 'estatus_contenedores_id' => 'required|min:1|numeric',
-                'serie'                   => 'required|min:1|max:25|unique:contenedores,serie,'.$id.',id,deleted_at,NULL',
                 'temperatura_minima'      => 'sometimes|numeric',
                 'temperatura_maxima'      => 'sometimes|numeric'
             ];
+
+            if(trim($request->serie)=='N/A' || trim($request->serie)=='n/a'){
+            } else {
+                $rules['serie'] = 'required|min:1|max:25|unique:contenedores,serie,'.$id.',id,deleted_at,NULL';
+            }
             
             $this->validate($request, $rules, $messages);
             $request->clues_id = (int) $request->clues_id;
@@ -427,10 +428,10 @@ class ContenedorBiologicoController extends Controller
                         ->update(['deleted_at' => Carbon::now("America/Mexico_City")->format('Y-m-d H:i:s')]);
                     }                    
                     DB::commit();
-                    $msgGeneral = 'Perfecto! se gurdaron los datos';
+                    $msgGeneral = 'Perfecto! se guardaron los datos';
                     $type       = 'flash_message_ok';
                     Session::flash($type, $msgGeneral);
-                    return redirect('catalogo/contenedor-biologico/'.$new_contenedor.'/edit');
+                    return redirect('catalogo/red-frio/contenedor-biologico/'.$new_contenedor.'/edit');
                 } else {
                     DB::rollback();
                     $msgGeneral = 'No se guardaron los datos personales. Verifique su información o recargue la página.';

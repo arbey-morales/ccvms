@@ -156,7 +156,7 @@ class CuadroDistribucionJurisdiccionalController extends Controller
                         
                         if($success){
                             DB::commit();
-                            $msgGeneral = 'Perfecto! se gurdaron los datos';
+                            $msgGeneral = 'Perfecto! se guardaron los datos';
                             $type       = 'flash_message_ok';
                             Session::flash($type, $msgGeneral);
                             return redirect()->back();

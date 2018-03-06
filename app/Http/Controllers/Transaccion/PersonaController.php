@@ -715,7 +715,7 @@ class PersonaController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function curp_repetida(Request $request)
+    public function curpRepetida(Request $request)
     {
         $data = Persona::where('curp', $request->curp)->where('deleted_at', NULL)->get();
         return response()->json([ 'data' => $data]);
@@ -1260,11 +1260,11 @@ class PersonaController extends Controller
 
                             if($success){
                                 DB::commit();
-                                $msgGeneral = 'Perfecto! se gurdaron los datos';
+                                $msgGeneral = 'Perfecto! se guardaron los datos';
                                 $type       = 'flash_message_ok';
                                 Session::flash($type, $msgGeneral);
                                 if ($request->ajax()) {
-                                    return response()->json(['estatus' => 'success', 'titulo' => 'Perfecto!', 'texto' => 'Se gurdaron los datos']);
+                                    return response()->json(['estatus' => 'success', 'titulo' => 'Perfecto!', 'texto' => 'Se guardaron los datos']);
                                 }
                                 return redirect()->back();
                             } else {

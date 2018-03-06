@@ -4,7 +4,7 @@ namespace App\Catalogo;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ContenedorBiologico extends Model
+class ContenedorBiologico2 extends Model
 {
     protected $table = 'contenedores';
 

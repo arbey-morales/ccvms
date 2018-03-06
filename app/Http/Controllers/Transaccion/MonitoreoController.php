@@ -173,7 +173,7 @@ class MonitoreoController extends Controller
                         // Attach Roles
                         $usuario->attachRole(3);
 
-                        $msgGeneral = 'Hey! se gurdaron los datos';
+                        $msgGeneral = 'Hey! se guardaron los datos';
                         $type       = 'flash_message_ok';
                     } else {
                         $msgGeneral = 'No se guardaron los datos.';

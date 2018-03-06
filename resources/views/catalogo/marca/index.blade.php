@@ -14,7 +14,7 @@
         <h2>Marcas  <i class="fa fa-angle-right text-danger"></i><small> Lista</small></h2>
         @role('root|red-frio')
             @permission('create.catalogos')
-                <a class="btn btn-default pull-right" href="{{ route('catalogo.marca.create') }}" role="button">Nueva marca</a>
+                <a class="btn btn-default pull-right" href="{{ url('catalogo/red-frio/marca/create') }}" role="button">Nueva marca</a>
             @endpermission 
         @endrole
         <div class="clearfix"></div>
@@ -48,7 +48,7 @@
             </div>
         </div>
     </div>
-    {!! Form::open(['route' => ['catalogo.marca.destroy', ':ITEM_ID'], 'method' => 'DELETE', 'id' => 'form-delete']) !!}
+    {!! Form::open(['route' => ['catalogo.red-frio.marca.destroy', ':ITEM_ID'], 'method' => 'DELETE', 'id' => 'form-delete']) !!}
     {!! Form::close() !!}
 @endsection
 @section('my_scripts')

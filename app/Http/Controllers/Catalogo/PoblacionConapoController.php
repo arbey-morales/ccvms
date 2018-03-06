@@ -150,7 +150,7 @@ class PoblacionConapoController extends Controller
                     
                 if($all) {                    
                     DB::commit();
-                    $msgGeneral = 'Perfecto! se gurdaron los datos';
+                    $msgGeneral = 'Perfecto! se guardaron los datos';
                     $type       = 'flash_message_ok';
                     Session::flash($type, $msgGeneral);
                     return redirect()->back();
@@ -225,7 +225,7 @@ class PoblacionConapoController extends Controller
                     }
                 })->get();
                                     
-                $msgGeneral = 'Perfecto! se gurdaron los datos';
+                $msgGeneral = 'Perfecto! se guardaron los datos';
                 $type       = 'flash_message_ok';
             } catch(\PDOException $e){
                 $msgGeneral = 'Ocurrió un error al intentar guardar los datos enviados. Recargue la página e intente de nuevo';

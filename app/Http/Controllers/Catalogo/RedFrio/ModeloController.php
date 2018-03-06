@@ -1,19 +1,18 @@
 <?php
 
-namespace App\Http\Controllers\Catalogo;
+namespace App\Http\Controllers\Catalogo\RedFrio;
 
 use Illuminate\Http\Request;
-
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Auth;
 use DB;
 use Input;
 use Carbon\Carbon;
-
 use Session; 
-use App\Catalogo\Modelo;
-use App\Catalogo\Marca;
+
+use App\Models\Catalogo\RedFrio\Modelo;
+use App\Models\Catalogo\RedFrio\Marca;
 
 class ModeloController extends Controller
 {
@@ -94,7 +93,7 @@ class ModeloController extends Controller
                 DB::beginTransaction();
                 if($modelo->save()) {                    
                     DB::commit();
-                    $msgGeneral = 'Perfecto! se gurdaron los datos';
+                    $msgGeneral = 'Perfecto! se guardaron los datos';
                     $type       = 'flash_message_ok';
                     Session::flash($type, $msgGeneral);
                     return redirect()->back();
@@ -190,7 +189,7 @@ class ModeloController extends Controller
                 DB::beginTransaction();
                 if($modelo->save()) {                    
                     DB::commit();
-                    $msgGeneral = 'Perfecto! se gurdaron los datos';
+                    $msgGeneral = 'Perfecto! se guardaron los datos';
                     $type       = 'flash_message_ok';
                     Session::flash($type, $msgGeneral);
                     return redirect()->back();

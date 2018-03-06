@@ -173,7 +173,7 @@
 
         $(".js-data-clues").change(function(){
             var clue_id = $(this).val();
-            $.get('../catalogo/contenedor-biologico/',{clues_id:clue_id}, function(response, status){ // Consulta        
+            $.get('../catalogo/red-frio/contenedor-biologico/',{clues_id:clue_id}, function(response, status){ // Consulta        
                 $('.js-data-contenedores').empty();
                 while (contenedores.length) { contenedores.pop(); }                
                 contenedores.push({ 'id': 0, 'text': 'Seleccionar contenedor' });  

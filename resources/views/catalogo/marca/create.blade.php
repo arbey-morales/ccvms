@@ -35,7 +35,7 @@
             <h2><i class="fa fa-flag-checkered"></i> Marcas <i class="fa fa-angle-right text-danger"></i><small> Nuevo</small></h2>
             <ul class="nav navbar-right panel_toolbox">
                 <li>
-                    <a class="" href="{{ route('catalogo.marca.index') }}">
+                    <a class="" href="{{ redirect()->getUrlGenerator()->previous() }}">
                         <i class="fa fa-chevron-circle-left" style="font-size:30px;"></i>
                     </a>
                 </li>
@@ -49,7 +49,7 @@
         </div>
         <div class="x_content">
             @include('errors.msgAll') <!-- Mensages -->
-            {!! Form::open([ 'route' => 'catalogo.marca.store', 'id' => 'personas-form', 'method' => 'POST', 'class' => 'uk-form bt-flabels js-flabels', 'data-parsley-validate' => 'on', 'data-parsley-errors-messages-disabled' => 'on']) !!}
+            {!! Form::open([ 'route' => 'catalogo.red-frio.marca.store', 'id' => 'personas-form', 'method' => 'POST', 'class' => 'uk-form bt-flabels js-flabels', 'data-parsley-validate' => 'on', 'data-parsley-errors-messages-disabled' => 'on']) !!}
                
                 <div class="bt-form__wrapper">  
                     <div class="bt-flabels__wrapper">

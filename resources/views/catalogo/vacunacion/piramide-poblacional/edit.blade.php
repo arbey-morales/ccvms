@@ -39,7 +39,7 @@
         <h2><i class="fa fa-flag-checkered"></i> Marcas <i class="fa fa-angle-right text-danger"></i><small> Editar</small></h2>
         <ul class="nav navbar-right panel_toolbox">
             <li>
-                <a class="" href="{{ redirect()->getUrlGenerator()->previous() }}">
+                <a class="" href="{{ route('catalogo.marca.index') }}">
                     <i class="fa fa-chevron-circle-left" style="font-size:30px;"></i>
                 </a>
             </li>
@@ -53,7 +53,7 @@
         </div>
         <div class="x_content">
             @include('errors.msgAll') <!-- Mensages -->
-            {!! Form::model($data, ['route' => ['catalogo.red-frio.marca.update', $data], 'method' => 'PUT', 'class' => 'uk-form bt-flabels js-flabels', 'data-parsley-validate' => '', 'data-parsley-errors-messages-disabled' => '']) !!}
+            {!! Form::model($data, ['route' => ['catalogo.marca.update', $data], 'method' => 'PUT', 'class' => 'uk-form bt-flabels js-flabels', 'data-parsley-validate' => '', 'data-parsley-errors-messages-disabled' => '']) !!}
                 <div class="bt-form__wrapper">  
                     <div class="bt-flabels__wrapper">
                         {!! Form::label('nombre', '* Nombre o descripción de la marca', ['for' => 'nombre'] ) !!}

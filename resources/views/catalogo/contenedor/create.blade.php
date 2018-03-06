@@ -39,7 +39,7 @@
             <h2><i class="fa fa fa-cube"></i> Contenedores de biológico <i class="fa fa-angle-right text-danger"></i><small> Nuevo</small></h2>
             <ul class="nav navbar-right panel_toolbox">
                 <li>
-                    <a class="" href="{{ route('catalogo.contenedor-biologico.index') }}">
+                    <a class="" href="{{ url('catalogo/red-frio/contenedor-biologico') }}">
                         <i class="fa fa-chevron-circle-left" style="font-size:30px;"></i>
                     </a>
                 </li>
@@ -53,7 +53,7 @@
         </div>
         <div class="x_content">
             @include('errors.msgAll') <!-- Mensages -->
-            {!! Form::open([ 'route' => 'catalogo.contenedor-biologico.store', 'id' => 'personas-form', 'method' => 'POST', 'class' => 'uk-form bt-flabels js-flabels', 'data-parsley-validate' => 'on', 'data-parsley-errors-messages-disabled' => 'on']) !!}
+            {!! Form::open([ 'route' => 'catalogo.red-frio.contenedor-biologico.store', 'id' => 'personas-form', 'method' => 'POST', 'class' => 'uk-form bt-flabels js-flabels', 'data-parsley-validate' => 'on', 'data-parsley-errors-messages-disabled' => 'on']) !!}
                
                 <div class="bt-form__wrapper">  
                     <div class="uk-grid uk-grid-collapse">                        
@@ -68,7 +68,7 @@
                         <div class="uk-width-1-2">
                             <div class="bt-flabels__wrapper">
                                 {!! Form::label('serie', '* No. de serie', ['for' => 'serie'] ) !!}
-                                {!! Form::text('serie', null , ['class' => 'form-control', 'data-parsley-required' => 'true', 'data-parsley-length' => '[1, 25]', 'id' => 'serie', 'autocomplete' => 'off', 'placeholder' => '* No. de serie' ]  ) !!}
+                                {!! Form::text('serie', null , ['class' => 'form-control', 'data-parsley-required' => 'true', 'data-parsley-length' => '[1, 25]', 'id' => 'serie', 'autocomplete' => 'off', 'data-toggle'=>'tooltip', 'data-placement'=>'top', 'title'=>'', 'data-original-title'=>'Si el contenedor no cuenta con número de serie o es ilegible, use la clave: N/A', 'placeholder' => '* No. de serie' ]  ) !!}
                                 <span class="bt-flabels__error-desc">Requerido / Min 1, Máx 25 caracteres</span>
                             </div>
                         </div>
@@ -209,7 +209,7 @@
         var modelos = [{ 'id': 0, 'marca':'', 'text': '* Modelo' }];
         $(".js-data-modelo").select2({
             ajax: {
-                url: "/catalogo/modelo",
+                url: "/catalogo/red-frio/modelo",
                 dataType: 'json',
                 delay: 250,
                 data: function (params) {

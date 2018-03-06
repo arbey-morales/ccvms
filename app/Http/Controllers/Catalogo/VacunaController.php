@@ -86,7 +86,7 @@ class VacunaController extends Controller
                  DB::beginTransaction();
                  if($marca->save()) {                    
                      DB::commit();
-                     $msgGeneral = 'Perfecto! se gurdaron los datos';
+                     $msgGeneral = 'Perfecto! se guardaron los datos';
                      $type       = 'flash_message_ok';
                      Session::flash($type, $msgGeneral);
                      return redirect()->back();
@@ -180,7 +180,7 @@ class VacunaController extends Controller
                  DB::beginTransaction();
                  if($marca->save()) {                    
                      DB::commit();
-                     $msgGeneral = 'Perfecto! se gurdaron los datos';
+                     $msgGeneral = 'Perfecto! se guardaron los datos';
                      $type       = 'flash_message_ok';
                      Session::flash($type, $msgGeneral);
                      return redirect()->back();

@@ -20,7 +20,7 @@ use App\Catalogo\Tipologia;
 use App\Catalogo\TipoUnidad;
 use App\Catalogo\Estatus;
 use App\Catalogo\Servidor;
-use App\Catalogo\ContenedorBiologico;
+use App\Models\Catalogo\RedFrio\ContenedorBiologico;
 
 class ClueController extends Controller
 {
@@ -229,7 +229,7 @@ class ClueController extends Controller
                     $servidor->created_at                = date('Y-m-d H:m:s');
                     $servidor->save();
                     DB::commit();
-                    $msgGeneral = 'Perfecto! se gurdaron los datos';
+                    $msgGeneral = 'Perfecto! se guardaron los datos';
                     $type       = 'flash_message_ok';
                     Session::flash($type, $msgGeneral);
                     return redirect()->back();
@@ -436,7 +436,7 @@ class ClueController extends Controller
                 DB::beginTransaction();
                 if($clue->save()) {
                     DB::commit();
-                    $msgGeneral = 'Perfecto! se gurdaron los datos';
+                    $msgGeneral = 'Perfecto! se guardaron los datos';
                     $type       = 'flash_message_ok';
                     Session::flash($type, $msgGeneral);
                     return redirect()->back();
@@ -564,7 +564,7 @@ class ClueController extends Controller
      *       'type'         :  'error'
 	 *     }
 	 */
-    public function cluecontenedor(Request $request)
+    public function clueContenedor(Request $request)
     {
         $parametros = Input::only('q','municipios_id');
         if (Auth::user()->can('show.catalogos') && Auth::user()->activo==1) {

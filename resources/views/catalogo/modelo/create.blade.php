@@ -37,7 +37,7 @@
             <h2><i class="fa fa-flag-checkered"></i> Modelos <i class="fa fa-angle-right text-danger"></i><small> Nuevo</small></h2>
             <ul class="nav navbar-right panel_toolbox">
                 <li>
-                    <a class="" href="{{ route('catalogo.modelo.index') }}">
+                    <a class="" href="{{ redirect()->getUrlGenerator()->previous() }}">
                         <i class="fa fa-chevron-circle-left" style="font-size:30px;"></i>
                     </a>
                 </li>
@@ -51,7 +51,7 @@
         </div>
         <div class="x_content">
             @include('errors.msgAll') <!-- Mensages -->
-            {!! Form::open([ 'route' => 'catalogo.modelo.store', 'id' => 'personas-form', 'method' => 'POST', 'class' => 'uk-form bt-flabels js-flabels', 'data-parsley-validate' => 'on', 'data-parsley-errors-messages-disabled' => 'on']) !!}
+            {!! Form::open([ 'route' => 'catalogo.red-frio.modelo.store', 'id' => 'personas-form', 'method' => 'POST', 'class' => 'uk-form bt-flabels js-flabels', 'data-parsley-validate' => 'on', 'data-parsley-errors-messages-disabled' => 'on']) !!}
                
                 <div class="bt-form__wrapper">  
                     <div class="uk-grid uk-grid-collapse">                        
@@ -98,7 +98,7 @@
         var marcas = [{ 'id': 0, 'text': 'Seleccionar marca' }];
         $(".js-data-marca").select2({
             ajax: {
-                url: "../../catalogo/marca",
+                url: "../../catalogo/red-frio/marca",
                 dataType: 'json',
                 delay: 250,
                 data: function (params) {
