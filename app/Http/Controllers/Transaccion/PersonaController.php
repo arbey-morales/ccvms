@@ -955,7 +955,7 @@ class PersonaController extends Controller
 
         if (Auth::user()->can('create.personas') && Auth::user()->activo==1) {
             $messages = [
-                'required' => 'El campo :attribute es requirido',
+                'required' => 'El campo :attribute es requerido',
                 'min'      => 'El campo :attribute debe tener :min caracteres como mínimo',
                 'max'      => 'El campo :attribute debe tener :max caracteres como máximo',
                 'mimes'    => 'El campo :attribute debe ser de tipo jpeg o jpg.',
@@ -1494,12 +1494,12 @@ class PersonaController extends Controller
                     $municipios = Municipio::select('id','clave','nombre')->where('deleted_at',NULL)->get();
                     //$localidades = Localidad::select('id','clave','nombre')->where('deleted_at',NULL)->get();
                     //$colonias = Colonia::select('id','nombre','municipios_id')->where('deleted_at',NULL)->with('municipio')->get();
-                    $agebs = Ageb::select('id','municipios_id','localidades_id')->where('deleted_at',NULL)->with('municipio','localidad')->get();
+                    //$agebs = Ageb::select('id','municipios_id','localidades_id')->where('deleted_at',NULL)->with('municipio','localidad')->get();
                     $persona = Persona::where('id', $id_persona)->where('deleted_at', NULL)->with('clue','pais','entidadNacimiento','entidadDomicilio','municipio','localidad','colonia','ageb','afiliacion','codigo','tipoParto','personasVacunasEsquemas')->first();
                 } else {
                     //$localidades = collect();
                     //$colonias = collect();
-                    $agebs = collect();
+                    //$agebs = collect();
                     //$clues = Clue::select('id','clues','nombre')->where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->where('estatus_id', 1)->get();
                     $municipios = Municipio::select('id','clave','nombre')->where('jurisdicciones_id', Auth::user()->idJurisdiccion)->where('deleted_at',NULL)->get();
                     /*foreach($municipios as $key=> $mpio){
@@ -1535,10 +1535,10 @@ class PersonaController extends Controller
                     $arraymunicipio[$municipio->id] = $municipio->clave .' - '.$municipio->nombre;
                 }
 
-                $arrayageb[0] = 'Seleccionar AGEB';
-                foreach ($agebs as $ageb) {
-                    $arrayageb[$ageb->id] = substr($ageb->id, -4).' - '.$ageb->localidad->nombre.', '.$ageb->municipio->nombre;
-                }
+                // $arrayageb[0] = 'Seleccionar AGEB';
+                // foreach ($agebs as $ageb) {
+                //     $arrayageb[$ageb->id] = substr($ageb->id, -4).' - '.$ageb->localidad->nombre.', '.$ageb->municipio->nombre;
+                // }
                 
                 foreach ($estados as $estado) {
                     $arrayestado[$estado->id] = $estado->clave .' - '.$estado->nombre;
@@ -1651,7 +1651,7 @@ class PersonaController extends Controller
                 $fn_nino = explode("-",$persona->fecha_nacimiento);
                 $persona->fecha_nacimiento = date($fn_nino[2].'-'.$fn_nino[1].'-'.$fn_nino[0]);
 
-                return view('persona.edit')->with(['esquema' => $esquema, 'data' => $persona, 'agebs' => $arrayageb, 'instituciones' => $arrayinstitucion, 'municipios' => $arraymunicipio, 'estados' => $arrayestado, 'codigos' => $arraycodigo, 'partos' => $arraytipoparto ]);
+                return view('persona.edit')->with(['esquema' => $esquema, 'data' => $persona, 'instituciones' => $arrayinstitucion, 'municipios' => $arraymunicipio, 'estados' => $arrayestado, 'codigos' => $arraycodigo, 'partos' => $arraytipoparto ]);
             } else {
                 return response()->view('errors.allPagesError', ['icon' => 'search-minus', 'error' => '404', 'title' => 'Not found / No se encuentra', 'message' => 'El servidor no puede encontrar el recurso solicitado y no es posible determinar si esta ausencia es temporal o permanente.'], 404);
             }
@@ -1702,7 +1702,7 @@ class PersonaController extends Controller
 
         if (Auth::user()->can('update.personas') && Auth::user()->activo==1) {
             $messages = [
-                'required' => 'El campo :attribute es requirido',
+                'required' => 'El campo :attribute es requerido',
                 'min'      => 'El campo :attribute debe tener :min caracteres como mínimo',
                 'max'      => 'El campo :attribute debe tener :max caracteres como máximo',
                 'mimes'    => 'El campo :attribute debe ser de tipo jpeg o jpg.',

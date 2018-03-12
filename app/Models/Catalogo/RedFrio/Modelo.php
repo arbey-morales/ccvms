@@ -13,5 +13,5 @@ class Modelo extends BaseModel
 
     public function marca(){
         return $this->belongsTo('App\Models\Catalogo\RedFrio\Marca', 'marcas_id', 'id')->select('id','nombre');
-  }
+    }
 }

@@ -81,7 +81,7 @@ class LocalidadController extends Controller
  
          if (Auth::user()->is('root|admin') && Auth::user()->can('create.catalogos') && Auth::user()->activo==1) {
              $messages = [
-                 'required' => 'El campo :attribute es requirido',
+                 'required' => 'El campo :attribute es requerido',
                  'min'      => 'El campo :attribute debe tener :min caracteres como mínimo',
                  'max'      => 'El campo :attribute debe tener :max caracteres como máximo',
                  'unique'   => 'El campo :attribute ya existe',
@@ -193,7 +193,7 @@ class LocalidadController extends Controller
 
         if (Auth::user()->is('root|admin') && Auth::user()->can('update.catalogos') && Auth::user()->activo==1) {
             $messages = [
-                'required' => 'El campo :attribute es requirido',
+                'required' => 'El campo :attribute es requerido',
                 'min'      => 'El campo :attribute debe tener :min caracteres como mínimo',
                 'max'      => 'El campo :attribute debe tener :max caracteres como máximo',
                 'unique'   => 'El campo :attribute ya existe',

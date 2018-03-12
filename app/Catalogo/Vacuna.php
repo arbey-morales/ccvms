@@ -14,6 +14,6 @@ class Vacuna extends Model
 
     public function vacunasEsquemas()
     {
-        return $this->hasMany('App\Catalogo\VacunaEsquema', 'vacuna_id', 'id');
+        return $this->hasMany('App\Catalogo\VacunaEsquema', 'vacunas_id', 'id');
     }
 }

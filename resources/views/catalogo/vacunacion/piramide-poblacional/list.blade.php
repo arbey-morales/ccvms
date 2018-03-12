@@ -1,7 +1,7 @@
 <table id="datatable-responsive" class="table table-striped table-bordered dt-responsive nowrap" cellspacing="0" width="100%">
 <thead>
     <tr>
-        <th style="vertical-align:middle; text-align:center;" rowspan="2">Municipio / Edades</th>
+        <th style="vertical-align:middle; text-align:center;" rowspan="2">Unidad de salud</th>
         <th style="text-align:center; color:#4d81bf;" colspan="11">Hombres</th>
         <th style="text-align:center; color:#ed1586;" colspan="11">Mujeres</th>
     </tr>

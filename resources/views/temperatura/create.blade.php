@@ -42,18 +42,32 @@
             </div>
             <div class="row">
                 <div class="col-md-2"><br>
-                    {!! Form::checkbox('desde_archivo', 'SI', false, ['class' => 'js-switch', 'id' => 'desde_archivo'] ) !!} 
+                    {!! Form::checkbox('desde_archivo', 'SI', true, ['class' => 'js-switch', 'id' => 'desde_archivo'] ) !!} 
                     {!! Form::label('desde_archivo', 'Cargar un archivo', ['for' => 'desde_archivo', 'style' => 'font-size:large; padding-right:10px;'] ) !!}
                 </div>
-                <div id="manual" class="col-md-5 show">
-                    {!! Form::label('temperatura', '* Temperatura', ['for' => 'temperatura'] ) !!}
-                    {!! Form::text('temperatura', null , ['class' => 'form-control', 'style' => 'width:200px', 'id' => 'temperatura', 'autocomplete' => 'off', 'placeholder' => '4.0' ]  ) !!}
-                </div>
-                <div id="archivo" class="col-md-5 hidden">
+            </div>
+            <div id="archivo" class="row show">
+                <div class="col-md-5">
                     {!! Form::label('archivo', 'Archivo de temperaturas', ['for' => 'archivo'] ) !!}
                     {!! Form::file('archivo', null , ['class' => 'form-control', 'id' => 'archivo', 'accept' => '.txt'] ) !!}
                 </div>
-                <div class="col-md-4">
+            </div>
+            <div id="manual" class="row hidden">
+                <div class="col-md-3">
+                    {!! Form::label('temperatura', '* Temperatura', ['for' => 'temperatura'] ) !!}
+                    {!! Form::text('temperatura', null , ['class' => 'form-control', 'style' => '', 'id' => 'temperatura', 'autocomplete' => 'off', 'placeholder' => '4.0' ]  ) !!}
+                </div>
+                <div class="col-md-3">
+                    {!! Form::label('fecha', '* Fecha', ['for' => 'fecha'] ) !!}
+                    {!! Form::text('fecha', null , ['class' => 'form-control fecha', 'style' => '', 'id' => 'fecha', 'autocomplete' => 'off' ]  ) !!}
+                </div>
+                <div class="col-md-3">
+                    {!! Form::label('hora', '* Hora', ['for' => 'hora'] ) !!}
+                    {!! Form::text('hora', null , ['class' => 'form-control hora', 'style' => '', 'id' => 'hora', 'autocomplete' => 'off' ]  ) !!}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
                     <br>
                     <span id="cargando"></span>
                     @permission('create.catalogos')<button type="submit" class="btn btn-primary btn-lg js-submit pull-right"> <i class="fa fa-save"></i> Guardar! </button>@endpermission
@@ -83,11 +97,13 @@
     {!! Html::script('assets/mine/js/myTags.js') !!}
 
     <script>
-        $(document).ready(function(){
-            //setTimeout(function(){ $(".js-data-clues").change(); }, 1000);
-        });
         var contenedores = [{ 'id': 0, 'text': 'Seleccionar contenedor' }];
         var clues = [{ 'id': 0, 'clues':'', 'text': '* Unidad de salud' }];
+        var fecha = moment().format("YYYY-MM-DD");
+        var hora = moment().format("hh:mm:s");
+        $(".fecha").val(fecha);
+        $(".hora").val(hora);
+        console.log(hora)
         $(".js-data-contenedores").select2();
         $('#desde_archivo').change(function() {
             if ($(this).is(':checked')){

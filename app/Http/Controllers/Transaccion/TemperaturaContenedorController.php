@@ -8,15 +8,12 @@ use \Validator,\Hash, \Response;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use Auth;
-use DB;
-use Input;
+use Auth,DB, Input, Session;
 use Carbon\Carbon;
 
-use Session;
 use App\Transaccion\TemperaturaContenedor;
 use App\Catalogo\Clue;
-use App\Catalogo\ContenedorBiologico;
+use App\Models\Catalogo\RedFrio\ContenedorBiologico;
 
 class TemperaturaContenedorController extends Controller
 {
@@ -186,7 +183,7 @@ class TemperaturaContenedorController extends Controller
         $type       = 'flash_message_info';
         if (Auth::user()->can('create.catalogos') && Auth::user()->activo==1) { 
             $messages = [
-                'required' => 'El campo :attribute es requirido',
+                'required' => 'El campo :attribute es requerido',
                 'min'      => 'El campo :attribute debe tener :min caracteres como mínimo',
                 'max'      => 'El campo :attribute debe tener :max caracteres como máximo',
                 'mimes'    => 'El :attribute debe ser de tipo .txt',
@@ -203,11 +200,14 @@ class TemperaturaContenedorController extends Controller
                 $rules['archivo'] = 'required|mimes:txt';
             } else { // desde input
                 $rules['temperatura'] = 'required|numeric';
+                $rules['fecha'] = 'required|date';
+                // $rules['hora'] = 'date_format:H:i:s';
             }
             
             $this->validate($request, $rules, $messages);
             try {
-                if(isset($request->desde_archivo) && $request->desde_archivo=="SI"){                                
+                if(isset($request->desde_archivo) && $request->desde_archivo=="SI"){
+                                                    
                     $file = \File::get($request->archivo);
                     $cabeceras = substr($file, 0, strrpos($file, "@HEADER ENDS"));
 
@@ -264,8 +264,9 @@ class TemperaturaContenedorController extends Controller
                     $msgGeneral = 'Hey! se guardaron los datos';
                     $type       = 'flash_message_ok';
                 } else {
-                    $clue = Clue::findOrFail($request->clues_id);  
-                    $contenedor = ContenedorBiologico::findOrFail($request->contenedores_id);
+                    
+                    $clue = Clue::find($request->clues_id);  
+                    $contenedor = ContenedorBiologico::find($request->contenedores_id);
                     $id = '';
                     $incremento = 0;
                     $increment = TemperaturaContenedor::where('servidor_id', $clue->servidor)->orderBy('incremento','DESC')->take(1)->get();
@@ -280,9 +281,9 @@ class TemperaturaContenedorController extends Controller
                     $temperatura->id                 = $id;
                     $temperatura->servidor_id        = $clue->servidor;
                     $temperatura->incremento         = $incremento;
-                    $temperatura->contenedores_id    = $request->contenedores_id;
-                    $temperatura->fecha              = Carbon::now("America/Mexico_City")->format('Y-m-d');
-                    $temperatura->hora               = Carbon::now("America/Mexico_City")->format('H:i:s');
+                    $temperatura->contenedores_id    = $contenedor->id;
+                    $temperatura->fecha              = $request->fecha;
+                    $temperatura->hora               = $request->hora;
                     $temperatura->temperatura        = $request->temperatura;
                     $temperatura->observacion        = 'Guardado desde formulario';
                     $temperatura->usuario_id         = Auth::user()->email;
@@ -293,7 +294,7 @@ class TemperaturaContenedorController extends Controller
                     $type       = 'flash_message_ok';                     
                 }
             } catch(\PDOException $e){
-                $msgGeneral = 'Ocurrió un error al intentar guardar los datos enviados.'.$e->getMessage();
+                $msgGeneral = 'Ocurrió un error al intentar guardar los datos enviados.';
                 $type       = 'flash_message_error';
             }
 

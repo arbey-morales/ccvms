@@ -93,7 +93,7 @@
                         <div class="uk-width-1-2">
                             <div class="bt-flabels__wrapper bt-flabels--right">
                                 {!! Form::label('fecha_nacimiento', '* Fecha de nacimiento', ['for' => 'fecha_nacimiento'] ) !!}
-                                {!! Form::text('fecha_nacimiento', $data->fecha_nacimiento, ['class' => 'form-control has-feedback-left',  'data-parsley-required' => 'true', 'id' => 'fecha_nacimiento', 'autocomplete' => 'off', 'placeholder' => '* Fecha de nacimiento' ]  ) !!}
+                                {!! Form::text('fecha_nacimiento', $data->fecha_nacimiento, ['class' => 'form-control has-feedback-left fecha-nacimiento',  'data-parsley-required' => 'true', 'id' => 'fecha_nacimiento', 'autocomplete' => 'off', 'placeholder' => '* Fecha de nacimiento' ]  ) !!}
                                 <span id="inputSuccess2Status" class="sr-only">(success)</span>
                                 <span class="bt-flabels__error-desc">Requerido</span>
                             </div>
@@ -145,7 +145,7 @@
                         <div class="uk-width-1-2">
                             <div class="bt-flabels__wrapper bt-flabels--right">
                                 {!! Form::label('fecha_nacimiento_tutor', '* Fecha de nacimiento tutor', ['for' => 'fecha_nacimiento_tutor'] ) !!}
-                                {!! Form::text('fecha_nacimiento_tutor', $data->fecha_nacimiento_tutor, ['class' => 'form-control has-feedback-left', 'aria-describedby' => 'inputSuccess2Status', 'id' => 'fecha_nacimiento_tutor', 'autocomplete' => 'off', 'placeholder' => '* Fecha de nacimiento tutor' ]  ) !!}
+                                {!! Form::text('fecha_nacimiento_tutor', $data->fecha_nacimiento_tutor, ['class' => 'form-control has-feedback-left fecha-nacimiento-tutor', 'aria-describedby' => 'inputSuccess2Status', 'id' => 'fecha_nacimiento_tutor', 'autocomplete' => 'off', 'placeholder' => '* Fecha de nacimiento tutor' ]  ) !!}
                                 <span id="inputSuccess2Status" class="sr-only">(success)</span>
                                 <!--<span class="bt-flabels__error-desc">Requerido</span>-->
                             </div>
@@ -174,7 +174,7 @@
                             <div class="bt-flabels__wrapper">
                                 <span class="select-label">AGEB</span>
                                 {!! Form::label('ageb_id', 'AGEB', ['for' => 'ageb_id'] ) !!}
-                                {!! Form::select('ageb_id', $agebs, $data->agebs_id, ['class' => 'form-control js-data-ageb select2', 'id' => 'ageb_id', 'data-placeholder' => 'Ageb', 'style' => 'width:100%'] ) !!}
+                                {!! Form::select('ageb_id', [], $data->agebs_id, ['class' => 'form-control js-data-ageb select2', 'id' => 'ageb_id', 'data-placeholder' => 'Ageb', 'style' => 'width:100%'] ) !!}
                                 
                             </div>
                         </div>
@@ -330,21 +330,33 @@
     {!! Html::script('assets/mine/js/personaEdita.js') !!}
 
     <script>
+
+        // Al editar reemplaza el municipio de la clue
         var esquema = $.parseJSON(escaparCharEspeciales('{{$esquema}}'));
         var aplicaciones_dosis = $.parseJSON(escaparCharEspeciales('{{json_encode($data->personasVacunasEsquemas)}}'));
         var persona = $.parseJSON(escaparCharEspeciales('{{$data}}'));
         // GUARADARÁ EL ESQUEMA SELECCIONADO
-        console.log(persona,esquema,aplicaciones_dosis)
         var ultimo_esquema = ''; 
         var ultima_fecha_nacimiento = '{{$data->fecha_nacimiento}}';
         var original_fecha_nacimiento = '{{$data->fecha_nacimiento}}';
         // CARGA EL ESQUEMA CON BASE A LA FECHA 01-01-AÑO ACTUAL
         var clues = [{'id':persona.clue.id,'clues':persona.clue.clues,'text':persona.clue.nombre}];
         var colonias = [{ 'id': 0, 'text': 'Sin colonia' }];
+        var agebs = [{ 'id': persona.ageb.id, 'text': persona.ageb.id.substr(-4)+' : '+persona.ageb.localidad.nombre+' '+persona.ageb.municipio.nombre }];
         var localidades = [{ 'id': persona.localidad.id, 'clave':'', 'text': persona.localidad.nombre }];
         if(persona.colonia==null){
             persona.colonia=colonias[0];
         }
+
+        $(document).ready(function(){
+            $(".js-data-ageb").select2({
+                language: "es",
+                data:agebs
+            });
+            $(".js-data-ageb").select2("trigger", "select", { 
+                data: agebs[0] 
+            });
+        });
         
         setTimeout(function() {  
             var anio = original_fecha_nacimiento.split("-");       
@@ -525,6 +537,7 @@
         });
 
         $(".js-data-localidad").select2("trigger", "select", { 
+            language: "es",
             data: localidades[0] 
         });
 
@@ -543,12 +556,44 @@
             return $localidades;
         };
 
-        $(document).ready(function(){
-            //$(".js-data-clue").change();
-            
-            //$(".js-data-colonia").val(persona.colonia.id).trigger("change");
-            //$(".js-data-localidad").val(persona.localidad.id).trigger("change");
+        $(".js-data-localidad").change(function(){
+            if($('.js-data-localidad').val()==0){ } else {
+                cargarAgeb($('.js-data-localidad').val());
+            }
         });
+        
+        function cargarAgeb(localidad){
+            $('.js-data-ageb').empty();
+            agebs = [{ 'id': 0, 'text': 'AGEB' }];
+            $.get('../../catalogo/ageb?localidades_id='+localidad, {}, function(response, status){
+                if(response.data==null){
+                    //notificar('Sin resultados','warning',2000);
+                } else {      
+                    while (agebs.length) { agebs.pop(); }                
+                    agebs.push({ 'id': 0, 'text': 'AGEB' });           
+                    if(response.data.length<=0){
+                        //notificar('Información','No existen AGEBS','warning',2000);
+                    } else {
+                        console.log(response.data)
+                        //notificar('Información','Cargando AGBES','info',2000);
+                        $('.js-data-ageb').empty();                      
+                        $.each(response.data, function( i, cont ) {
+                            agebs.push({ 'id': cont.id, 'text':cont.id.substr(-4)+' : '+cont.localidad+' '+cont.municipio });
+                        });  
+                    }  
+                    $(".js-data-ageb").select2({
+                        language: "es",
+                        data: agebs
+                    });
+                }
+            }).fail(function(){ 
+                notificar('Información','Falló carga de AGEBS','danger',2000);
+                $(".js-data-ageb").select2({
+                    language: "es",
+                    data:agebs
+                }); 
+            });
+        }
 
     </script>
 @endsection

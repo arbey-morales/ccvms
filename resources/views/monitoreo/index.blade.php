@@ -24,7 +24,7 @@
         <div class="x_title">
             {!! Form::open([ 'route' => 'monitoreo.index', 'id' => 'form', 'method' => 'GET']) !!}
                 <div class="col-md-2">                    
-                    {!! Form::text('fecha', $fecha, ['class' => 'form-control search', 'id' => 'fecha', 'autocomplete' => 'off', 'placeholder' => '01-02-2017' ]) !!}
+                    {!! Form::text('fecha',  null, ['class' => 'form-control search', 'id' => 'fecha', 'autocomplete' => 'off', 'placeholder' => '01-02-2017' ]) !!}
                 </div>
                 <div class="col-md-5">
                     {!! Form::checkbox('todo', 'SI', $todo, ['class' => 'js-switch', 'id' => 'todo'] ) !!} 
@@ -60,12 +60,14 @@
     {!! Html::script('assets/mine/js/images.js') !!}
 
     <script>
+        var fecha = moment().format("DD-MM-YYYY");
+        $("#fecha").val(fecha);
         var data2   = $.parseJSON(escaparCharEspeciales('{{json_encode($data2)}}'));
         var usuario = $.parseJSON(escaparCharEspeciales('{{json_encode($usuario)}}'));
         var documentoDefinicion = construirTabla();
 
         // MASCARA TIPO DD-MM-AAAA
-        $("#fecha").mask("99-99-9999");
+        //$("#fecha").mask("99-99-9999");
 
         /*function totalCapturas() {
             $.get('persona/captura', {}, function(response, status){ // Consulta esquema

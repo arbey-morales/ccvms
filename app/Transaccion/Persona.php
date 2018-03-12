@@ -42,7 +42,7 @@ class Persona extends Model
 	}
 
     public function ageb(){
-		return $this->belongsTo('App\Catalogo\Ageb', 'agebs_id', 'id')->select('id','municipios_id','localidades_id');
+		return $this->belongsTo('App\Catalogo\Ageb', 'agebs_id', 'id')->select('id','municipios_id','localidades_id')->with('municipio','localidad');
 	}
 
     public function afiliacion(){

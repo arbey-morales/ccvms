@@ -151,7 +151,34 @@
               styling: 'bootstrap3'
           });
       }
+
+        // HORA
+        $.mask.definitions['H'] = "[0-2]";
+        $.mask.definitions['h'] = "[0-9]";
+        $.mask.definitions['I'] = "[0-5]";
+        $.mask.definitions['i'] = "[0-9]";
+        $.mask.definitions['S'] = "[0-5]";
+        $.mask.definitions['s'] = "[0-9]";
+        // FECHA NORMAL
+        $.mask.definitions['Y'] = "[2]";
+        $.mask.definitions['y'] = "[0-1]";
+        $.mask.definitions['A'] = "[0-1]";
+        $.mask.definitions['a'] = "[0-9]";
+        $.mask.definitions['M'] = "[0-1]";
+        $.mask.definitions['m'] = "[0-9]";
+        $.mask.definitions['D'] = "[0-3]";
+        $.mask.definitions['d'] = "[0-9]";
+
+        // FECHA TUTOR
+        $.mask.definitions['T'] = "[1-2]";
+        $.mask.definitions['t'] = "[0,1,9]";
       
+        $(document).ready(function(){
+          $(".hora").mask("Hh:Ii:Ss", {placeholder: "__:__:__"});
+          $(".fecha").mask("YyAa-Mm-Dd", {placeholder: "____-__-__"});
+          $(".fecha-nacimiento").mask("Dd-Mm-YyAa", {placeholder: "__-__-____"});
+          $(".fecha-nacimiento-tutor").mask("Dd-Mm-Ttaa", {placeholder: "__-__-____"});
+        });
     </script>
 
   </body>

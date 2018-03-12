@@ -1,5 +1,5 @@
 // MASCARA TIPO DD-MM-AAAA
-$("#fecha_nacimiento_tutor,#fecha_nacimiento").mask("99-99-9999");
+//$("#fecha_nacimiento_tutor,#fecha_nacimiento").mask("99-99-9999");
 
 /*$("#personas-form").submit(function(e){
     e.preventDefault();
@@ -20,6 +20,7 @@ $("#fecha_nacimiento_tutor,#fecha_nacimiento").mask("99-99-9999");
 });*/
 
 // EQUIVALENCIA DE CLAVES ESTADOS
+var no_cambio_clue = 0; var no_cambio_localidad = 0;
 var estados_equivalencia = ["X","AS","BC","BS","CC","CL","CM","CS","CH","DF","DG","GT","GR","HG","JC","MC","MN","MS","NT","NL","OC","PL","QT","QR","SP","SL","SR","TC","TS","TL","VZ","YN","ZS"];
 var localidad = { 'id':null, 'nombre':'Localidad'};
 
@@ -75,12 +76,14 @@ $(".js-data-clue").change(function(){
     if(clue_id==null || clue_id=="" || clue_id==0){
         clue_id = persona.clue.id;
     }
-    //console.log(88)
-    $.get('../../catalogo/clue/'+clue_id, function(response, status){ // Consulta CURP
-        $(".js-data-municipio").val(response.data.municipios_id).trigger("change");
-    }).fail(function(){  // Calcula CURP
-        notificar('Información','No se consultaron los detalles de la unidad de salud','warning',2000);
-    });
+     if(no_cambio_clue>0){
+        $.get('../../catalogo/clue/'+clue_id, function(response, status){ // Consulta CURP
+            $(".js-data-municipio").val(response.data.municipios_id).trigger("change");
+        }).fail(function(){  // Calcula CURP
+            notificar('Información','No se consultaron los detalles de la unidad de salud','warning',2000);
+        });
+     }
+    no_cambio_clue++;
 });
 
 // CADA QUE ESTOS ELEMENTOS PIERDEN EL FOCO, SE VALIDAN PARA CONSULTAR LA CURP
@@ -300,7 +303,6 @@ function generarEsquema(aplicaciones){
     ultimo_esquema = aplicaciones; // LAS VALIDACIONES DEL ESQUEMA ESTÁN AQUÍ
     var key_plus = 0;
     $.each(aplicaciones, function( key, ve ) {
-        //console.log(ve);           
         
         key_plus++;
         var placeholder = '';
@@ -310,19 +312,16 @@ function generarEsquema(aplicaciones){
         var fecha_aplicada    = ''; var es_aplicada = false;
         ultimo_esquema[key].es_ideal = false;
         $.each(aplicaciones_dosis, function( key_ad, ve_ad ) { 
-            //console.log(ve_ad);           
             if(ve.id==ve_ad.vacunas_esquemas_id){
                 es_aplicada = true;
                 var fa_temp = ve_ad.fecha_aplicacion;
                 var fa_split = fa_temp.substr(0,10);
                 var fa = fa_split.split("-");
-                //console.log(fa_temp);
                 fecha_aplicada = fa[2]+'-'+fa[1]+'-'+fa[0];
                 var fecha_ideal_con_dias  = moment(ultima_fecha_nacimiento,'DD-MM-YYYY').add(ve.edad_ideal_dia, 'days');
                 var fecha_ideal_con_meses = fecha_ideal_con_dias.add(ve.edad_ideal_mes, 'months');
                 var fecha_ideal_real      = fecha_ideal_con_meses.add(ve.edad_ideal_anio, 'years');
                 var f_aplicacion  = moment(fecha_aplicada,'DD-MM-YYYY');
-                //console.log(fecha_aplicada);
                 if(f_aplicacion < fecha_ideal_real){ // es ideal o no
                     ultimo_esquema[key].es_ideal = true; 
                 }                
@@ -359,7 +358,6 @@ function generarEsquema(aplicaciones){
                     }                                        
                 });
             } 
-            //console.log(id_primera, es_aplicada);
             if(es_aplicada){ // Está aplicada                                                 
                 if(ve.menores.length){ //                                         
                     if(primera.es_ideal){ // Es segunda en adelante
@@ -389,7 +387,7 @@ function generarEsquema(aplicaciones){
 
     // APLICA MASCARA DD-MM-AAAA PARA LAS FECHAS DE APLICACIÓN
     setTimeout(function() {
-        $("input[name*='fecha_aplicacion']").mask("99-99-9999");
+        $("input[name*='fecha_aplicacion']").mask("Dd-Mm-YyAa", {placeholder: "__-__-____"});
     }, 100);
 }
 

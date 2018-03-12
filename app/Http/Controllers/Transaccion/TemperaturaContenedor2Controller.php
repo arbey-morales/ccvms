@@ -186,7 +186,7 @@ class TemperaturaContenedor2Controller extends Controller
         $type       = 'flash_message_info';
         if (Auth::user()->can('create.catalogos') && Auth::user()->activo==1) { 
             $messages = [
-                'required' => 'El campo :attribute es requirido',
+                'required' => 'El campo :attribute es requerido',
                 'min'      => 'El campo :attribute debe tener :min caracteres como mínimo',
                 'max'      => 'El campo :attribute debe tener :max caracteres como máximo',
                 'mimes'    => 'El :attribute no es de tipo válido',

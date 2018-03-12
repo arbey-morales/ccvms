@@ -93,7 +93,7 @@
                         <div class="uk-width-1-2">
                             <div class="bt-flabels__wrapper bt-flabels--right">
                                 {!! Form::label('fecha_nacimiento', '* Fecha de nacimiento', ['for' => 'fecha_nacimiento'] ) !!}
-                                {!! Form::text('fecha_nacimiento', null , ['class' => 'form-control has-feedback-left', 'aria-describedby' => 'inputSuccess2Status', 'data-parsley-required' => 'true', 'id' => 'fecha_nacimiento', 'autocomplete' => 'off', 'placeholder' => '* Fecha de nacimiento' ]  ) !!}
+                                {!! Form::text('fecha_nacimiento', null , ['class' => 'form-control has-feedback-left fecha-nacimiento', 'aria-describedby' => 'inputSuccess2Status', 'data-parsley-required' => 'true', 'id' => 'fecha_nacimiento', 'autocomplete' => 'off', 'placeholder' => '* Fecha de nacimiento' ]  ) !!}
                                 <span id="inputSuccess2Status" class="sr-only">(success)</span>
                                 <span class="bt-flabels__error-desc">Requerido</span>
                             </div>
@@ -145,7 +145,7 @@
                         <div class="uk-width-1-2">
                             <div class="bt-flabels__wrapper bt-flabels--right">
                                 {!! Form::label('fecha_nacimiento_tutor', '* Fecha de nacimiento tutor', ['for' => 'fecha_nacimiento_tutor'] ) !!}
-                                {!! Form::text('fecha_nacimiento_tutor', null , ['class' => 'form-control has-feedback-left', 'aria-describedby' => 'inputSuccess2Status', 'id' => 'fecha_nacimiento_tutor', 'autocomplete' => 'off', 'placeholder' => '* Fecha de nacimiento tutor' ]  ) !!}
+                                {!! Form::text('fecha_nacimiento_tutor', null , ['class' => 'form-control has-feedback-left fecha-nacimiento-tutor', 'aria-describedby' => 'inputSuccess2Status', 'id' => 'fecha_nacimiento_tutor', 'autocomplete' => 'off', 'placeholder' => '* Fecha de nacimiento tutor' ]  ) !!}
                                 <span id="inputSuccess2Status" class="sr-only">(success)</span>
                                 <!--<span class="bt-flabels__error-desc">Requerido</span>-->
                             </div>

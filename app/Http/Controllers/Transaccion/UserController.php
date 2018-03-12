@@ -91,7 +91,7 @@ class UserController extends Controller
 
         if (Auth::user()->is('admin|root') && Auth::user()->can('create.usuarios') && Auth::user()->activo==1) {
             $messages = [
-                'required' => 'El campo :attribute es requirido',
+                'required' => 'El campo :attribute es requerido',
                 'min'      => 'El campo :attribute debe tener :min caracteres como mínimo',
                 'max'      => 'El campo :attribute debe tener :max caracteres como máximo',
                 'mimes'    => 'El campo :attribute debe ser de tipo jpeg o jpg.',
@@ -259,7 +259,7 @@ class UserController extends Controller
         $usuario = User::findOrFail($id);
         if (Auth::user()->is('admin|root') && Auth::user()->can('update.usuarios') && Auth::user()->activo==1) {
             $messages = [
-                'required' => 'El campo :attribute es requirido',
+                'required' => 'El campo :attribute es requerido',
                 'min'      => 'El campo :attribute debe tener :min caracteres como mínimo',
                 'max'      => 'El campo :attribute debe tener :max caracteres como máximo',
                 'mimes'    => 'El campo :attribute debe ser de tipo jpeg o jpg.',

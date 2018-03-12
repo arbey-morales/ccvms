@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use Auth, DB, Input, Response, Session; 
 
 use App\Models\Catalogo\RedFrio\EstatusContenedor;
+use App\Models\Catalogo\RedFrio\ContenedorBiologico;
 
 class EstatusContenedorController extends Controller
 {
@@ -45,6 +46,7 @@ class EstatusContenedorController extends Controller
 		} else {
 			$data = EstatusContenedor::where('deleted_at',NULL)->get();
 		}
+		
 		if ($request->ajax()) {
 			return Response::json(array("status" => 200, "messages" => "Operación realizada con exito", "data" => $data, "total" => count($data)), 200);			
 		} else {       

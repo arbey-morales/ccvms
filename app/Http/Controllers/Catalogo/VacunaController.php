@@ -6,12 +6,9 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use Auth;
-use DB;
-use Input;
+use Auth, DB, Input, Response, Session;
 use Carbon\Carbon;
 
-use Session; 
 use App\Catalogo\Vacuna;
 
 class VacunaController extends Controller
@@ -25,15 +22,15 @@ class VacunaController extends Controller
     {
         $parametros = Input::only('q');
         if (Auth::user()->can('show.catalogos') && Auth::user()->activo==1 && Auth::user()->is('root|admin|captura|red-frio')) {
-            $data = Vacuna::where('deleted_at',NULL);
+            $data = Vacuna::where('deleted_at',NULL)->with('vacunasEsquemas');
             if ($parametros['q']) {
-                $data = Vacuna::where('clave','LIKE',"%".$parametros['q']."%")->orWwhere('clave','LIKE',"%".$parametros['q']."%");
+                $data = Vacuna::where('clave','LIKE',"%".$parametros['q']."%")->orWhere('clave','LIKE',"%".$parametros['q']."%");
             } 
             $data = $data->get();
             if ($request->ajax()) {
-                return response()->json([ 'data' => $data]);
+                return Response::json(array("status" => 200, "messages" => "Operación realizada con exito", "data" => $data, "total" => count($data)), 200);
             } else {                
-                return view('catalogo.marca.index')->with('data', $data)->with('q', $parametros['q']);
+                return view('catalogo.vacuna.index')->with('data', $data)->with('q', $parametros['q']);
             }
         } else {
             return response()->view('errors.allPagesError', ['icon' => 'user-secret', 'error' => '403', 'title' => 'Forbidden / Prohibido', 'message' => 'No tiene autorización para acceder al recurso. Se ha negado el acceso.'], 403);
@@ -63,7 +60,7 @@ class VacunaController extends Controller
  
          if (Auth::user()->is('root|red-frio') && Auth::user()->can('create.catalogos') && Auth::user()->activo==1) {
              $messages = [
-                 'required' => 'El campo :attribute es requirido',
+                 'required' => 'El campo :attribute es requerido',
                  'min'      => 'El campo :attribute debe tener :min caracteres como mínimo',
                  'max'      => 'El campo :attribute debe tener :max caracteres como máximo',
                  'unique'   => 'El campo :attribute ya existe',
@@ -157,7 +154,7 @@ class VacunaController extends Controller
  
          if (Auth::user()->is('root|red-frio') && Auth::user()->can('update.catalogos') && Auth::user()->activo==1) {
              $messages = [
-                 'required' => 'El campo :attribute es requirido',
+                 'required' => 'El campo :attribute es requerido',
                  'min'      => 'El campo :attribute debe tener :min caracteres como mínimo',
                  'max'      => 'El campo :attribute debe tener :max caracteres como máximo',
                  'unique'   => 'El campo :attribute ya existe',

@@ -43,11 +43,11 @@
                 <div class="row">
                     <div class="col-md-4">   
                         {!! Form::label('fecha_inicial', 'Fecha inicial', ['for' => 'fecha_inicial'] ) !!}                 
-                        {!! Form::text('fecha_inicial', null, ['class' => 'form-control search', 'id' => 'fecha_inicial', 'autocomplete' => 'off', 'placeholder' => '2017-01-02' ]) !!}
+                        {!! Form::text('fecha_inicial', null, ['class' => 'form-control search fecha', 'id' => 'fecha_inicial', 'autocomplete' => 'off', 'placeholder' => '2017-01-02' ]) !!}
                     </div>
                     <div class="col-md-4">
                         {!! Form::label('fecha_final', 'Fecha final', ['for' => 'fecha_final'] ) !!}
-                        {!! Form::text('fecha_final', null, ['class' => 'form-control search', 'id' => 'fecha_final', 'autocomplete' => 'off', 'placeholder' => '2017-01-02' ]) !!}
+                        {!! Form::text('fecha_final', null, ['class' => 'form-control search fecha', 'id' => 'fecha_final', 'autocomplete' => 'off', 'placeholder' => '2017-01-02' ]) !!}
                     </div>
                     <div class="col-md-4">
                         <br>
@@ -102,7 +102,6 @@
         // Al segundo busca los contenedores de la clue seleccionada
         $(document).ready(function(){
             //setTimeout(function(){ $(".js-data-clues").change(); }, 1000);
-            $("#fecha_inicial,#fecha_final").mask("9999-99-99");
             $("#fecha_inicial").val(moment(new Date()).add(-1, 'days').format('YYYY-MM-DD'));
             $("#fecha_final").val(moment(new Date()).format('YYYY-MM-DD'));
 

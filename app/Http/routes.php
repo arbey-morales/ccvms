@@ -42,11 +42,11 @@ Route::group(['middleware' => 'auth'], function () {
         Route::resource('temperatura',                         'TemperaturaContenedorController');
     });  
 
-    Route::group(['namespace' => 'Dashboard', 'prefix' => 'dashboard',], function () {
-        Route::get('/',                                 'DashboardController@index');
-        Route::get('capturas',                          'DashboardController@capturas');  
-        Route::get('vacunacion',                        'DashboardController@vacunacion');
-        Route::get('contenedores-status',               'DashboardController@contenedoresEstatus');
+    Route::group(['namespace' => 'Dashboard', 'prefix' =>   'dashboard',], function () {
+        Route::get('/',                                     'DashboardController@index');
+        Route::get('capturas',                              'DashboardController@capturas');  
+        Route::get('vacunacion',                            'DashboardController@vacunacion');
+        Route::get('contenedores-biologico',                'DashboardController@contenedoresBiologico');
     });
 
     Route::group(['prefix' => 'persona/reporte', 'namespace' => 'Reporte'], function () {

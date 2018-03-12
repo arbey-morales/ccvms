@@ -1,5 +1,5 @@
 // MASCARA TIPO DD-MM-AAAA
-$("#fecha_nacimiento_tutor,#fecha_nacimiento").mask("99-99-9999");
+//$("#fecha_nacimiento_tutor,#fecha_nacimiento").mask("99-99-9999");
 // GUARADARÁ EL ESQUEMA SELECCIONADO
 var ultimo_esquema = ''; 
 var ultima_fecha_nacimiento = '';
@@ -792,7 +792,7 @@ function generarEsquema(aplicaciones){
 
     // APLICA MASCARA DD-MM-AAAA PARA LAS FECHAS DE APLICACIÓN
     setTimeout(function() {
-        $("input[name*='fecha_aplicacion']").mask("99-99-9999");
+        $("input[name*='fecha_aplicacion']").mask("Dd-Mm-YyAa", {placeholder: "__-__-____"});
     }, 100);
 }
 
