@@ -342,11 +342,19 @@
         // CARGA EL ESQUEMA CON BASE A LA FECHA 01-01-AÑO ACTUAL
         var clues = [{'id':persona.clue.id,'clues':persona.clue.clues,'text':persona.clue.nombre}];
         var colonias = [{ 'id': 0, 'text': 'Sin colonia' }];
-        var agebs = [{ 'id': persona.ageb.id, 'text': persona.ageb.id.substr(-4)+' : '+persona.ageb.localidad.nombre+' '+persona.ageb.municipio.nombre }];
+        
         var localidades = [{ 'id': persona.localidad.id, 'clave':'', 'text': persona.localidad.nombre }];
         if(persona.colonia==null){
             persona.colonia=colonias[0];
         }
+        console.log(persona.ageb)
+        if(persona.ageb==null){
+            var agebs = [{ 'id': 0, 'text': 'AGEB' }];
+        } else {
+            var agebs = [{ 'id': persona.ageb.id, 'text': persona.ageb.id.substr(-4)+' : '+persona.ageb.localidad.nombre+' '+persona.ageb.municipio.nombre }];
+        }
+
+
 
         $(document).ready(function(){
             $(".js-data-ageb").select2({

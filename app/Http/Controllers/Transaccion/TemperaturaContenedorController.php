@@ -8,7 +8,7 @@ use \Validator,\Hash, \Response;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use Auth,DB, Input, Session;
+use Auth,DB, Input, Session, Excel;
 use Carbon\Carbon;
 
 use App\Transaccion\TemperaturaContenedor;
@@ -209,6 +209,10 @@ class TemperaturaContenedorController extends Controller
                 if(isset($request->desde_archivo) && $request->desde_archivo=="SI"){
                                                     
                     $file = \File::get($request->archivo);
+                    $reader = Excel::load($request->archivo);
+                    $reader->dump();
+                    die;
+
                     $cabeceras = substr($file, 0, strrpos($file, "@HEADER ENDS"));
 
                     $lecturas = substr($file, strrpos($file, "@HEADER ENDS")+ 14, strlen($file));
