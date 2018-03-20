@@ -25,7 +25,7 @@
                 {!! Form::close() !!}
             </div>
             <div class="col-md-4">
-                @role('root|admin')
+                @role('root|admin|captura')
                     @permission('create.catalogos')
                         <a class="btn btn-default pull-right" href="{{ url('catalogo/vacunacion/piramide-poblacional/create') }}" role="button">Agregar pirámide poblacional</a>
                     @endpermission 

@@ -61,8 +61,8 @@
                 <div class="clearfix"></div>
                 <br />
                 <div class="row">
-                  <div class="col-md-6 col-sm-12" style="text-align:left;"> <img src="{{ url('images/salud-mesoamerica.png') }}" alt="..." class="img-rounded" width="100%"></div>
-                  <div class="col-md-6 col-sm-12" style="text-align:right;"> <img src="{{ url('images/sm.png') }}" alt="..." class="img-rounded" width="50%"></div>
+                  <div class="col-md-6 col-sm-6 col-xs-6" style="text-align:left;"> <img src="{{ url('images/salud-mesoamerica.png') }}" alt="..." class="img-rounded" width="100%"></div>
+                  <div class="col-md-6 col-sm-6 col-xs-6" style="text-align:right;"> <img src="{{ url('images/sm.png') }}" alt="..." class="img-rounded" width="50%"></div>
                   <div class="clearfix"></div>
                   <p>©2017 Todos los derechos reservados</p>
                 </div>

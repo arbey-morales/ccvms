@@ -24,12 +24,16 @@ class PiramidePoblacionalController extends Controller
     {
         $parametros = Input::only('q','anio');
         $anio = Carbon::now()->format('Y');
-        if (Auth::user()->can('show.catalogos') && Auth::user()->activo==1 && Auth::user()->is('root|admin')){
+        if (Auth::user()->can('show.catalogos') && Auth::user()->activo==1 && Auth::user()->is('root|admin|captura')){
             $data = DB::table('piramide_poblacional as pp')
             ->select('pp.*','c.clues as clues','c.nombre as clue_nombre')
             ->leftJoin('clues AS c','c.id','=','pp.clues_id')            
             ->where('pp.deleted_at', NULL)
             ->orderBy('pp.clues_id', 'ASC');
+
+            if(Auth::user()->is('captura')){
+                $data = $data->where('c.jurisdicciones_id', Auth::user()->idJurisdiccion);
+            }
             if ($parametros['q']) {
                 $data = $data->where('pp.anio','LIKE',"%".$parametros['q']."%");
             }      
@@ -134,7 +138,8 @@ class PiramidePoblacionalController extends Controller
                 $msgGeneral = 'Ocurrió un error al intentar guardar los datos enviados. Recargue la página e intente de nuevo: '.json_encode($request['hombresdiez46']).' ---- '.$e->getMessage();
                 $type       = 'flash_message_error';
             }        
-            
+            if ($request->ajax()) 
+                return \Response::json(array("status" => 204, "messages" => $msgGeneral),204);
             Session::flash($type, $msgGeneral);
             return redirect()->back()->withInput();
 
@@ -233,9 +238,9 @@ class PiramidePoblacionalController extends Controller
         $data = PiramidePoblacional::find($id);        
         
         if(!$data ){            
-            return Response::json(['error' => "No se encuentra el recurso que esta buscando."], HttpResponse::HTTP_NOT_FOUND);
+            return \Response::json(['error' => "No se encuentra el recurso que esta buscando."], 201);
         }
 
-        return Response::json([ 'data' => $data ], HttpResponse::HTTP_OK);
+        return \Response::json([ 'data' => $data ], 201);
     }
 }

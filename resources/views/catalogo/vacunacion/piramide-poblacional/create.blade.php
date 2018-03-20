@@ -33,7 +33,7 @@
         <div class="x_content">
         
             @include('errors.msgAll') <!-- Mensages -->
-            {!! Form::open([ 'route' => 'catalogo.vacunacion.piramide-poblacional.store', 'id' => 'piramide-form', 'method' => 'POST', 'class' => 'uk-form bt-flabels js-flabels', 'data-parsley-validate' => 'on', 'data-parsley-errors-messages-disabled' => 'on']) !!}
+            {!! Form::open([ 'route' => 'catalogo.vacunacion.piramide-poblacional.store', 'id' => 'nuevo', 'method' => 'POST', 'class' => 'uk-form bt-flabels js-flabels', 'data-parsley-validate' => 'on', 'data-parsley-errors-messages-disabled' => 'on']) !!}
                
                 <div class="row">
                     <div class="col-md-6">
@@ -81,28 +81,28 @@
                                 <th style="vertical-align:middle; text-align:center;">10</th>
                             </tr>
                             <tr>
-                                <th style="vertical-align:middle; text-align:center;">{!! Form::text('hombres_0', null , ['class' => 'form-control numero', 'style' => 'width:100%', 'id' => 'hombres_0', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
-                                <th style="vertical-align:middle; text-align:center;">{!! Form::text('hombres_1', null , ['class' => 'form-control numero', 'style' => 'width:100%', 'id' => 'hombres_1', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
-                                <th style="vertical-align:middle; text-align:center;">{!! Form::text('hombres_2', null , ['class' => 'form-control numero', 'style' => 'width:100%', 'id' => 'hombres_2', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
-                                <th style="vertical-align:middle; text-align:center;">{!! Form::text('hombres_3', null , ['class' => 'form-control numero', 'style' => 'width:100%', 'id' => 'hombres_3', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
-                                <th style="vertical-align:middle; text-align:center;">{!! Form::text('hombres_4', null , ['class' => 'form-control numero', 'style' => 'width:100%', 'id' => 'hombres_4', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
-                                <th style="vertical-align:middle; text-align:center;">{!! Form::text('hombres_5', null , ['class' => 'form-control numero', 'style' => 'width:100%', 'id' => 'hombres_5', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
-                                <th style="vertical-align:middle; text-align:center;">{!! Form::text('hombres_6', null , ['class' => 'form-control numero', 'style' => 'width:100%', 'id' => 'hombres_6', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
-                                <th style="vertical-align:middle; text-align:center;">{!! Form::text('hombres_7', null , ['class' => 'form-control numero', 'style' => 'width:100%', 'id' => 'hombres_7', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
-                                <th style="vertical-align:middle; text-align:center;">{!! Form::text('hombres_8', null , ['class' => 'form-control numero', 'style' => 'width:100%', 'id' => 'hombres_8', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
-                                <th style="vertical-align:middle; text-align:center;">{!! Form::text('hombres_9', null , ['class' => 'form-control numero', 'style' => 'width:100%', 'id' => 'hombres_9', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
-                                <th style="vertical-align:middle; text-align:center;">{!! Form::text('hombres_10', null , ['class' => 'form-control numero', 'style' => 'width:100%', 'id' => 'hombres_10', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
-                                <th style="vertical-align:middle; text-align:center;">{!! Form::number('mujeres_0', null , ['class' => 'form-control numero', 'style' => 'width:100%', 'id' => 'mujeres_0', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
-                                <th style="vertical-align:middle; text-align:center;">{!! Form::number('mujeres_1', null , ['class' => 'form-control numero', 'style' => 'width:100%', 'id' => 'mujeres_1', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
-                                <th style="vertical-align:middle; text-align:center;">{!! Form::number('mujeres_2', null , ['class' => 'form-control numero', 'style' => 'width:100%', 'id' => 'mujeres_2', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
-                                <th style="vertical-align:middle; text-align:center;">{!! Form::number('mujeres_3', null , ['class' => 'form-control numero', 'style' => 'width:100%', 'id' => 'mujeres_3', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
-                                <th style="vertical-align:middle; text-align:center;">{!! Form::number('mujeres_4', null , ['class' => 'form-control numero', 'style' => 'width:100%', 'id' => 'mujeres_4', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
-                                <th style="vertical-align:middle; text-align:center;">{!! Form::number('mujeres_5', null , ['class' => 'form-control numero', 'style' => 'width:100%', 'id' => 'mujeres_5', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
-                                <th style="vertical-align:middle; text-align:center;">{!! Form::number('mujeres_6', null , ['class' => 'form-control numero', 'style' => 'width:100%', 'id' => 'mujeres_6', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
-                                <th style="vertical-align:middle; text-align:center;">{!! Form::number('mujeres_7', null , ['class' => 'form-control numero', 'style' => 'width:100%', 'id' => 'mujeres_7', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
-                                <th style="vertical-align:middle; text-align:center;">{!! Form::number('mujeres_8', null , ['class' => 'form-control numero', 'style' => 'width:100%', 'id' => 'mujeres_8', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
-                                <th style="vertical-align:middle; text-align:center;">{!! Form::number('mujeres_9', null , ['class' => 'form-control numero', 'style' => 'width:100%', 'id' => 'mujeres_9', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
-                                <th style="vertical-align:middle; text-align:center;">{!! Form::number('mujeres_10', null , ['class' => 'form-control numero', 'style' => 'width:100%', 'id' => 'mujeres_10', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
+                                <th style="vertical-align:middle; text-align:center;">{!! Form::number('hombres_0', null , ['class' => 'form-control numero', 'min'=>0, 'style' => 'width:100%', 'id' => 'hombres_0', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
+                                <th style="vertical-align:middle; text-align:center;">{!! Form::number('hombres_1', null , ['class' => 'form-control numero', 'min'=>0, 'style' => 'width:100%', 'id' => 'hombres_1', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
+                                <th style="vertical-align:middle; text-align:center;">{!! Form::number('hombres_2', null , ['class' => 'form-control numero', 'min'=>0, 'style' => 'width:100%', 'id' => 'hombres_2', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
+                                <th style="vertical-align:middle; text-align:center;">{!! Form::number('hombres_3', null , ['class' => 'form-control numero', 'min'=>0, 'style' => 'width:100%', 'id' => 'hombres_3', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
+                                <th style="vertical-align:middle; text-align:center;">{!! Form::number('hombres_4', null , ['class' => 'form-control numero', 'min'=>0, 'style' => 'width:100%', 'id' => 'hombres_4', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
+                                <th style="vertical-align:middle; text-align:center;">{!! Form::number('hombres_5', null , ['class' => 'form-control numero', 'min'=>0, 'style' => 'width:100%', 'id' => 'hombres_5', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
+                                <th style="vertical-align:middle; text-align:center;">{!! Form::number('hombres_6', null , ['class' => 'form-control numero', 'min'=>0, 'style' => 'width:100%', 'id' => 'hombres_6', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
+                                <th style="vertical-align:middle; text-align:center;">{!! Form::number('hombres_7', null , ['class' => 'form-control numero', 'min'=>0, 'style' => 'width:100%', 'id' => 'hombres_7', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
+                                <th style="vertical-align:middle; text-align:center;">{!! Form::number('hombres_8', null , ['class' => 'form-control numero', 'min'=>0, 'style' => 'width:100%', 'id' => 'hombres_8', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
+                                <th style="vertical-align:middle; text-align:center;">{!! Form::number('hombres_9', null , ['class' => 'form-control numero', 'min'=>0, 'style' => 'width:100%', 'id' => 'hombres_9', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
+                                <th style="vertical-align:middle; text-align:center;">{!! Form::number('hombres_10', null , ['class' => 'form-control numero', 'min'=>0, 'style' => 'width:100%', 'id' => 'hombres_10', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
+                                <th style="vertical-align:middle; text-align:center;">{!! Form::number('mujeres_0', null , ['class' => 'form-control numero', 'min'=>0, 'style' => 'width:100%', 'id' => 'mujeres_0', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
+                                <th style="vertical-align:middle; text-align:center;">{!! Form::number('mujeres_1', null , ['class' => 'form-control numero', 'min'=>0, 'style' => 'width:100%', 'id' => 'mujeres_1', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
+                                <th style="vertical-align:middle; text-align:center;">{!! Form::number('mujeres_2', null , ['class' => 'form-control numero', 'min'=>0, 'style' => 'width:100%', 'id' => 'mujeres_2', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
+                                <th style="vertical-align:middle; text-align:center;">{!! Form::number('mujeres_3', null , ['class' => 'form-control numero', 'min'=>0, 'style' => 'width:100%', 'id' => 'mujeres_3', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
+                                <th style="vertical-align:middle; text-align:center;">{!! Form::number('mujeres_4', null , ['class' => 'form-control numero', 'min'=>0, 'style' => 'width:100%', 'id' => 'mujeres_4', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
+                                <th style="vertical-align:middle; text-align:center;">{!! Form::number('mujeres_5', null , ['class' => 'form-control numero', 'min'=>0, 'style' => 'width:100%', 'id' => 'mujeres_5', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
+                                <th style="vertical-align:middle; text-align:center;">{!! Form::number('mujeres_6', null , ['class' => 'form-control numero', 'min'=>0, 'style' => 'width:100%', 'id' => 'mujeres_6', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
+                                <th style="vertical-align:middle; text-align:center;">{!! Form::number('mujeres_7', null , ['class' => 'form-control numero', 'min'=>0, 'style' => 'width:100%', 'id' => 'mujeres_7', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
+                                <th style="vertical-align:middle; text-align:center;">{!! Form::number('mujeres_8', null , ['class' => 'form-control numero', 'min'=>0, 'style' => 'width:100%', 'id' => 'mujeres_8', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
+                                <th style="vertical-align:middle; text-align:center;">{!! Form::number('mujeres_9', null , ['class' => 'form-control numero', 'min'=>0, 'style' => 'width:100%', 'id' => 'mujeres_9', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
+                                <th style="vertical-align:middle; text-align:center;">{!! Form::number('mujeres_10', null , ['class' => 'form-control numero', 'min'=>0, 'style' => 'width:100%', 'id' => 'mujeres_10', 'autocomplete' => 'off', 'value'=>0, 'placeholder' => '0' ]  ) !!}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -164,7 +164,29 @@
             $(".js-data-anio").val(anio_actual).trigger("change");
 
             var clues_id = $(".js-data-clue").val();
+            
         });
+
+        // SUBMIT DEL FORMULARIO
+
+        /*$("#nuevod").submit(function(e) {
+            e.preventDefault();
+            console.log($(this).attr('action'))
+            $.post($(this).attr('action')+'/store',$(this).serialize(), function(response, status){ // Envía formulario
+                if(status=='success'){
+                    notificar(response.titulo,response.texto,response.estatus,5000);
+                    if(response.estatus=='success'){
+                        $("#nombre,#paterno,#materno,#fecha_nacimiento,#curp,#sector,#manzana,#descripcion_domicilio,#calle,#numero,#codigo_postal,#fecha_nacimiento_tutor,#tutor").val('');
+                        conseguirEsquema(moment().format('YYYY'),"01-01-"+moment().format('YYYY'));
+                        $("#paterno").focus();
+                    }
+                } else {
+                    notificar('Error','Error en el servidor','No se guardó el registro','error',3000);
+                }
+            }).fail(function(){ 
+                notificar('Información','No se guardó el registro verifique los datos o recargue la página','error',4000);
+            });
+        });*/
 
         $(".js-data-clue").select2({
             ajax: {

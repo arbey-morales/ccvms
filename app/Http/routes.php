@@ -47,6 +47,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('capturas',                              'DashboardController@capturas');  
         Route::get('vacunacion',                            'DashboardController@vacunacion');
         Route::get('contenedores-biologico',                'DashboardController@contenedoresBiologico');
+        Route::get('ubicacion-contenedores',                'DashboardController@ubicacionContenedores');
     });
 
     Route::group(['prefix' => 'persona/reporte', 'namespace' => 'Reporte'], function () {

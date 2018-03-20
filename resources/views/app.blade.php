@@ -133,9 +133,6 @@
     {!! Html::script('assets/vendors/pnotify/dist/pnotify.nonblock.js') !!}
     {!! Html::script('assets/vendors/pnotify/dist/pnotify.confirm.js') !!}
 
-    <!-- My Scripts -->
-    @yield('my_scripts')
-
     <!-- Custom Theme Scripts -->
     {!! Html::script('assets/build/js/custom.min.js') !!}
 
@@ -180,6 +177,9 @@
           $(".fecha-nacimiento-tutor").mask("Dd-Mm-Ttaa", {placeholder: "__-__-____"});
         });
     </script>
+
+    <!-- My Scripts -->
+    @yield('my_scripts')
 
   </body>
 </html>

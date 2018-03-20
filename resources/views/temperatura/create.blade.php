@@ -55,7 +55,7 @@
             <div id="manual" class="row hidden">
                 <div class="col-md-3">
                     {!! Form::label('temperatura', '* Temperatura', ['for' => 'temperatura'] ) !!}
-                    {!! Form::text('temperatura', null , ['class' => 'form-control', 'style' => '', 'id' => 'temperatura', 'autocomplete' => 'off', 'placeholder' => '4.0' ]  ) !!}
+                    {!! Form::number('temperatura', null , ['class' => 'form-control', 'style' => '', 'id' => 'temperatura', 'min' => '-12', 'autocomplete' => 'off', 'placeholder' => '4.0' ]  ) !!}
                 </div>
                 <div class="col-md-3">
                     {!! Form::label('fecha', '* Fecha', ['for' => 'fecha'] ) !!}
