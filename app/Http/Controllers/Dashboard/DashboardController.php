@@ -65,8 +65,8 @@ class DashboardController extends Controller
     {
         $hoy = Carbon::today("America/Mexico_City");
         
-        $fecha_edad_inicio = Carbon::today("America/Mexico_City")->subYear((integer)$request->edad); 
-        $fecha_edad_fin = ((Carbon::today("America/Mexico_City")->subYear((integer)$request->edad))->subYear(1))->addDay(); // Limite un anio antes de la fecha de inicio   01-12-2015
+        $fecha_edad_inicio = Carbon::today("America/Mexico_City")->subYear($request->edad); 
+        $fecha_edad_fin = ((Carbon::today("America/Mexico_City")->subYear($request->edad))->subYear(1))->addDay(); // Limite un anio antes de la fecha de inicio   01-12-2015
         //var_dump($fecha_edad_fin->format('Y-m-d'),$fecha_edad_inicio->format('Y-m-d'));
        
         $personasCapturas = Persona::select('personas.id','personas.fecha_nacimiento','personas.genero')
@@ -140,16 +140,16 @@ class DashboardController extends Controller
             $fna = explode("-", $value->fecha_nacimiento);
             
             $vei = VacunaEsquema::select('id')
-                ->where('vacunas_id', (integer)$request->vacunas_id)
-                ->where('esquemas_id', (integer)$fna[0])
-                ->where('edad_ideal_anio', (integer)$request->edad);
+                ->where('vacunas_id', $request->vacunas_id)
+                ->where('esquemas_id', $fna[0])
+                ->where('edad_ideal_anio', $request->edad);
             // $veec = VacunaEsquema::select('id') // PARA ESQUEMAS COMPLETOS
-            //     ->where('esquemas_id', (integer)$fna[0])
-            //     ->where('edad_ideal_anio','<=', (integer)$request->edad)->get();
+            //     ->where('esquemas_id', $fna[0])
+            //     ->where('edad_ideal_anio','<=', $request->edad)->get();
             
             // var_dump(json_encode($vei), json_encode($veec));
             // if($request->tipo_aplicacion!=0)
-            //     $vei = $vei->where('tipo_aplicacion', (integer)$request->tipo_aplicacion);
+            //     $vei = $vei->where('tipo_aplicacion', $request->tipo_aplicacion);
             $vei = $vei->get();
             
             $dosisAplicar = count($vei);
@@ -159,7 +159,7 @@ class DashboardController extends Controller
             foreach ($vei as $keyVei => $valueVei) { // Todas
                 $pve = DB::table('personas_vacunas_esquemas')
                 ->select('id')
-                ->where('vacunas_esquemas_id', (integer)$valueVei->id)
+                ->where('vacunas_esquemas_id', $valueVei->id)
                 ->where('personas_id', $value->id)
                 ->where('deleted_at', NULL)
                 ->count(); 
