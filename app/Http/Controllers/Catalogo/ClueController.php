@@ -54,10 +54,12 @@ class ClueController extends Controller
 	 */
     public function index(Request $request)
     {
-        $parametros = Input::only('q','municipios_id');
+        $parametros = Input::only('q','municipios_id','jurisdicciones_id');
         if (Auth::user()->can('show.catalogos') && Auth::user()->activo==1) {
             $data = Clue::select('id','clues','nombre','municipios_id','localidades_id','jurisdicciones_id')->with('municipio','localidad','jurisdiccion')->where('instituciones_id',13)->where('deleted_at',NULL);
-            if (Auth::user()->is('root|admin|red-frio')) { } else {
+            if (Auth::user()->is('root|admin|red-frio')) { 
+
+            } else {
                 $data = $data->where('jurisdicciones_id', Auth::user()->idJurisdiccion);                
             }            
             if ($parametros['q']) {
@@ -65,8 +67,11 @@ class ClueController extends Controller
                     $query->where('clues','LIKE',"%".$parametros['q']."%")->orWhere('nombre','LIKE',"%".$parametros['q']."%");
                 });
             } 
-            if ($parametros['municipios_id']) {
+            if ($parametros['municipios_id'] && $parametros['municipios_id']!=0) {
                 $data = $data->where('municipios_id', $parametros['municipios_id']);
+            }
+            if ($parametros['jurisdicciones_id'] && $parametros['jurisdicciones_id']!=0) {
+                $data = $data->where('jurisdicciones_id', $parametros['jurisdicciones_id']);
             }
             $data = $data->get();
 

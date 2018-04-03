@@ -11,6 +11,8 @@ use Auth, DB, Input, Response;
 use Carbon\Carbon;
 
 use App\Transaccion\Persona;
+use App\Catalogo\PersonaVacunaEsquema;
+use App\Catalogo\VacunaEsquema;
 use App\Models\Catalogo\RedFrio\EstatusContenedor;
 use App\Models\Catalogo\RedFrio\ContenedorBiologico;
 use App\Models\Catalogo\RedFrio\TipoContenedor;
@@ -62,69 +64,129 @@ class DashboardController extends Controller
     public function vacunacion(Request $request) 
     {
         $hoy = Carbon::today("America/Mexico_City");
-        $semana = Carbon::now()->subWeek();
-        $mes = Carbon::now()->subMonth();
         
-        $personas = Persona::select('personas.id','personas.genero')
-        ->where('personas.deleted_at',NULL);
+        $fecha_edad_inicio = Carbon::today("America/Mexico_City")->subYear((integer)$request->edad); 
+        $fecha_edad_fin = ((Carbon::today("America/Mexico_City")->subYear((integer)$request->edad))->subYear(1))->addDay(); // Limite un anio antes de la fecha de inicio   01-12-2015
+        //var_dump($fecha_edad_fin->format('Y-m-d'),$fecha_edad_inicio->format('Y-m-d'));
+       
+        $personasCapturas = Persona::select('personas.id','personas.fecha_nacimiento','personas.genero')
+            ->where('personas.deleted_at',NULL)
+            ->whereBetween('fecha_nacimiento', [$fecha_edad_fin, $fecha_edad_inicio]);
 
         if (Auth::user()->is('captura')) {
-            $personas = $personas->leftJoin('clues','clues.id','=','personas.clues_id')
-            ->where('clues.jurisdicciones_id', Auth::user()->idJurisdiccion);
+            $personasCapturas = $personasCapturas
+                ->leftJoin('clues','clues.id','=','personas.clues_id')
+                ->where('clues.jurisdicciones_id', Auth::user()->idJurisdiccion);
         } else {
             if ($request->jurisdicciones_id!=0) {
-                $personas = $personas->leftJoin('clues','clues.id','=','personas.clues_id')
-                ->where('clues.jurisdicciones_id',$request->jurisdicciones_id);
+                $personasCapturas = $personasCapturas
+                    ->leftJoin('clues','clues.id','=','personas.clues_id')
+                    ->where('clues.jurisdicciones_id',$request->jurisdicciones_id);
             }
         }
 
         if ($request->clues_id!=0) {
-            $personas = $personas->where('personas.clues_id',$request->clues_is);
+            $personasCapturas = $personasCapturas
+                ->where('personas.clues_id',$request->clues_id);
         }
         if ($request->municipios_id!=0) {
-            $personas = $personas->where('personas.municipios_id',$request->municipios_id);
-        }
+            $personasCapturas = $personasCapturas
+                ->where('personas.municipios_id',$request->municipios_id);
+        }   
+        // END PARAMETROS GENERALES
 
-        if ($request->vacunas_id!=0) {
-            $personas = $personas->leftJoin('personas_vacunas_esquemas', 'personas.id', '=', 'personas_vacunas_esquemas.personas_id')
+        if ($request->vacunas_id!=0) { // SI SELECCIONA UNA  VACUNA EN ESPECIFICO SE CONTEMPLAN AQUÍ
+            $personasCapturas = $personasCapturas
+                ->leftJoin('personas_vacunas_esquemas', 'personas.id', '=', 'personas_vacunas_esquemas.personas_id')
                 ->leftJoin('vacunas_esquemas','vacunas_esquemas.id','=','personas_vacunas_esquemas.vacunas_esquemas_id')
                 ->where('vacunas_esquemas.vacunas_id', $request->vacunas_id);
-            if ($request->tipo_aplicacion!=0) {
-                $personas = $personas->where('vacunas_esquemas.tipo_aplicacion', $request->tipo_aplicacion);
+            if ($request->tipo_aplicacion!=0) {  // SI SELECCIONA UN DOSIS ESPECIFICA DE UNA VACUNA SE CONTEMPLAN AQUÍ
+                $personasCapturas = $personasCapturas
+                    ->where('vacunas_esquemas.tipo_aplicacion', $request->tipo_aplicacion);
             }                
         }
 
+        $personasCoberturas = $personasCapturas;
+        $personasCapturas = $personasCapturas
+            ->distinct('personas.id')
+            ->get();
+        $personasCoberturas = $personasCoberturas
+            ->distinct('personas.id')
+            ->get();
+
+        // ESTRUCTURA DE LA RESPUESTA ESTRUCTURA DE LA RESPUESTA ESTRUCTURA DE LA RESPUESTA ESTRUCTURA DE LA RESPUESTA
         $data = [
-                    'biologico'=>[],
-                    'concordancia'=>[],
-                    'cobertura'=>[],
-                    'esquema_completo'=>[]
-                ];
-        $personas = $personas->distinct('personas.id')->get();
-        
-        if(!$personas){
-            return Response::json(array("status" => 204, "messages" => "No hay resultados"),204);
-        } 
-        else {
-            $data = [
-                    'biologico'=>
-                        [
-                            'todos'=>0,
-                            'ninios'=>0,
-                            'ninias'=>0
-                        ]
-                    ];
-            foreach ($personas as $key => $value) {
-                $data['biologico']['todos'] += 1;
-                if($value->genero=='M'){
-                    $data['biologico']['ninios'] += 1;
-                }
-                if($value->genero=='F'){
-                    $data['biologico']['ninias'] += 1;
-                }
+            'captura'=>['todos'=>0, 'ninios'=>0, 'ninias'=>0 ],
+            'concordancia'=>[],
+            'cobertura'=>[ 'todos'=>0, 'ninios'=>0, 'ninias'=>0, 'datos'=>[] ],
+            'esquema_completo'=>[]
+        ];
+        // ESTRUCTURA DE LA RESPUESTA ESTRUCTURA DE LA RESPUESTA ESTRUCTURA DE LA RESPUESTA ESTRUCTURA DE LA RESPUESTA
+
+        // CAPTURAS CAPTURAS CAPTURAS CAPTURAS CAPTURAS CAPTURAS CAPTURAS CAPTURAS CAPTURAS CAPTURAS CAPTURAS CAPTURAS CAPTURAS
+        foreach ($personasCapturas as $key => $value) {
+            $data['captura']['todos'] += 1;
+            if($value->genero=='M'){
+                $data['captura']['ninios'] += 1;
             }
-            return Response::json(array("status" => 200, "messages" => "Operación realizada con exito", "data" => $data, "personas" => $personas, "total" => count($data)), 200);			
+            if($value->genero=='F'){
+                $data['captura']['ninias'] += 1;
+            }
         }
+        // CAPTURAS CAPTURAS CAPTURAS CAPTURAS CAPTURAS CAPTURAS CAPTURAS CAPTURAS CAPTURAS CAPTURAS CAPTURAS CAPTURAS CAPTURAS
+
+        // COBERTURAS COBERTURAS COBERTURAS COBERTURAS COBERTURAS COBERTURAS COBERTURAS COBERTURAS COBERTURAS COBERTURAS
+        foreach ($personasCoberturas as $key => $value) { 
+            $fna = explode("-", $value->fecha_nacimiento);
+            
+            $vei = VacunaEsquema::select('id')
+                ->where('vacunas_id', (integer)$request->vacunas_id)
+                ->where('esquemas_id', (integer)$fna[0])
+                ->where('edad_ideal_anio', (integer)$request->edad);
+            // $veec = VacunaEsquema::select('id') // PARA ESQUEMAS COMPLETOS
+            //     ->where('esquemas_id', (integer)$fna[0])
+            //     ->where('edad_ideal_anio','<=', (integer)$request->edad)->get();
+            
+            // var_dump(json_encode($vei), json_encode($veec));
+            // if($request->tipo_aplicacion!=0)
+            //     $vei = $vei->where('tipo_aplicacion', (integer)$request->tipo_aplicacion);
+            $vei = $vei->get();
+            
+            $dosisAplicar = count($vei);
+
+            $dosisAplicadas = 0;
+            //var_dump($dosisAplicar);
+            foreach ($vei as $keyVei => $valueVei) { // Todas
+                $pve = DB::table('personas_vacunas_esquemas')
+                ->select('id')
+                ->where('vacunas_esquemas_id', (integer)$valueVei->id)
+                ->where('personas_id', $value->id)
+                ->where('deleted_at', NULL)
+                ->count(); 
+
+                if($pve>0)
+                    $dosisAplicadas++;    
+            }
+            
+            if($dosisAplicar<=0){ // NO HAY DOSIS PARA APLICAR A ESA EDAD
+
+            } else {
+                if($dosisAplicar==$dosisAplicadas){ // EL INFANTE TIENE LAS "DOSIS" DE LA VACUNA QUE LE CORRESPONDE A SU EDAD
+                    $data['cobertura']['todos'] += 1;
+                    if($value->genero=='M'){
+                        $data['cobertura']['ninios'] += 1;
+                    }
+                    if($value->genero=='F'){
+                        $data['cobertura']['ninias'] += 1;
+                    }
+                }
+            }                        
+        }
+        // COBERTURAS COBERTURAS COBERTURAS COBERTURAS COBERTURAS COBERTURAS COBERTURAS COBERTURAS COBERTURAS COBERTURAS 
+
+
+        return Response::json(array("status" => 200, "messages" => "Operación realizada con exito", "data" => $data, "personas" => $personasCapturas, "total" => count($data)), 200);			
+
     }
 
     public function contenedoresBiologico(Request $request) 
