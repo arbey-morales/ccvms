@@ -66,9 +66,9 @@ class DashboardController extends Controller
         $hoy = Carbon::today("America/Mexico_City");
         
         $fecha_edad_inicio = Carbon::today("America/Mexico_City")->subYear($request->edad); 
-        $fecha_edad_fin = ((Carbon::today("America/Mexico_City")->subYear($request->edad))->subYear(1))->addDay(); // Limite un anio antes de la fecha de inicio   01-12-2015
+        $fecha_edad_fin = Carbon::today("America/Mexico_City")->subYear($request->edad)->subYear(1)->addDay(); // Limite un anio antes de la fecha de inicio   01-12-2015
         //var_dump($fecha_edad_fin->format('Y-m-d'),$fecha_edad_inicio->format('Y-m-d'));
-       
+       //var_dump($fecha_edad_fin = Carbon::today("America/Mexico_City")->subYear($request->edad)->subYear(1)->addDay(), $fecha_edad_fin); die;
         $personasCapturas = Persona::select('personas.id','personas.fecha_nacimiento','personas.genero')
             ->where('personas.deleted_at',NULL)
             ->whereBetween('fecha_nacimiento', [$fecha_edad_fin, $fecha_edad_inicio]);
