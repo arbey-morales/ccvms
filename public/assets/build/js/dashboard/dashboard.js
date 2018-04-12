@@ -2,8 +2,14 @@
 $('body').removeClass('nav-md');
 $('body').addClass('nav-sm');
 
+// BUSCANDO
+var buscandoCoberturas = false;
+var buscandoEsquemasCompletos = false;
+var buscandoConcordancia = false;
+var buscandoRedFrio = false;
+
 // Inicio de valores iniciales
-var jurisdicciones = [{ 'id': 0, 'text': 'Todas las Jurisdicciones' }];
+var jurisdicciones = [{ 'id': 0, 'text': 'Todo el estado' }];
 var municipios = [{ 'id':0, 'text':'Todos los Municipios'}];
 var municipiosData = [];
 var localidades = [{ 'id':0, 'text':'Todas las Localidades'}];
@@ -24,25 +30,32 @@ var dosis = [
 var dosis_vacunas = [];
 var vacunas = [{ 'id': 0, 'text': 'Todas las Vacunas' }];
 
+var anios = [];
+var anio = moment().format('YYYY');
+var anio_actual = parseInt(anio);
+for (inicio = (anio_actual-1); inicio < (anio_actual + 1); inicio++) {
+  anios.push({ 'id': inicio, 'text': 'Población oficial CONAPO '+inicio  });
+}
+
 $(".js-data-jurisdiccion").change(function () {
   vaciaClue();
   limitaMunicipios($(this).val()); 
   ubicacionContenedores(); 
   contenedoresEstatus(); 
-  vacunacion(); 
+  //coberturas(); 
 });
 
 $(".js-data-municipio").change(function () {
   vaciaClue();
   ubicacionContenedores(); 
   contenedoresEstatus(); 
-  vacunacion();
+  //coberturas();
 });
 
 $(".js-data-clue").change(function () {
   ubicacionContenedores(); 
   contenedoresEstatus(); 
-  vacunacion();
+  //coberturas();
 });
 
 $(".js-data-estatus-contenedor,.js-data-tipo-contenedor").change(function(){
@@ -50,17 +63,21 @@ $(".js-data-estatus-contenedor,.js-data-tipo-contenedor").change(function(){
   contenedoresEstatus();
 });
 
-$(".js-data-tipo-aplicacion").change(function(){
-  vacunacion();
-});
-
-$(".js-data-edad").change(function(){
-  vacunacion();
-});
-
 $(".js-data-vacuna").change(function(){
   limitaDosis($(this).val());
-  vacunacion();
+  //coberturas();
+});
+
+$(".coberturas-button").click(function(){
+  coberturas();
+});
+
+$(".esquemas-completos-button").click(function(){
+  esquemasCompletos();
+});
+
+$(".concordancia-button").click(function(){
+  concordancia();
 });
 
 var vaciaClue = function(){
@@ -95,6 +112,7 @@ var limitaMunicipios = function(id){
   $('.js-data-municipio').empty();
   $(".js-data-municipio").select2({
     language: "es",
+    allowClear: true,
     data: municipios
   });
 }
@@ -132,7 +150,7 @@ $.get('catalogo/jurisdiccion', {}, function(response, status){ // Consulta
     notificar('Error','Sin datos','error',2000);
   } else { 
     while (jurisdicciones.length) { jurisdicciones.pop(); }                
-    jurisdicciones.push({ 'id': 0, 'text': 'Todas las Jurisdicciones' });           
+    jurisdicciones.push({ 'id': 0, 'text': 'Todo el estado' });           
     if(response.data.length<=0){
         notificar('Información','No existen jurisdicciones','warning',2000);
     } else {
@@ -170,6 +188,7 @@ $.get('catalogo/municipio', {}, function(response, status){ // Consulta
     }  
     $(".js-data-municipio").select2({
         language: "es",
+        allowClear: true,
         data: municipios
     });
   }
@@ -196,9 +215,10 @@ $.get('catalogo/vacuna', {}, function(response, status){ // Consulta
         var temp = []; // Por cada vacuna
         while (dv.length) { dv.pop(); }
         while (temp.length) { temp.pop(); }
+        //console.log(cont.vacunas_esquemas)
         $.each(cont.vacunas_esquemas, function( ive, contve ) {
-          // if(ive==0)
-          //   dv.push(dosis[1]);
+          if(ive==0)
+            dv.push({ 'id': 0, 'text': 'Todas las aplicaciones/dosis' });
             //console.log(contve.tipo_aplicacion)
           if(temp.indexOf(contve.tipo_aplicacion) != -1){ 
             //console.log('VACUNA: '+cont.id+' , existe TA: '+contve.tipo_aplicacion)
@@ -218,7 +238,7 @@ $.get('catalogo/vacuna', {}, function(response, status){ // Consulta
         data: vacunas
     }); 
 
-    limitaDosis(1);
+    limitaDosis(vacunas[0].id);
 
   }
 }).fail(function(){ 
@@ -358,12 +378,53 @@ $(document).ready(function(){
     language: "es",
     data: edades
   }); 
+  $(".js-data-edad-esquema").select2({
+    language: "es",
+    data: edadesEsquemasCompletos
+  }); 
+  $(".js-data-edad-concordancia").select2({
+    language: "es",
+    data: edadesConcordancia
+  }); 
   $(".js-data-tipo-aplicacion").select2({
     language: "es",
     data: dosis
   });
+
+  $(".js-data-anio").select2({
+    language: "es",
+    data: anios
+  });
+
+  $(".js-data-anio").val(anio_actual).trigger("change");
+  //console.log(anios)
+
   setTimeout(() => {    
-    vacunacion();
+    coberturas();
   }, 1000); 
   contenedoresEstatus();
+});
+
+$(".tab-coberturas").click(function(){
+  if ( $(".contenido-coberturas").hasClass( "hide" ) ) {
+    $(".contenido-coberturas").removeClass("hide");
+  }
+
+  $(".contenido-concordancia,.contenido-esquemas-completos").addClass("hide");
+});
+
+$(".tab-concordancia").click(function(){
+  if ( $(".contenido-concordancia").hasClass( "hide" ) ) {
+    $(".contenido-concordancia").removeClass("hide");
+  }
+
+  $(".contenido-coberturas,.contenido-esquemas-completos").addClass("hide");
+});
+
+$(".tab-esquemas-completos").click(function(){
+  if ( $(".contenido-esquemas-completos").hasClass( "hide" ) ) {
+    $(".contenido-esquemas-completos").removeClass("hide");
+  }
+
+  $(".contenido-concordancia,.contenido-coberturas").addClass("hide");
 });

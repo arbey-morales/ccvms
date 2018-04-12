@@ -23,6 +23,9 @@
                     </li>
                 @endpermission
             @endrole
+                <li>
+                    <a href="{{ url('pedido') }}"><i class="fa fa-file-text"></i> Pedidos</a>
+                </li>
             @role('red-frio|root')
                 @permission('show.catalogos')
                 <li>
@@ -77,11 +80,10 @@
                         <ul class="nav child_menu">
                             @permission('show.usuarios')<li><a href="{{ route('usuario.index') }}">Usuarios</a></li>@endpermission
                             @permission('show.usuarios')<li><a href="{{ route('monitoreo.index') }}">Monitoreo</a></li>@endpermission
-                        <!-- @role('root') 
-                                @permission('show.roles')<li><a href="#">Roles</a></li>@endpermission
-                                @permission('show.permissions')<li><a href="#">Permisos</a></li>@endpermission
+                            @role('root|admin') 
+                                <!-- @permission('show.roles')<li><a href="#">Roles</a></li>@endpermission -->
+                                @permission('show.pedidos')<li><a href="{{ route('permiso.index') }}">Permisos</a></li>@endpermission
                             @endrole 
-                            -->
                         </ul>
                     </li>
                 @endrole

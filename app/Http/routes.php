@@ -19,47 +19,74 @@ Route::get('/', ['middleware' => 'auth', function () {
     }        
 }]);
 
+// JWT
+Route::post('obtener-token',    'AutenticacionController@autenticar');
+Route::post('refresh-token',    'AutenticacionController@refreshToken');
+Route::get('check-token',       'AutenticacionController@verificar');
+
+// APP MÓVIL
+Route::group(['namespace' => 'Movil', 'prefix' => 'movil/catalogo', 'middleware' => 'jwt'], function () {
+    // CLUE
+    Route::resource('clue',                 'ClueController');
+    // CONTENEDOR
+    // FALLAS CONTENEDORES
+});
+
+
+// AUTH
 Route::group(['namespace' => 'Auth','prefix' => 'auth'], function () {
-    // Authentication routes...
     Route::get('login',                 'AuthController@getLogin');
     Route::post('login',                ['as' =>'auth/login',       'uses' => 'AuthController@postLogin']);
     Route::get('logout',                ['as' => 'auth/logout',     'uses' => 'AuthController@getLogout']);
 });
 
+// TRANSACCIONES
 Route::group(['middleware' => 'auth'], function () {
     Route::group(['namespace' => 'Transaccion'], function () {
-        // Trancacciones vacunación
+        // TRANSACCION
+        Route::resource('usuario',                             'UserController');
+        Route::resource('permiso',                             'PermissionController');
+
+        // VACUNACIÓN
         Route::get('persona/buscar',                           'PersonaController@buscar');
         Route::get('persona/curp-repetida',                    'PersonaController@curpRepetida');
         Route::get('persona/curp',                             'PersonaController@curp');
         Route::get('persona/reporte',                          'PersonaController@reporte');
         Route::resource('persona',                             'PersonaController');                
-        Route::resource('usuario',                             'UserController');
+        
         Route::resource('monitoreo',                           'MonitoreoController');
         Route::resource('cuadro-dist-juris',                   'CuadroDistribucionJurisdiccionalController');
         Route::resource('cuadro_distribucion_clue',            'CuadroDistribucionClueController');   
-        // Transacciones red de frío
+        // RED DE FRÍO
         Route::resource('temperatura',                         'TemperaturaContenedorController');
+
+        Route::resource('pedido',                              'PedidoController');
     });  
 
-    Route::group(['namespace' => 'Dashboard', 'prefix' =>   'dashboard',], function () {
+    // DASHBOARD
+    Route::group(['prefix' =>   'dashboard', 'namespace' => 'Dashboard'], function () {
+        // VACUNACIÓN
         Route::get('/',                                     'DashboardController@index');
         Route::get('capturas',                              'DashboardController@capturas');  
-        Route::get('vacunacion',                            'DashboardController@vacunacion');
+        Route::get('cobertura',                             'DashboardController@coberturas');
+        Route::get('esquema-completo',                      'DashboardController@esquemaCompleto');
+        Route::get('concordancia',                          'DashboardController@concordancia');
         Route::get('contenedores-biologico',                'DashboardController@contenedoresBiologico');
         Route::get('ubicacion-contenedores',                'DashboardController@ubicacionContenedores');
     });
 
+    // REPORTES
     Route::group(['prefix' => 'persona/reporte', 'namespace' => 'Reporte'], function () {
-        // Reportes vacunación
+        // VACUNACIÓN
         Route::get('buscar',                    'ReportePersonaController@buscar');
         Route::get('seguimiento',               'ReportePersonaController@seguimiento');
         Route::get('actividad',                 'ReportePersonaController@actividad');
         Route::get('biologico',                 'ReportePersonaController@biologico');
     });
 
+    // CATALOGOS
     Route::group(['prefix' => 'catalogo', 'namespace' => 'Catalogo'], function () {
-        // Catalogos vacunación
+        // GENÉRICOS
         Route::resource('ageb',                 'AgebController',                   ['only' => ['index', 'show']]);
         Route::resource('clue',                 'ClueController');
         Route::get('clue-contenedor',           'ClueController@clueContenedor');
@@ -76,12 +103,12 @@ Route::group(['middleware' => 'auth'], function () {
         Route::resource('tipo-parto',           'TipoPartoController',              ['only' => ['index', 'show']]);
         Route::resource('poblacion-conapo',     'PoblacionConapoController');
         Route::post('poblacion-conapo/importar','PoblacionConapoController@importar');
-        // Catalogos Vacunación
+        // VACUNACIÓN
         Route::group(['prefix' => 'vacunacion', 'namespace' => 'Vacunacion'], function () {
             Route::get('piramide-poblacional/clue-detalle',     'PiramidePoblacionalController@clueDetalle');
             Route::resource('piramide-poblacional',     'PiramidePoblacionalController');
         });
-        // Catalogos Red de frío
+        // RED DE FRÍO
         Route::group(['prefix' => 'red-frio', 'namespace' => 'RedFrio'], function () {
             Route::resource('contenedor-biologico', 'ContenedorBiologicoController');
             Route::resource('estatus-contenedor',   'EstatusContenedorController',      ['only' => ['index', 'show']]);
@@ -93,14 +120,14 @@ Route::group(['middleware' => 'auth'], function () {
         
     });
 });
-
+// PDF
 Route::group(['namespace' => 'Pdf'], function () {
-    // PDF vacunación
+    // VACUNACIÓN
     Route::get('persona-pdf',               'PdfController@persona');
     Route::get('persona-filtro-pdf',        'PdfController@filter');
 });
 
-// Error abort
+// ERROR ABORT
 Route::get('error', function(){
     abort(500);             
 });

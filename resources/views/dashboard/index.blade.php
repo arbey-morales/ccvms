@@ -46,116 +46,169 @@
     <div role="main">
       <!-- form -->
       {!! Form::open([ 'url' => 'dashboard/vacunacion', 'id' => 'dashboard-form', 'method' => 'GET']) !!}
-        <div class="row">
-          <!-- UBICACIÓN -->
-          <div class="row">
-            <div class="col-md-12">
-              Filtros de ubicación
-            </div>
-          </div>
-          <div class="row">          
-            @role('root|admin|red-frio')
-              <div class="col-md-4 col-sm-6 col-xs-12">
-                {!!Form::select('jurisdicciones_id', [], 0, ['class' => 'form-control js-data-jurisdiccion select2', 'style' => 'width:100%'])!!}
-              </div>
-            @endrole
-            <div class="col-md-4 col-sm-6 col-xs-12 municipios">
-              {!! Form::select('municipios_id', [],  0, ['class' => 'form-control js-data-municipio select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'municipios_id', 'data-placeholder' => 'Todos los municipios', 'style' => 'width:100%'] ) !!}
-            </div>
-            <div class="col-md-4 col-sm-6 col-xs-12 clues">
-              {!! Form::select('clues_id', [],  0, ['class' => 'form-control js-data-clue select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'clues_id', 'data-placeholder' => 'Todas la unidad de salud', 'style' => 'width:100%'] ) !!}
-            </div>
-          </div>
-        </div>
-
-      <br />
 
         <div class="row">
-          @role('root|admin|captura')
           <div class="col-md-12 col-sm-12 col-xs-12">
             <div class="x_panel tile fixed_height_340">
               <div class="x_content">
-
+                <div class="row text-muted well well-sm no-shadow">          
+                  @role('root|admin|red-frio')
+                    <div class="col-md-4 col-sm-12 col-xs-12" style="padding-top:10px; padding-bottom:5px;">
+                      {!!Form::select('jurisdicciones_id', [], 0, ['class' => 'form-control js-data-jurisdiccion select2', 'style' => 'width:100%'])!!}
+                    </div>
+                  @endrole
+                  <div class="col-md-4 col-sm-12 col-xs-12 municipios" style="padding-top:10px; padding-bottom:5px;">
+                    {!! Form::select('municipios_id', [],  0, ['class' => 'form-control js-data-municipio select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'municipios_id', 'data-placeholder' => 'Todos los municipios', 'style' => 'width:100%'] ) !!}
+                  </div>
+                  <div class="col-md-4 col-sm-12 col-xs-12 clues" style="padding-top:10px; padding-bottom:5px;">
+                    {!! Form::select('clues_id', [],  0, ['class' => 'form-control js-data-clue select2', 'data-parsley-required' => 'true', 'data-parsley-type' => 'number', 'data-parsley-min' => '1', 'id' => 'clues_id', 'data-placeholder' => 'Todas la unidad de salud', 'style' => 'width:100%'] ) !!}
+                  </div>
+                </div>
+                @role('root|admin|captura')
                 <div class="row">
-                  <div class="col-sm-3">
-                    <button id="compose-cb" class="btn btn-sm btn-info btn-block" type="button">COBERTURAS</button>
+                  <div class="col-md-6 col-sm-12 col-xs-12" style="padding-top:10px; padding-bottom:5px;">
+                    <div class="btn-group">
+                      <button class="btn btn-info tab-coberturas" type="button"> <i class="fa fa-adjust btn-md" style="font-size:x-large;"></i> PORCENTAJE DE COBERTURAS</button>
+                      <button class="btn btn-success tab-esquemas-completos" type="button"> <i class="fa fa-bullseye btn-md" style="font-size:x-large;"></i> ESQUEMAS COMPLETOS</button>
+                      <button class="btn btn-warning tab-concordancia" type="button"> <i class="fa fa-star-half-empty btn-md" style="font-size:x-large;"></i> PORCENTAJE DE CONCORDANCIA</button>
+                    </div>
+                  </div>
+                  <div class="col-md-6 col-sm-12 col-xs-12" style="padding-top:10px; padding-bottom:5px;">
+                  <h1 class="price pull-right">VACUNACIÓN</h1>
+                  </div>
+                </div>
+                
+                <div class="row">
+                  <div class="col-sm-3 col-sm-12 col-xs-12 contenido-coberturas"> <!-- COBERTURAS -->                    
                     <div style="padding-top:10px; padding-bottom:5px;">
                       {!!Form::select('vacunas_id', [], 1, ['class' => 'form-control js-data-vacuna select2', 'style' => 'width:100%'])!!}
                     </div>
-                    <!-- <div style="padding-top:10px; padding-bottom:5px;">
-                     {!!Form::select('tipo_aplicacion', [], 0, ['class' => 'form-control js-data-tipo-aplicacion select2', 'style' => 'width:100%'])!!}
-                    </div> -->
                     <div style="padding-top:10px; padding-bottom:5px;">
-                     {!!Form::select('edad', [], 0, ['class' => 'form-control js-data-edad select2', 'style' => 'width:100%'])!!}
+                    {!!Form::select('tipo_aplicacion', [], 0, ['class' => 'form-control js-data-tipo-aplicacion select2', 'style' => 'width:100%'])!!}
                     </div>
-                    <!-- <button id="compose-ec" class="btn btn-sm btn-success btn-block" type="button">ESQUEMAS COMPLETOS</button>
-                    <button id="compose-c" class="btn btn-sm btn-warning btn-block" type="button">CONCORDANCIA</button> -->
+                    <div style="padding-top:10px; padding-bottom:5px;">
+                    {!!Form::select('edad', [], 0, ['class' => 'form-control js-data-edad select2', 'style' => 'width:100%'])!!}
+                    </div>
+                    <button id="compose-coberturas" class="btn btn-large btn-info btn-block coberturas-button" type="button">BUSCAR</button>
                   </div>
-                  <div class="col-sm-9">
-                    <div class="row tile_count">
-                      <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-                        <span class="count_top"><i class="fa fa-keyboard-o"></i> RESULTADOS </span>
-                        <div class="count total-capturas"> </div>
-                        <span class="count_bottom"> <i class="primary"><i class="fa fa-female"></i><i class="total-ninas"> </i> </i> Niñas <i class="green"><i class="fa fa-male"></i><i class="total-ninos"> </i> </i> Niños </span>
+
+                  <div class="col-sm-3 col-sm-12 col-xs-12 contenido-esquemas-completos hide"> <!-- ESQUEMAS COMPLETOS -->
+                    <div style="padding-top:10px; padding-bottom:5px;">
+                      {!!Form::select('edad_esquemas', [], 0, ['class' => 'form-control js-data-edad-esquema select2', 'style' => 'width:100%'])!!}
+                    </div>
+                    <button id="compose-esquemas esquemas-completos" class="btn btn-large btn-success btn-block esquemas-completos-button" type="button">BUSCAR</button>
+                  </div>
+
+                  <div class="col-sm-3 col-sm-12 col-xs-12 contenido-concordancia hide"> <!-- CONCORDANCIA -->
+                    PARA OBTENER EL PORCENTAJE DE CONCORDANCIA DEL AÑO ACTUAL ES NECESARIO QUE LA POBLACIÓN CONAPO SEA AGREGADA.
+                    <!-- <div style="padding-top:10px; padding-bottom:5px;">
+                      {!! Form::select('anio', [], '', ['class' => 'form-control js-data-anio select2', 'data-parsley-type' => 'number', 'data-parsley-min' => '0', 'id' => 'anio',  'data-placeholder' => 'Población CONAPO', 'style' => 'width:100%'] ) !!}
+                    </div> -->
+                    <div class="product_price" style="text-align:center !important;">
+                      <span class="price-tax">CONCORDANCIA</span>
+                      <br>
+                      <h1 class="price pc" style="text-decoration:none; cursor:pointer;"onClick="masMenosDetalles()"> </h1>
+                   </div> 
+                    <div style="padding-top:10px; padding-bottom:5px;">
+                      {!!Form::select('edad_concordancia', [], 0, ['class' => 'form-control js-data-edad-concordancia select2', 'style' => 'width:100%'])!!}
+                    </div>
+                    <button id="compose-concordancia concordancia" class="btn btn-large btn-warning btn-block concordancia-button" type="button">BUSCAR</button>
+                  </div>
+
+
+                  <div class="col-sm-9 col-sm-12 col-xs-12 contenido-coberturas"> <!-- COBERTURAS -->   
+                    <div class="row">  
+                      <div class="product_price col-md-4 col-sm-12 col-xs-12" style="text-align:center !important;">
+                        <span class="price-tax">Población Nominal</span>
+                        <br>
+                        <h1 class="price total-capturas"> </h1>
+                        <i class="total-ninas" style="font-size:x-large; color:gray; padding:5px;"></i> 
+                        <i class="fa fa-male" style="color:#4d81bf; font-size:xx-large;"></i> 
+                        <i class="fa fa-female" style="color:#ed1586; font-size:xx-large;"></i>  
+                        <i class="total-ninos" style="font-size:x-large; color:gray; padding:5px;"></i>
+                      </div>             
+                      <div class="product_price col-md-4 col-sm-12 col-xs-12" style="text-align:center !important;">
+                        <span class="price-tax">Coberturas</span>
+                        <br>
+                        <h1 class="price total-coberturas"> </h1>  
+                        <i class="total-coberturas-ninas" style="font-size:x-large; color:gray; padding:5px;"></i> 
+                        <i class="fa fa-male" style="color:#4d81bf; font-size:xx-large;"></i> 
+                        <i class="fa fa-female" style="color:#ed1586; font-size:xx-large;"></i>  
+                        <i class="total-coberturas-ninos" style="font-size:x-large; color:gray; padding:5px;"></i>
                       </div>
-                      <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-                        <span class="count_top"><i class="fa fa-flash"></i> COBERTURAS CENSO NOM.</span>
-                        <div class="count total-coberturas"> </div>
-                        <span class="count_bottom"> <i class="primary"><i class="fa fa-female"></i><i class="total-coberturas-ninas"> </i> </i> Niñas <i class="green"><i class="fa fa-male"></i><i class="total-coberturas-ninos"> </i> </i> Niños </span>
-                      </div>
-                      <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-                        <span class="count_top"><i class="fa fa-flas"></i> % </span>
-                        <div class="count porcentaje-coberturas"> </div>
-                        <!-- <span class="count_bottom"> <i class="primary"><i class="fa fa-female"></i><i class="porcentaje-coberturas-ninas"> </i> </i> Niñas <i class="green"><i class="fa fa-male"></i><i class="porcentaje-coberturas-ninos"> </i> </i> Niños </span> -->
+                      <div class="product_price col-md-4 col-sm-12 col-xs-12" style="text-align:center !important;">
+                        <span class="price-tax">Porcentaje de Coberturas</span>
+                        <h1 class="price porcentaje-coberturas-nominal"> </h1>
+                        <h1 class="price porcentaje-coberturas-oficial"> </h1>
                       </div>
                     </div>
+                  </div>
+
+                  <div class="col-sm-9 col-sm-12 col-xs-12 contenido-esquemas-completos hide"> <!-- ESQUEMAS COMPLETOS -->
+                    <div class="row">
+                      <div class="product_price col-md-4 col-sm-12 col-xs-12" style="text-align:center !important;">
+                        <span class="price-tax">Población Nominal</span>
+                        <br>
+                        <h1 class="price total-nominal-esquemas-completos"> </h1>
+                        <i class="total-nominal-esquemas-completos-ninas" style="font-size:x-large; color:gray; padding:5px;"></i> 
+                        <i class="fa fa-male" style="color:#4d81bf; font-size:xx-large;"></i> 
+                        <i class="fa fa-female" style="color:#ed1586; font-size:xx-large;"></i>  
+                        <i class="total-nominal-esquemas-completos-ninos" style="font-size:x-large; color:gray; padding:5px;"></i>
+                      </div> 
+                      <div class="product_price col-md-4 col-sm-12 col-xs-12" style="text-align:center !important;">
+                        <span class="price-tax">Total de esquemas</span>
+                        <br>
+                        <h1 class="price total-esquemas-completos"> </h1>
+                        <i class="total-esquemas-completos-ninas" style="font-size:x-large; color:gray; padding:5px;"></i> 
+                        <i class="fa fa-male" style="color:#4d81bf; font-size:xx-large;"></i> 
+                        <i class="fa fa-female" style="color:#ed1586; font-size:xx-large;"></i>  
+                        <i class="total-esquemas-completos-ninos" style="font-size:x-large; color:gray; padding:5px;"></i>
+                      </div> 
+                    </div>
+                  </div>
+
+                  <div class="col-sm-9 col-sm-12 col-xs-12 contenido-concordancia hide"> <!-- CONCORDANCIA -->
+                    <!-- <div class="concordancia-detalles"> 
+                      <a href="#tabla-concordancia" style="font-size:large;" class="mas-menos-detalles" onClick="masMenosDetalles()"> <i class="fa fa-chevron-circle-down"></i> Menos Detalles </a> 
+                    </div> -->
+                    <div class="tabla-concordancia"></div>
+                  </div>
+
+
+                </div>
+                @endrole
+                @role('root')
+                  <hr>
+                @endrole
+                @role('root|red-frio')
+                <div class="row">
+                  <div class="col-md-12">                  
+                    <h1 class="price pull-right">RED DE FRÍO</h1>
                   </div>
                 </div>
-              </div>
-            </div>
-          </div>
-          @endrole
-
-          @role('root|red-frio')
-          <div class="col-md-12 col-sm-12 col-xs-12">
-            <div class="x_panel fixed_height_340">
-              <div class="x_content">
                 <div class="row">
+                  <div class="col-sm-9">
+                    <div id="map" class="padre" style="width:100%; height:550px;"> 
+                    <div> <span class="hijo"> <i class="fa fa-spin fa-spinner"></i> Cargando </span></div>
+                    </div>
+                  </div>
                   <div class="col-sm-3">
-                    <button id="compose-es" class="btn btn-sm btn-primary btn-block" type="button">FILTROS RED DE FRÍO</button>
+                    <!-- <button id="compose-es" class="btn btn-sm btn-primary btn-block" type="button">FILTROS RED DE FRÍO</button> -->
                     <div style="padding-top:10px; padding-bottom:5px;">
                       {!!Form::select('estatus_contenedor_id', [], 0, ['class' => 'form-control js-data-estatus-contenedor select2', 'style' => 'width:100%'])!!}
                     </div>
                     <div style="padding-top:10px; padding-bottom:5px;">
                       {!!Form::select('tipo_contenedor_id', [], 0, ['class' => 'form-control js-data-tipo-contenedor select2', 'style' => 'width:100%'])!!}
                     </div>
+                    <br>
+                    <div class="accordion" id="accordion" role="tablist" aria-multiselectable="true"> </div>
                   </div>
-                  <!-- /MAIL LIST -->
-
-                  <!-- CONTENT MAIL -->
-                  <div class="col-sm-9">
-                    <div id="map" class="padre" style="width:100%; height:550px;"> 
-                    <div> <span class="hijo"> <i class="fa fa-spin fa-spinner"></i> Cargando </span></div>
-                    </div>
-                  </div>
-                  <!-- /CONTENT MAIL -->
                 </div>
-                <!-- ESTATUS Y TIPO DE CONTENEDOR -->
-                
-                <!-- start accordion -->
-                <!-- <div class="accordion col-md-4 col-sm-4 col-xs-12" id="accordion" role="tablist" aria-multiselectable="true">            
-                </div> -->
-                <!-- end of accordion -->
-                <!-- <div class="col-md-8 col-sm-8 col-xs-12">
-                  <div id="map" class="padre" style="width:100%; height:550px;"> 
-                  <div> <span class="hijo"> <i class="fa fa-spin fa-spinner"></i> Cargando </span></div>
-                  </div>
-                </div> -->
-                
+                @endrole
+
               </div>
             </div>
           </div>
-          @endrole
           
         </div>
     {!! Form::close() !!}
@@ -194,6 +247,7 @@
     <script>
       
     </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAG20do9iIKewhzw2MPwKGQmcdqYg9F6U&callback=ubicacionContenedores"
+    <!-- AIzaSyAcJqDlKB4Kk_FQExuMuEKQVmmYzy-dUMU -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAcJqDlKB4Kk_FQExuMuEKQVmmYzy-dUMU&callback=ubicacionContenedores"
     async defer></script>
 @endsection
