@@ -68,9 +68,9 @@
                 <div class="row">
                   <div class="col-md-6 col-sm-12 col-xs-12" style="padding-top:10px; padding-bottom:5px;">
                     <div class="btn-group">
-                      <button class="btn btn-info tab-coberturas" type="button"> <i class="fa fa-adjust btn-md" style="font-size:x-large;"></i> PORCENTAJE DE COBERTURAS</button>
+                      <button class="btn btn-info tab-coberturas" type="button"> <i class="fa fa-adjust btn-md" style="font-size:x-large;"></i> % COBERTURAS</button>
                       <button class="btn btn-success tab-esquemas-completos" type="button"> <i class="fa fa-bullseye btn-md" style="font-size:x-large;"></i> ESQUEMAS COMPLETOS</button>
-                      <button class="btn btn-warning tab-concordancia" type="button"> <i class="fa fa-star-half-empty btn-md" style="font-size:x-large;"></i> PORCENTAJE DE CONCORDANCIA</button>
+                      <button class="btn btn-warning tab-concordancia" type="button"> <i class="fa fa-star-half-empty btn-md" style="font-size:x-large;"></i> % CONCORDANCIA</button>
                     </div>
                   </div>
                   <div class="col-md-6 col-sm-12 col-xs-12" style="padding-top:10px; padding-bottom:5px;">

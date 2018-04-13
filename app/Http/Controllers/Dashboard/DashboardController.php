@@ -85,7 +85,7 @@ class DashboardController extends Controller
                     ->where('clues.jurisdicciones_id',$request->jurisdicciones_id);
             }
         }
-
+        // var_dump('JURIS: '.$request->jurisdicciones_id, 'VACUNA: '.$request->vacunas_id, 'TA: '.$request->tipo_aplicacion, 'EDAD: '.$request->edad); die;
         if ($request->clues_id!=0) {
             $personasCapturas = $personasCapturas
                 ->where('personas.clues_id',$request->clues_id);
@@ -97,14 +97,14 @@ class DashboardController extends Controller
         // END PARAMETROS GENERALES
 
         if ($request->vacunas_id!=0) { // SI SELECCIONA UNA  VACUNA EN ESPECIFICO SE CONTEMPLAN AQUÍ
-            $personasCapturas = $personasCapturas
+            /*$personasCapturas = $personasCapturas
                 ->leftJoin('personas_vacunas_esquemas', 'personas.id', '=', 'personas_vacunas_esquemas.personas_id')
                 ->leftJoin('vacunas_esquemas','vacunas_esquemas.id','=','personas_vacunas_esquemas.vacunas_esquemas_id')
                 ->where('vacunas_esquemas.vacunas_id', $request->vacunas_id);
             if ($request->tipo_aplicacion!=0) {  // SI SELECCIONA UN DOSIS ESPECIFICA DE UNA VACUNA SE CONTEMPLAN AQUÍ
                 $personasCapturas = $personasCapturas
                     ->where('vacunas_esquemas.tipo_aplicacion', $request->tipo_aplicacion);
-            }                
+            } */               
         }
 
         $personasCoberturas = $personasCapturas;
@@ -114,6 +114,8 @@ class DashboardController extends Controller
         $personasCoberturas = $personasCoberturas
             ->distinct('personas.id')
             ->get();
+        
+            //var_dump(json_encode($personasCoberturas), json_encode($personasCapturas)); die;
 
         // ESTRUCTURA DE LA RESPUESTA ESTRUCTURA DE LA RESPUESTA ESTRUCTURA DE LA RESPUESTA ESTRUCTURA DE LA RESPUESTA
         $data = [
@@ -147,11 +149,12 @@ class DashboardController extends Controller
             //     ->where('edad_ideal_anio','<=', $request->edad)->get();
             
             // var_dump(json_encode($vei), json_encode($veec));
-            // if($request->tipo_aplicacion!=0)
-            //     $vei = $vei->where('tipo_aplicacion', $request->tipo_aplicacion);
+            if($request->tipo_aplicacion!=0)
+                $vei = $vei->where('tipo_aplicacion', $request->tipo_aplicacion);
             $vei = $vei->get();
             
             $dosisAplicar = count($vei);
+            //  var_dump('NIÑO: '.$value->id.' DEBE TENER '.$dosisAplicar.' DOSIS ');
 
             $dosisAplicadas = 0;
             foreach ($vei as $keyVei => $valueVei) { // Todas
@@ -160,12 +163,14 @@ class DashboardController extends Controller
                 ->where('vacunas_esquemas_id', $valueVei->id)
                 ->where('personas_id', $value->id)
                 ->where('deleted_at', NULL)
-                ->count(); 
-
+                ->count();
+                
                 if($pve>0)
                     $dosisAplicadas++;    
+
+                //var_dump(' - - - - - - '.$value->id.' aplica: '.$valueVei->id.' DEBE TENER '.$dosisAplicar.' DOSIS - TIENE: '.$dosisAplicadas.' [[[[[[[[[[[[[[[[[[');
             }
-            // var_dump('APLICADAS: '.$dosisAplicadas);
+             //var_dump('NIÑO: '.$value->id.' DEBE TENER '.$dosisAplicar.' DOSIS - TIENE: '.$dosisAplicadas.' ------------');
             
             if($dosisAplicar<=0){ // NO HAY DOSIS PARA APLICAR A ESA EDAD
 
@@ -181,7 +186,7 @@ class DashboardController extends Controller
                 }
             }                        
         }
-        // die;
+        //  die;
         // COBERTURAS COBERTURAS COBERTURAS COBERTURAS COBERTURAS COBERTURAS COBERTURAS COBERTURAS COBERTURAS COBERTURAS 
 
 
