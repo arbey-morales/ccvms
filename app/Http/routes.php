@@ -27,7 +27,7 @@ Route::get('check-token',       'AutenticacionController@verificar');
 // APP MÓVIL
 Route::group(['namespace' => 'Movil', 'prefix' => 'movil/catalogo', 'middleware' => 'jwt'], function () {
     // CLUE
-    Route::resource('clue',                 'ClueController');
+    // Route::resource('clue',                 'ClueController');
     // CONTENEDOR
     // FALLAS CONTENEDORES
 });
