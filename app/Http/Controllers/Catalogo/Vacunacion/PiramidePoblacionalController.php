@@ -156,7 +156,7 @@ class PiramidePoblacionalController extends Controller
       */
       public function clueDetalle(Request $request)
       {
-          $data = PiramidePoblacional::where('clues_id', $request->clues_id)->where('anio', $request->anio)->get();
+          $data = PiramidePoblacional::where('clues_id', $request->clues_id)->where('anio', $request->anio)->where('deleted_at', NULL)->get();
           if(!$data ){            
               return response()->json(['error' => "No se encuentra el recurso que esta buscando."]);
           }

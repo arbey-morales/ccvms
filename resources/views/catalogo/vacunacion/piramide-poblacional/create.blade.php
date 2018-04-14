@@ -38,7 +38,7 @@
         <div class="x_content">
         
             @include('errors.msgAll') <!-- Mensages -->
-            {!! Form::open([ 'route' => 'catalogo.vacunacion.piramide-poblacional.store', 'id' => 'nuevo', 'method' => 'POST', 'class' => 'uk-form bt-flabels js-flabels', 'data-parsley-validate' => 'on', 'data-parsley-errors-messages-disabled' => 'on']) !!}
+            {!! Form::open([ 'route' => 'catalogo.vacunacion.piramide-poblacional.store', 'id' => 'piramide-form', 'method' => 'POST', 'class' => 'uk-form bt-flabels js-flabels', 'data-parsley-validate' => 'on', 'data-parsley-errors-messages-disabled' => 'on']) !!}
                
                 <div class="row">
                     <div class="col-md-6">
@@ -266,14 +266,16 @@
         $(".js-data-clue,.js-data-anio").change(function(){
             var data = $("#piramide-form").serialize();
             $.get('/catalogo/vacunacion/piramide-poblacional/clue-detalle', data , function(response, status){ // Consulta  
+                // console.log($(".js-data-clue").val())
                 if(response.data.length>0){
+                    notificar('Información','Cargando Pirámide Poblacional '+$(".js-data-anio").val()+' de la Unidad de Salud','success',3000);
                     var dato = response.data[0];
                     for (let index = 0; index < 11; index++) {
                         $("input#hombres_"+index).val(dato["hombres_"+index+""]);
                         $("input#mujeres_"+index).val(dato["mujeres_"+index+""]);
                     }
                 } else {
-                    $("input.numero").val(0);
+                    $("input.numero").val(0);   
                 }
             }).fail(function(){  // Calcula CURP
                 notificar('Información','No se consultaron los detalles de la unidad de salud','warning',2000);
