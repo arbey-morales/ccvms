@@ -214,6 +214,21 @@ class PedidoController extends Controller
     }
 
     /**
+      * Display the specified resource.
+      *
+      * @param  int  $id
+      * @return \Illuminate\Http\Response
+      */
+    public function clueDetalle(Request $request)
+    {
+        $data = Pedido::where('clues_id', $request->clues_id)->where('anio', $request->anio)->where('deleted_at', NULL)->get();
+        if(!$data ){            
+            return response()->json(['error' => "No se encuentra el recurso que esta buscando."]);
+        }
+        return response()->json([ 'data' => $data]);
+    }
+
+    /**
      * Show the form for editing the specified resource.
      *
      * @param  int  $id

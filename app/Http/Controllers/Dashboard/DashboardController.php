@@ -478,7 +478,7 @@ class DashboardController extends Controller
                 }
                 
                 if ($request->clues_id!=0) {
-                    $conte_est_tipo = $conte_est_tipo->where('contenedores.clues_id',$request->clues_is);
+                    $conte_est_tipo = $conte_est_tipo->where('contenedores.clues_id',$request->clues_id);
                 }
                 if ($request->municipios_id!=0) {
                     $conte_est_tipo = $conte_est_tipo->where('clues.municipios_id',$request->municipios_id);
@@ -499,7 +499,7 @@ class DashboardController extends Controller
             }
             
             if ($request->clues_id!=0) {
-                $conte_est = $conte_est->where('contenedores.clues_id',$request->clues_is);
+                $conte_est = $conte_est->where('contenedores.clues_id',$request->clues_id);
             }
             if ($request->municipios_id!=0) {
                 $conte_est = $conte_est->where('clues.municipios_id',$request->municipios_id);
@@ -540,7 +540,7 @@ class DashboardController extends Controller
         }
         
         if ($request->clues_id!=0) {
-            $data = $data->where('contenedores.clues_id',$request->clues_is);
+            $data = $data->where('contenedores.clues_id',$request->clues_id);
         }
         if ($request->municipios_id!=0) {
             $data = $data->where('clues.municipios_id',$request->municipios_id);

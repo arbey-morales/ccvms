@@ -60,6 +60,7 @@ Route::group(['middleware' => 'auth'], function () {
         // RED DE FRÍO
         Route::resource('temperatura',                         'TemperaturaContenedorController');
 
+        Route::get('pedido/clue-detalle',                      'PedidoController@clueDetalle');
         Route::resource('pedido',                              'PedidoController');
     });  
 
