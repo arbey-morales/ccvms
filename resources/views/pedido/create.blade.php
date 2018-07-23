@@ -84,9 +84,10 @@
                     </table>
                     <div class="col-md-4 col-sm-12 col-xs-12" style="text-align:center;">
                         <br><br><br><br><br><br>
-                            <i>CERRAR PEDIDO</i> {!! Form::checkbox('cerrar_pedido', '1', false, ['class' => 'js-switch', 'id' => 'cerrar_pedido'] ) !!}    
-                        <br><br>
-                            Cuando este seguro de no modificar los detalles del pedido seleccione esta casilla
+                        Cuando este seguro de no modificar los detalles del pedido seleccione esta casilla
+                            <br><br>
+                        <i>CERRAR PEDIDO</i> {!! Form::checkbox('cerrar_pedido', '1', false, ['class' => 'js-switch', 'id' => 'cerrar_pedido'] ) !!}    
+                        
                     </div>
                 </div>       
                 
@@ -154,11 +155,12 @@
                     response.data.forEach(element => {
                         table+= `<tr>
                                     <th style="vertical-align:middle; text-align:center;">`+element.clave+`</th>
-                                    <th style="vertical-align:middle; text-align:center;"><input class="form-control numero" min="0" style="width:100%; height:50px; font-size:large;" name="`+element.insumos_clave+`" id="`+element.insumos_clave+`" autocomplete="off" value="0" "placeholder="0"/> </th>
+                                    <th style="vertical-align:middle; text-align:center;"><input class="form-control x-numero numero" min="0" style="width:100%; height:50px; font-size:large;" name="`+element.insumos_clave+`" id="`+element.insumos_clave+`" autocomplete="off" value="0" "placeholder="0"/> </th>
                                 </tr>`; 
                     });
 
                     $('.contenido-vacuna').empty().html(table);
+                    $(".x-numero").addClass('numero');
                 } else {
                     // $("input.numero").val(0);   
                     notificar('Información','El catalogo de vacunas no tiene elementos','info',2000);

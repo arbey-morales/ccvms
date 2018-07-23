@@ -15,7 +15,9 @@
         "barryvdh/laravel-dompdf": "^0.8",
         "nesbot/carbon": "~1.14",
         "maatwebsite/excel": "~2.1.0",
-        "tymon/jwt-auth": "0.5.*"
+        "tymon/jwt-auth": "0.5.*",
+        "pusher/pusher-php-server": "^3.0",
+        "predis/predis": "^1.1"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

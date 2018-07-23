@@ -34,7 +34,7 @@
     <!-- Laravel styles -->
     @section('styles_laravel')
     <!-- Fonts -->
-    <!--<link href='//fonts.googleapis.com/css?family=Roboto:400,300' rel='stylesheet' type='text/css'>-->
+    <link href='//fonts.googleapis.com/css?family=Roboto:400,300' rel='stylesheet' type='text/css'>
     @show
     
   </head>
@@ -54,7 +54,8 @@
             <!-- menu profile quick info -->
             @include('partials.layout.profile')
             <!-- /menu profile quick info -->
-            <br />
+            <br />            
+            <br>
             <!-- sidebar menu -->
             @include('partials.layout.sidebar')
             <!-- /sidebar menu -->
@@ -137,6 +138,9 @@
     {!! Html::script('assets/build/js/custom.min.js') !!}
 
     <script>
+      var userId = '{{ Auth::user()->id }}';
+      var URL = "{{ url() }}";
+      var path = "{{ Request::path() }}";
       // LANZA EL NOTIFY
       function notificar(titulo,texto,tipo,retardo){
           new PNotify({
@@ -195,9 +199,85 @@
               e.preventDefault();
             }
           });
-
         });
     </script>
+
+    @role('root|red-frio')
+      <script src="https://js.pusher.com/4.1/pusher.min.js"></script>
+      <script>
+
+        // Enable pusher logging - don't include this in production
+        Pusher.logToConsole = true;
+
+        var pusher = new Pusher('8e24f7266f6dbf39a74e', {
+          cluster: 'us2',
+          encrypted: true
+        });
+        
+        // aca debe de existir una forma para obtener el usuario para abrir el canal
+        var channel = pusher.subscribe('reporteC'+userId);
+        var mensajes = ``;
+        channel.bind('my-event', function(data) {
+          var totalNotificaciones = Number($('.total-notificaciones').html()) + 1;
+          $(".total-notificaciones").empty().html(totalNotificaciones);
+          notificar(data.message.titulo, data.message.mensaje+' a las '+data.message.created_at+'<br><br> <a href="/reporte-contenedor/'+data.message.reportes_contenedores_id+'/edit" class="btn btn-sm btn-success"> <i class="fa fa-cogs"></i> Revisar </a> <a id="mcl" href="#mcl" onClick="leida('+data.message.reportes_contenedores_id+','+data.message.notificaciones_usuarios_id+')" class="btn btn-sm btn-danger"> <i class="fa fa-check"></i>  Leída </a> <a href="/reporte-contenedor" class="btn btn-sm btn-default pull-right"> <i class="fa fa-tasks"></i> Ver todas </a>','info',6000);
+        });
+
+         $(document).ready(function(){
+          misNotificaciones();
+        });
+
+        function leida(idReporteContenedor,idNotificacionUsuario){
+          $.ajax({
+            url: URL+'/reporte-contenedor/leida/'+idNotificacionUsuario,
+            type : "GET",
+            dataType : 'json',
+            data : {},
+            success : function(response, status) {
+              if(response.status==200){
+                var totalNotificaciones = Number($('.total-notificaciones').html()) - 1;
+                $(".total-notificaciones").empty().html(totalNotificaciones);
+                PNotify.removeAll();
+                // $(".total-notificaciones").empty().html(response.total_n); 
+                // console.log(URL,path);
+                // if(response.total_n>0 && path!="reporte-contenedor" && path!="reporte-contenedor/create")
+                //   notificar('Información','Tiene un total de '+response.total_n+' notificaciones sin leer <br><br> <a href="/reporte-contenedor" class="btn btn-sm btn-default pull-right"> Ver todas </a>','info',8000);
+              }
+              if(response.status==500){
+                notificar('Error',response.error,'warning',200);
+              }
+              if(response.status==304){
+                notificar('Info',response.messages,'warning',200);
+              }
+            },
+            error: function(xhr, resp, text) {
+                console.log(xhr, resp, text);
+            }
+          });
+        }
+
+        function misNotificaciones(){
+          $.ajax({
+            url: URL+'/notificacion',
+            type : "GET",
+            dataType : 'json',
+            data : $("#form").serialize(),
+            success : function(response, status) {
+              if(response.status==200){
+                $(".total-notificaciones").empty().html(response.total_n); 
+                console.log(URL,path);
+                if(response.total_n>0 && path!="reporte-contenedor" && path!="reporte-contenedor/create")
+                  notificar('Información','Tiene un total de '+response.total_n+' notificaciones sin leer <br><br> <a href="/reporte-contenedor" class="btn btn-sm btn-default pull-right"> Ver todas </a>','info',8000);
+              }
+            },
+            error: function(xhr, resp, text) {
+                console.log(xhr, resp, text);
+            }
+          });
+        }
+
+      </script>
+    @endrole
 
     <!-- My Scripts -->
     @yield('my_scripts')

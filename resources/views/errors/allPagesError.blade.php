@@ -33,7 +33,7 @@
               <p>{{$message}}
               </p>
               <div class="mid_center">
-                <a href="{{ url('home') }}">
+                <a href="{{ url('/') }}">
                   <img src="{{ url('images/anger.png') }}" class="img-responsive" alt="Error">
                 </a>
               </div>

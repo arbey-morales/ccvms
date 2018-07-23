@@ -19,7 +19,7 @@ use App\Models\Catalogo\RedFrio\TipoContenedor;
 use App\Catalogo\PoblacionConapo;
 
 class DashboardController extends Controller
-{
+{    
     public function index(Request $request) 
     {
         if (!$request->ajax()) {           

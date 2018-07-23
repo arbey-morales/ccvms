@@ -51,4 +51,9 @@ class User extends Model implements AuthenticatableContract,
         return $this->hasMany('App\RoleUser', 'user_id', 'id')->with('role');
     }
     
+    public function notificacion()
+    {
+        return $this->hasMany('App\Models\ReporteContenedor\SisUsuariosNotificaciones', 'sis_usuarios_id', 'id');
+    }
+    
 }

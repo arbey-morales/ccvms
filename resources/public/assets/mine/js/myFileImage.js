@@ -2,8 +2,12 @@ $(document).ready(function() {
     $('input[type=file]').bootstrapFileInput();
     $('.file-inputs').bootstrapFileInput();
 
-    $('input[type=file]').change(function(e){
+    $('.img-load').change(function(e){
+        console.log(9888)
         if(this.name=='foto'){
+            mostrarImagen(this);
+        }
+        if(this.name=='foto2'){
             mostrarImagen(this);
         }
         if(this.name=='licencia'){
@@ -30,6 +34,8 @@ $(document).ready(function() {
             var name = this.name;
             mostrar(this,name);
         }
+
+        console.log(345)
     });
 });
 

@@ -14,6 +14,10 @@ use Session;
 use App\User;
 use App\Role;
 use App\Catalogo\Jurisdiccion;
+use App\Catalogo\Clue;
+use App\Models\ReporteContenedor\SisUsuariosNotificaciones;
+use App\Models\Catalogo\RedFrio\ContenedorBiologico;
+use App\Models\Catalogo\RedFrio\UsuarioClue;
 
 
 class UserController extends Controller
@@ -27,9 +31,9 @@ class UserController extends Controller
     {
         if (Auth::user()->is('admin|root') && Auth::user()->can('show.usuarios') && Auth::user()->activo==1) {
             if (Auth::user()->is('root')) {
-                $usuarios = User::where('borrado', 0)->with('jurisdiccion')->get();
+                $usuarios = User::where('borrado', 0)->with('jurisdiccion','notificacion')->get();
             } else {
-                $usuarios = User::where('borrado', 0)->where('asRoot', 0)->with('jurisdiccion')->get();
+                $usuarios = User::where('borrado', 0)->where('asRoot', 0)->with('jurisdiccion','notificacion')->get();
             }
             return view('usuario.index')->with('data', $usuarios);
         } else {
@@ -106,6 +110,7 @@ class UserController extends Controller
                 'paterno'              => 'required|min:3|max:20|string',
                 'materno'              => 'required|min:3|max:20|string',
                 'idJurisdiccion'       => 'required|min:1|numeric',
+                'role_id'              => 'required|min:1|numeric',
                 'direccion'            => 'required|min:10|max:80',
                 'email'                => 'required|email|unique:users,email,borrado,0',
                 'foto'                 => 'sometimes|mimes:jpeg,jpg',
@@ -136,9 +141,15 @@ class UserController extends Controller
             $usuario->creadoUsuario         = Auth::user()->id;
 
                 try {
-                    $usuario->save();
-                    
+                    $usuario->save();                    
                     if($usuario->id) {
+
+                        if ($request->notificacion==1) {
+                            $sun = new SisUsuariosNotificaciones;
+                            $sun->sis_usuarios_id = $usuario->id;
+                            $sun->tipos_notificaciones_id = 1;
+                            $sun->save();
+                        }
 
                         if ($request->foto) {
                             $img = \Image::make($request->foto->getRealPath())->resize(250, 250)->save($destinationPath.$imgSave);
@@ -146,6 +157,20 @@ class UserController extends Controller
 
                         // Attach Roles
                         $usuario->attachRole($request->role_id);
+
+                        if($request->role_id==5){ // Usuario Móvil
+                            $clues = Clue::where('jurisdicciones_id', $request->idJurisdiccion)->where('instituciones_id',13)->where('deleted_at', NULL)->get();
+                            foreach ($clues as $key => $value) {
+                                $clues = ContenedorBiologico ::where('clues_id', $value->id)->where('deleted_at', NULL)->count();
+                                if($clues>0){
+                                    $usuarioClue = new UsuarioClue;
+                                    $usuarioClue->users_id = $usuario->id;
+                                    $usuarioClue->clues_id = $value->id;
+                                    $usuarioClue->save();
+                                }
+
+                            }
+                        }
 
                         $msgGeneral = 'Hey! se guardaron los datos';
                         $type       = 'flash_message_ok';
@@ -179,11 +204,11 @@ class UserController extends Controller
             $usuario = User::findOrFail($id);
             if (Auth::user()->is('root')) {
                 $usuarioSend = User::where('id', '=', $id)->where('borrado',0)
-                ->with('jurisdiccion','rolesuser')
+                ->with('jurisdiccion','notificacion','rolesuser')
                 ->first();
             } else {
                 $usuarioSend = User::where('id', '=', $id)->where('asRoot', 0)->where('borrado',0)
-                ->with('jurisdiccion','rolesuser')
+                ->with('jurisdiccion','notificacion','rolesuser')
                 ->first();
             }
 
@@ -208,11 +233,11 @@ class UserController extends Controller
             $usuario = User::findOrFail($id);
             if (Auth::user()->is('root')) {
                 $usuarioSend = User::where('id', '=', $id)->where('borrado',0)
-                ->with('jurisdiccion','rolesuser')
+                ->with('jurisdiccion','notificacion','rolesuser')
                 ->first();
             } else {
                 $usuarioSend = User::where('id', '=', $id)->where('asRoot', 0)->where('borrado',0)
-                ->with('jurisdiccion','rolesuser')
+                ->with('jurisdiccion','notificacion','rolesuser')
                 ->first();
             }
 
@@ -333,10 +358,45 @@ class UserController extends Controller
             
                 if ($updates) {
                     $user = User::findOrFail($id);
-                    // >Detach Roles
+                    // Quita Roles
                     $user->detachRole($usuario->rolesuser[0]->role_id);
-                    // Attach Roles
+                    // Asigna Roles
                     $user->attachRole($request->role_id);
+                    // Si acepta notificaciones de red de frio
+                    if ($request->notificacion==1) {
+                        $sun = SisUsuariosNotificaciones::where('sis_usuarios_id', $id)->first();
+                        if(!$sun){
+                            $sun = new SisUsuariosNotificaciones;
+                            $sun->sis_usuarios_id = $usuario->id;
+                            $sun->tipos_notificaciones_id = 1;
+                            $sun->save();
+                        }
+                    } else {
+                        $sun = SisUsuariosNotificaciones::where('sis_usuarios_id', $id)->first();
+                        if ($sun)
+                            $sun->delete();                        
+                    }
+                    // Borra todas la clues asignadas
+                    $uc = UsuarioClue::where('users_id', $id)->where('deleted_at', NULL)->get();
+                    foreach ($uc as $key => $value) {
+                        $uc2 = UsuarioClue::find($value->id);
+                        $uc2->delete();
+                    }
+                    // Asigna clues a un usuario, Todas las clues que tienen al menos un contenedor de biologico
+                    if($request->role_id==5){ // Usuario Móvil
+                        $clues = Clue::where('jurisdicciones_id', $request->idJurisdiccion)->where('instituciones_id',13)->where('deleted_at', NULL)->get();
+                        foreach ($clues as $key => $value) {
+                            $clues = ContenedorBiologico ::where('clues_id', $value->id)->where('deleted_at', NULL)->count();
+                            if($clues>0){
+                                $usuarioClue = new UsuarioClue;
+                                $usuarioClue->users_id = $usuario->id;
+                                $usuarioClue->clues_id = $value->id;
+                                $usuarioClue->save();
+                            }
+
+                        }
+                    }
+
                     $msgGeneral = 'Se guardaron los cambios.';
                     $type       = 'flash_message_ok';
                 } else {

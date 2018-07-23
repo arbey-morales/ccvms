@@ -79,6 +79,11 @@
                                                     <li>
                                                         <i class="fa fa-calendar user-profile-icon"></i> Registro: {{ $data->creadoAl }}
                                                     </li>
+                                                    @if(count($data->notificacion)>0) 
+                                                        <li>
+                                                            <i class="fa fa-bell-o green" title="Recibe notificaciones"></i> Recibe notificaciones
+                                                        </li>
+                                                    @endif
                                                     <li>
                                                         @if($data->activo==1) <i class="fa fa-heart text-danger user-profile-icon"></i> En actividad! @else
                                                         <i class="fa fa-heartbeat text-dafault user-profile-icon"></i> Usuario Inactivo

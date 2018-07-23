@@ -44,12 +44,20 @@ class MonitoreoController extends Controller
                     $fecha_send = Carbon::today('America/Mexico_City')->format('d-m-Y');
                 }
             }
-            
             $data2 = Jurisdiccion::where('deleted_at', NULL)->orderBy('id')->get();
             foreach ($data2 as $key2 => $value2) {
-                $data_users = User::select('idJurisdiccion','id','email','borrado','nombre','paterno','materno')->where('idJurisdiccion', $value2->id)->where('asRoot', 0)->where('borrado', 0)->orderBy('id')->get();
-                $usuarios = collect();
+                $data_users = User::select('users.*')
+                ->leftJoin('role_user','users.id','=','role_user.user_id')
+                ->where('users.idJurisdiccion', $value2->id)
+                ->whereIn('role_user.role_id',[1,2,3])
+                ->where('users.asRoot', 0)
+                ->where('users.borrado', 0)
+                ->orderBy('users.id')
+                ->get();
+                // $usuarios = collect();
                 foreach ($data_users as $key_users => $value_users) {
+                    // $cuenta = false;
+                    //  $rol = \DB::select('select * from role_user where user_id = '.$value_users->id);
                     if($todo){
                         $value_users->captura = DB::select("select count(id) as captura from personas where usuario_id='$value_users->email' and deleted_at is null")[0]->captura;
                     } else {

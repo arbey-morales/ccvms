@@ -116,7 +116,16 @@
                             <h4 class="text-info">Dejar vacio el password para no hacerle cambios.</h4>
                              <h4 class="text-warning">@if(Auth::user()->id==$data->id) Si hace cambios a su mail o password será redireccionado para iniciar sesión @endif </h4>
                             <br>
-                            <?php $check = true;  if($data->activo==0)  $check= false; ?>
+                            <?php   
+                                $check = true;  
+                                if($data->activo==0) { 
+                                    $check= false; 
+                                } 
+                                $checkN = true;  
+                                if(count($data->notificacion)<=0) { 
+                                    $checkN= false; 
+                                }
+                            ?>
                             <div class="row">
                                 <div class="col-md-1 text-right">
                                     {!! Form::checkbox('activo', '1', $check, ['class' => 'js-switch', 'id' => 'activo'] ) !!}
@@ -130,11 +139,8 @@
                                 <div class="col-md-3">
                                    
                                 </div>
-                                <div class="col-md-1 text-right">
-                                    
-                                </div>
-                               <div class="col-md-3">
-                                   
+                                <div class="col-md-4 content-roles text-right">
+                                    {!! Form::checkbox('notificacion', '1', $checkN, ['class' => 'js-switch notificacion', 'id' => 'notificacion'] ) !!} Marcar la casilla si desea que el usuario reciba notificaciones de red de frío
                                 </div>
                             </div>
                         </div>
@@ -201,65 +207,17 @@
             $("#password_confirmation").prop('placeholder','Repetir password');
         });
 
-         $(".js-data-jurisdiccion,.js-data-role").select2();
-    </script>
-    <!-- Select2 Personalizado -->
-    <!--<script>
-        $(".js-data-localidad-ajax").select2({
-            ajax: {
-                url: "/catalogo/localidad/search",
-                dataType: 'json',
-                delay: 250,
-                data: function (params) {
-                return {
-                    q: params.term, // search term
-                    page: params.page
-                };
-                },
-                processResults: function (data, params) {
-                // parse the results into the format expected by Select2
-                // since we are using custom formatting functions we do not need to
-                // alter the remote JSON data, except to indicate that infinite
-                // scrolling can be used
-                params.page = params.page || 1;
-
-                return {
-                    results: $.map(data, function (item) {  // hace un  mapeo de la respuesta JSON para presentarlo en el select
-                        return {
-                            id:        item.id,
-                            nombre: item.nombre,
-                            municipio: item.municipio.nombre,
-                            estado: item.municipio.estado.abreviatura
-                        }
-                    }),
-                    pagination: {
-                    more: (params.page * 30) < data.total_count
-                    }
-                };
-                },
-                cache: true
-            },
-            escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
-            minimumInputLength: 5,
-            language: "es",
-            cache: true,
-            templateResult: formatRepo, // omitted for brevity, see the source of this page
-            templateSelection: formatRepoSelection // omitted for brevity, see the source of this page
+        $(".js-data-jurisdiccion,.js-data-role").select2();
+         
+        $(".roles").change(function(){
+            if ($(".notificacion").is(':checked')) {
+                $(".notificacion").click();
+            }
+            if ($(this).val()==4) {
+                $(".content-roles").show('fast');
+            } else {
+                $(".content-roles").hide('fast');
+            }
         });
-
-        function formatRepo (localidad) {
-            if (!localidad.id) { return localidad.nombre; }
-            var $localidad = $(
-                '<span class=""><strong><i class="fa fa-globe"></i> ' + localidad.nombre + '</strong>, '+ localidad.municipio +', '+ localidad.estado +'</span>'
-            );
-            return $localidad;
-        };
-        function formatRepoSelection (localidad) {
-            if (!localidad.id) { return localidad.nombre; }
-            var $localidad = $(
-                '<span class="results-select2"><strong><i class="fa fa-globe"></i> ' + localidad.nombre + '</strong>, '+ localidad.municipio +', '+ localidad.estado +'</span>'
-            );
-            return $localidad;
-        };
-    </script>-->
+    </script>
 @endsection

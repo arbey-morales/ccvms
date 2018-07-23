@@ -15,7 +15,12 @@
                 <td class="text-center"><strong> {{ ++$key }} </strong></td>
                 <td class="text-left">{{ $item->nombre }} {{ $item->paterno }} {{ $item->materno }}</td>
                 <td class="text-left">{{ $item->direccion }}</td>
-                <td class="text-left">{{ $item->email }}</td>
+                <td class="text-left"> 
+                    @if(count($item->notificacion)>0) 
+                        <i class="fa fa-bell-o green" style="padding-right:10px;" title="Recibe notificaciones"></i>
+                    @endif 
+                    {{ $item->email }}
+                </td>
                 <td class="text-left">
                 @foreach($item->rolesuser as $k=>$rol) 
                     @if($rol->role->slug=='admin')
@@ -28,7 +33,7 @@
                     @endif
                 @endforeach                
                </td>
-                <td class="text-center col-md-1">
+                <td class="text-center col-md-1">                    
                     @include('partials.layout.actions')
                 </td>
             </tr>

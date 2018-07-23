@@ -27,13 +27,16 @@
                     <a href="{{ url('pedido') }}"><i class="fa fa-file-text"></i> Pedidos</a>
                 </li>
             @role('red-frio|root')
-                @permission('show.catalogos')
                 <li>
-                    <a href="{{ url('temperatura') }}"><i class="fa fa-share-alt-square"></i> Registro de temperaturas</a>
+                    <a href="{{ url('reporte-contenedor') }}"><i class="fa fa-bell-o"></i> Reportes contenedores</a>
                 </li>
-               <!-- <li>
-                    <a href="{{ url('mantenimiento') }}"><i class="fa fa-wrench"></i> Mantenimiento de equipos</a>
-                </li>-->
+                @permission('show.catalogos')
+                    <li>
+                        <a href="{{ url('temperatura') }}"><i class="fa fa-share-alt-square"></i> Registro de temperaturas</a>
+                    </li>
+                <!-- <li>
+                        <a href="{{ url('mantenimiento') }}"><i class="fa fa-wrench"></i> Mantenimiento de equipos</a>
+                    </li>-->
                 @endpermission
             @endrole
             
@@ -53,6 +56,7 @@
                         <li><a href="{{ url('catalogo/red-frio/modelo') }}">Modelo</a></li>            
                         <li><a href="{{ url('catalogo/red-frio/contenedor-biologico') }}">Contenedores de biológico</a></li>
                         <li><a href="{{ url('catalogo/red-frio/estatus-contenedor') }}">Estatus contenedores</a></li>
+                        <li><a href="{{ url('catalogo/red-frio/falla-contenedor') }}">Fallas contenedores</a></li>
                     @endrole 
                 @endpermission  
                 </ul>                

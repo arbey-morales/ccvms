@@ -141,7 +141,8 @@ class AutenticacionController extends Controller
                 
 
                 $usuario_data = [
-                    "id" => $usuario->email,
+                    "id" => $usuario->id,
+                    "email" => $usuario->email,
                     "nombre" => $usuario->nombre,
                     "apellidos" => $usuario->paterno.' '.$usuario->materno,
                     "avatar" => $usuario->foto,

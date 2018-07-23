@@ -12,11 +12,16 @@
 */
 
 Route::get('/', ['middleware' => 'auth', function () {
+    
+    if(\Auth::user()->is('movil-red-frio')){
+        return view('descargar-app');
+    }
     if(\Auth::user()->is('red-frio')){
         return redirect('dashboard');
     } else {
         return redirect('dashboard');
-    }        
+    }     
+
 }]);
 
 // JWT
@@ -26,10 +31,22 @@ Route::get('check-token',       'AutenticacionController@verificar');
 
 // APP MÓVIL
 Route::group(['namespace' => 'Movil', 'prefix' => 'movil/catalogo', 'middleware' => 'jwt'], function () {
-    // CLUE
-    // Route::resource('clue',                 'ClueController');
-    // CONTENEDOR
-    // FALLAS CONTENEDORES
+    Route::get('falla-contenedor',                   'CatalogoMovilController@fallaContenedor');
+    Route::get('contenedor',                         'CatalogoMovilController@contenedor');
+    Route::get('estatus-contenedor',                 'CatalogoMovilController@estatusContenedor');
+    Route::get('tipo-contenedor',                    'CatalogoMovilController@tipoContenedor');
+    Route::get('clue',                               'CatalogoMovilController@clue');
+    Route::get('usuario-clue',                       'CatalogoMovilController@usuarioClue');
+});
+
+Route::group(['namespace' => 'ReporteContenedor', 'prefix' => 'movil/reportes', 'middleware' => 'jwt'], function () {
+   
+    Route::resource('reportes-movil',   'ReporteContenedorMovilController');
+
+});
+
+Route::group(['namespace' => 'ReporteContenedor', 'prefix' => 'movil'], function () {    
+    Route::resource('reporte-contenedor',                               'ReporteContenedorController');
 });
 
 
@@ -42,6 +59,14 @@ Route::group(['namespace' => 'Auth','prefix' => 'auth'], function () {
 
 // TRANSACCIONES
 Route::group(['middleware' => 'auth'], function () {
+    
+    // Descargar APP Red de Frío
+    Route::get('descargar-app',                   'DescargarApp@redFrio');
+
+    Route::get('reporte-contenedor/leida/{id}',            'ReporteContenedor\ReporteContenedorController@leida');
+    Route::resource('reporte-contenedor',                  'ReporteContenedor\ReporteContenedorController');
+    Route::resource('notificacion',                        'ReporteContenedor\NotificacionController');
+
     Route::group(['namespace' => 'Transaccion'], function () {
         // TRANSACCION
         Route::resource('usuario',                             'UserController');
@@ -68,7 +93,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::group(['prefix' =>   'dashboard', 'namespace' => 'Dashboard'], function () {
         // VACUNACIÓN
         Route::get('/',                                     'DashboardController@index');
-        Route::get('capturas',                              'DashboardController@capturas');  
+        Route::get('capturas',                              'DashboardController@capturas');
         Route::get('cobertura',                             'DashboardController@coberturas');
         Route::get('esquema-completo',                      'DashboardController@esquemaCompleto');
         Route::get('concordancia',                          'DashboardController@concordancia');
@@ -116,6 +141,7 @@ Route::group(['middleware' => 'auth'], function () {
             Route::resource('tipo-contenedor',      'TipoContenedorController',         ['only' => ['index', 'show']]);
             Route::resource('marca',                'MarcaController');
             Route::resource('modelo',               'ModeloController');
+            Route::resource('falla-contenedor',     'FallaContenedorController');
         });
                 
         

@@ -13,10 +13,10 @@ use App\Models\Catalogo\RedFrio\ContenedorBiologico;
 class EstatusContenedorController extends Controller
 {
     /**
-	 * @api {get} 	/catalogo/estatus-contenedor/ 	1. Listar posibles Estatus de contenedor 
+	 * @api {get} 	/catalogo/red-frio/estatus-contenedor/ 	1. Listar posibles Estatus de contenedor 
 	 * @apiVersion 	0.1.0
 	 * @apiName 	EstatusContenedor
-	 * @apiGroup 	Catalogo/Estatus-Contenedor
+	 * @apiGroup 	Catalogo/Red-Frio/Estatus-Contenedor
 	 *
 	 * @apiParam 	{String} 		q 			Descripción del Estatus del contenedor (Opcional).
      *
