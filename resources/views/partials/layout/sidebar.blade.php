@@ -23,9 +23,9 @@
                     </li>
                 @endpermission
             @endrole
-                <li>
+                <!-- <li>
                     <a href="{{ url('pedido') }}"><i class="fa fa-file-text"></i> Pedidos</a>
-                </li>
+                </li> -->
             @role('red-frio|root')
                 <li>
                     <a href="{{ url('reporte-contenedor') }}"><i class="fa fa-bell-o"></i> Reportes contenedores</a>
