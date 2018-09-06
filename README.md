@@ -2,6 +2,8 @@
 
 ## API-Cliente del Sistema para la Administración de Red de Frío y Vacinación CCVMS
 
+[![Build Status](https://travis-ci.org/arbey-morales/ccvms-api.svg?branch=master)](https://travis-ci.org/arbey-morales/ccvms-api)
+
 ### Descripción y contexto
 ---
 Salud Mesoamérica, ME-G1001 & ME-G1004
