@@ -93,7 +93,7 @@ Si deseas contribuir con este proyecto, por favor lee las siguientes guías que 
 
 ### Autor/es
 ---
-* **[Luis Alberto Valdez Lescieur](https://github.com/arbey-morales  "Github")** - [Bitbucket](https://bitbucket.org/Arbey "Bitbucket")
+* **[Caralampio Arbey Morales Trujillo](https://github.com/arbey-morales  "Github")** - [Bitbucket](https://bitbucket.org/Arbey "Bitbucket")
 * **[Ramiro Gabriel Alférez Chavez](mailto:ramiro.alferez@gmail.com "Correo electrónico")**
 * **[Eliecer Ramirez Esquinca](https://github.com/checherman "Github")**
 
