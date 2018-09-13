@@ -209,9 +209,9 @@ class TemperaturaContenedorController extends Controller
                 if(isset($request->desde_archivo) && $request->desde_archivo=="SI"){
                                                     
                     $file = \File::get($request->archivo);
-                    $reader = Excel::load($request->archivo);
-                    $reader->dump();
-                    die;
+                    // $reader = Excel::load($request->archivo);
+                    // $reader->dump();
+                    // die;
 
                     $cabeceras = substr($file, 0, strrpos($file, "@HEADER ENDS"));
 
