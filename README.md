@@ -1,8 +1,8 @@
 *Esta herramienta digital forma parte del catálogo de herramientas del **Banco Interamericano de Desarrollo**. Puedes conocer más sobre la iniciativa del BID en [code.iadb.org](code.iadb.org)*
 
-## API-Cliente del Sistema para la Administración de Red de Frío y Vacinación CCVMS
+## Sistema para la Administración de Red de Frío y Vacinación CCVMS
 
-[![Build Status](https://travis-ci.org/arbey-morales/ccvms-api.svg?branch=master)](https://travis-ci.org/arbey-morales/ccvms-api)
+[![Build Status](https://travis-ci.org/arbey-morales/ccvms.svg?branch=master)](https://travis-ci.org/arbey-morales/ccvms)
 
 ### Descripción y contexto
 ---
@@ -38,7 +38,7 @@ Para poder instalar y utilizar esta API, deberá asegurarse de que su servidor c
 Guia de Instalación Oficial de Laravel 5.1 [Aquí](https://laravel.com/docs/5.1#installation)
 ##### Proyecto (API/Cliente)
 El resto del proceso es sencillo.
-1. Clonar el repositorio con: `git clone https://github.com/arbey-morales/ccvms-api.git`
+1. Clonar el repositorio con: `git clone https://github.com/arbey-morales/ccvms.git`
 2. Instalar dependencias: `composer install`
 3. Editar archivo `.env`  ubicado en la raiz del directorio de instalación.
        

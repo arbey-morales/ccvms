@@ -116,7 +116,7 @@ class NotificacionController extends Controller {
 		}
 
 		if(count($data)<=0){
-			return Response::json(array("status" => 204, "messages" => "No hay resultados"),204);
+			return Response::json(array("status" => 200, "messages" => "No hay resultados"),200);
 		}else {
 			$total_n = NotificacionesUsuarios::with("Notificaciones")->where("usuarios_id",Auth::user()->id)->where("leido", NULL)->get();
 

@@ -477,7 +477,8 @@ function descargarSeguimientos() {
     var vac = [];
     var awd = [];
     var wd = 0;
-    var body = [];       
+    var body = [];
+
     if(data_seguimiento[0]){
         wd = Math.round(100/data_seguimiento[0].seguimientos.length);
         if(data_seguimiento[0].seguimientos.length>0){                 
@@ -588,9 +589,9 @@ function descargarSeguimientos() {
                         widths: [ '15%','70%','15%'], 
                         body: [
                             [
-                                { image: logo_ccvms, width: 40 }, 
+                                // { image: logo_ccvms, width: 40 }, 
                                 { text: 'Reporte de seguimiento \n Jurisdicción '+usuario.jurisdiccion.clave+' '+usuario.jurisdiccion.nombre, alignment: 'center', bold: true },
-                                { image: censia, width: 50, alignment:'right'}
+                                // { image: censia, width: 50, alignment:'right'}
                             ]
                         ]
                     }
@@ -641,7 +642,7 @@ function descargarSeguimientos() {
 }
 
 /**
- * TAB SEGUIMIENTO
+ * TAB ACTIVIDAD
  */
 $(".js-ajax-actividad").click(function(e){
     e.preventDefault();
