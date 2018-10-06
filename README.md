@@ -2,7 +2,7 @@
 
 ## Sistema para la Administración de Red de Frío y Vacinación CCVMS
 
-[![Build Status](https://travis-ci.org/arbey-morales/ccvms.svg?branch=master)](https://travis-ci.org/arbey-morales/ccvms)
+[![Build Status](https://travis-ci.org/EL-BID/ccvms.svg?branch=master)](https://travis-ci.org/EL-BID/ccvms)
 
 ### Descripción y contexto
 ---
